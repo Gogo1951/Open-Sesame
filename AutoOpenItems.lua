@@ -4,7 +4,7 @@ AutoOpenItems:SetScript('OnEvent', function(self, event, ...) self[event](...) e
 
 local atBank, atMail, atMerchant, inCombat, isLooting
 
-local OpenItemList = {
+local ItemWhiteList = {
 
    -- Classic
 
@@ -396,7 +396,7 @@ if (atBank or atMail or atMerchant or inCombat) then return end
 for bag = 0, 4 do
    for slot = 0, C_Container.GetContainerNumSlots(bag) do
       local id = C_Container.GetContainerItemID(bag, slot)
-      if id and OpenItemList[id] then
+      if id and ItemWhiteList[id] then
          -- DEFAULT_CHAT_FRAME:AddMessage("|cff00FF80Auto Open Items : Opening " .. GetContainerItemLink(bag, slot))
          C_Container.UseContainerItem(bag, slot)
          return
