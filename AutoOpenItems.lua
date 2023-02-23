@@ -1,8 +1,9 @@
 local AutoOpenItems = CreateFrame('Frame')
-
 AutoOpenItems:SetScript('OnEvent', function(self, event, ...) self[event](...) end)
 
-local Whitelist = {
+local atBank, atMail, atMerchant, isLooting
+
+local autoOpenItems = {
 
  -- Classic
 
@@ -343,29 +344,55 @@ local Whitelist = {
 }
 
 function AutoOpenItems:Register(event, func)
-    self:RegisterEvent(event)
-    self[event] = function(...)
-        func(...)
-    end
+	self:RegisterEvent(event)
+	self[event] = function(...)
+		func(...)
+	end
 end
 
-function CheckBag()
-    if (not InCombatLockdown()) and (not (MerchantFrame and MerchantFrame:IsShown())) then
-        for bag = 0, 4 do
-            for slot = 0, C_Container.GetContainerNumSlots(bag) do
-                local id = C_Container.GetContainerItemID(bag, slot)
-                    if id and Whitelist[id] then
-                    -- DEFAULT_CHAT_FRAME:AddMessage("|cff00FF80Auto Open Items : Opening " .. C_Container.GetContainerItemLink(bag, slot) .. " ID: " .. id)
-                    C_Container.UseContainerItem(bag, slot)
-                    return
-                end
-            end
-        end
-    end
-end
+AutoOpenItems:Register('BANKFRAME_OPENED', function()
+	atBank = true
+end)
 
-AutoOpenItems:Register('BAG_UPDATE_DELAYED', CheckBag)
+AutoOpenItems:Register('BANKFRAME_CLOSED', function()
+	atBank = false
+end)
 
-AutoOpenItems:Register('PLAYER_REGEN_ENABLED', CheckBag)
+AutoOpenItems:Register('GUILDBANKFRAME_OPENED', function()
+	atBank = true
+end)
 
-AutoOpenItems:Register('MERCHANT_CLOSED', CheckBag)
+AutoOpenItems:Register('GUILDBANKFRAME_CLOSED', function()
+	atBank = false
+end)
+
+AutoOpenItems:Register('MAIL_SHOW', function()
+	atMail = true
+end)
+
+AutoOpenItems:Register('MAIL_CLOSED', function()
+	atMail = false
+end)
+
+AutoOpenItems:Register('MERCHANT_SHOW', function()
+	atMerchant = true
+end)
+
+AutoOpenItems:Register('MERCHANT_CLOSED', function()
+	atMerchant = false
+end)
+
+AutoOpenItems:Register('BAG_UPDATE_DELAYED', function(bag)
+	if (InCombatLockdown()) and (atBank or atMail or atMerchant) then return end
+	
+	for bag = 0, 4 do
+		for slot = 0, GetContainerNumSlots(bag) do
+			local id = GetContainerItemID(bag, slot)
+			if id and autoOpenItems[id] then
+				-- DEFAULT_CHAT_FRAME:AddMessage("|cff00FF80Auto Open Items : Opening " .. GetContainerItemLink(bag, slot))
+				UseContainerItem(bag, slot)
+				return
+			end
+		end
+	end
+end)
