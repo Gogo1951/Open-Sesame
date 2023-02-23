@@ -2,7 +2,7 @@
 
 Just a simple add-on that does what the title says.
 
-Automatically opens containers under the following conditions:
+⚙️ Automatically opens containers in your inventory under the following conditions:
 
 - You are not in combat.
 - The container is not locked.
@@ -14,11 +14,9 @@ Automatically opens containers under the following conditions:
 - You do not have your Guild Bank Window Open.
 - You do not have your Mailbox Window Open.
 
+### Download
 
-### Download from CurseForge
-
-- https://beta.curseforge.com/wow/addons/auto-open-items
-
+⏬ Auto Open Items on CurseForge : https://beta.curseforge.com/wow/addons/auto-open-items
 
 ### How It Works
 
@@ -29,7 +27,6 @@ AutoOpenItems looks for items on a whitelist (containers that meet the above sta
 🚫 NOTE: Due to API changes in Wrath, "UseContainerItem" no longer works on clams. Likely has something to do with the "Clam Weaving" hack.
 
 - https://www.youtube.com/watch?v=h3YO7jeoOWs
-
 
 ### Similar Add-ons
 
