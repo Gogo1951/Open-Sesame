@@ -189,7 +189,7 @@ local AllowedItemsList = {
    [21113]   =  true,  -- Watertight Trunk
    [17965]   =  true,  -- Yellow Sack of Gems
    [22137]   =  true,  -- Ysida's Satchel
-   [22233]   =  true,  -- Zigris' Footlocker
+   -- [22233]   =  true,  -- Zigris' Footlocker (Seems like bad data; a dupe of #13247)
 
    -- The Burning Crusade
 
