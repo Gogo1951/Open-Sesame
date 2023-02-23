@@ -2,18 +2,31 @@
 
 Just a simple add-on that does what the title says.
 
-Automatically opens white listed containers as you loot (as soon as you are out of combat).
+Automatically opens containers under the following conditions:
+
+- You are NOT in combat.
+- You do NOT have a Merchang Window Open.
+- You do NOT have a Bank Window Open.
+- You do NOT have a Guild Bank Window Open.
+- The container is not locked (lockboxes).
+- The contianer did not drop off a raid boss.
+- The contianer does not contain a BoP item.
+
+
+### Download from CurseForge
+
+- https://beta.curseforge.com/wow/addons/auto-open-items
+
+
+### How It Works
+
+AutoOpenItems looks for items on a whitelist (containers that meet the above stated criteria), and runs a "UseContainerItem" on those items to open them as soon as they land in your inentory. 
 
 - https://wowpedia.fandom.com/wiki/API_C_Container.UseContainerItem
 
 NOTE: Due to API changes in Wrath, "UseContainerItem" no longer works on clams. Likely has something to do with the Clam Weaving patch.
 
 - https://www.youtube.com/watch?v=h3YO7jeoOWs
-
-
-### Download from CurseForge
-
-- https://beta.curseforge.com/wow/addons/auto-open-items
 
 
 ### Similar Add-ons
