@@ -33,9 +33,9 @@ NOTE: Due to API changes in Wrath, "UseContainerItem" no longer works on clams. 
 
 ### Similar Add-ons
 
-I didn't create this add-on, I just updated it for TBC.
+NOTE: I didn't create this add-on, I just updated it for TBC and Wrath.
 
-Looking around CurseForge, it looks like code was heavily borrowed from KAutoOpen. 
+Looking around CurseForge, it looks like code originated from KAutoOpen.
 
 - https://beta.curseforge.com/wow/addons/kautoopen
 - https://beta.curseforge.com/wow/addons/kautoopen-dragonflight
