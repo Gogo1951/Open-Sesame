@@ -16,10 +16,11 @@ https://beta.curseforge.com/wow/addons/auto-open-items
 
 ### Similar Add-ons
 
-https://beta.curseforge.com/wow/addons/kautoopen
+I didn't create this add-on, I just updated it for TBC.
 
-https://beta.curseforge.com/wow/addons/kautoopen-dragonflight
+Looking around CurseForge, it looks like code was borrowed from KAutoOpen. 
 
-https://beta.curseforge.com/wow/addons/autoopen
-
-https://beta.curseforge.com/wow/addons/autoclam
+- https://beta.curseforge.com/wow/addons/kautoopen
+- https://beta.curseforge.com/wow/addons/kautoopen-dragonflight
+- https://beta.curseforge.com/wow/addons/autoopen
+- https://beta.curseforge.com/wow/addons/autoclam
