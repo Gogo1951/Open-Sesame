@@ -33,8 +33,8 @@ AutoOpenItems looks for items in your inventory [that are on the list](https://g
 
 Looking around CurseForge, it looks like bulk of the original code came from kAutoOpen.
 
-- https://beta.curseforge.com/wow/addons/auto-open-items
-- https://beta.curseforge.com/wow/addons/autoclam
-- https://beta.curseforge.com/wow/addons/autoopen
-- https://beta.curseforge.com/wow/addons/kautoopen
-- https://beta.curseforge.com/wow/addons/kautoopen-dragonflight
+- https://www.curseforge.com/wow/addons/auto-open-items
+- https://www.curseforge.com/wow/addons/autoclam
+- https://www.curseforge.com/wow/addons/autoopen
+- https://www.curseforge.com/wow/addons/kautoopen
+- https://www.curseforge.com/wow/addons/kautoopen-dragonflight
