@@ -24,13 +24,11 @@ Just a simple add-on that does what the title says.
 
 AutoOpenItems looks for items in your inventory [that are on the whitelist](https://github.com/Gogo1951/AutoOpenItems/blob/main/AutoOpenItems.lua#L7) (containers that meet the above stated criteria), and runs a the "[C_Container.UseContainerItem](https://wowpedia.fandom.com/wiki/API_C_Container.UseContainerItem)" public API call on those items to open them as soon as it detects them. AutoOpenItems runs on less than 3kb of memory; it's very lightweight and won't impact performance. 
 
-🚫 NOTE: Due to API changes in Wrath, "UseContainerItem" no longer works on clams. Likely has something to do with the "Clam Weaving" hack.
-
-- https://www.youtube.com/watch?v=h3YO7jeoOWs
+🚫 **Due to API changes in Wrath, "UseContainerItem" no longer works on clams. Likely has something to do with the "[Clam Weaving](https://www.youtube.com/watch?v=h3YO7jeoOWs)" hack.**
 
 ### Similar Add-ons
 
-👏 **NOTE: I didn't create this add-on, I just updated it for TBC and Wrath.**
+👏 **I didn't create this add-on, I just updated it for TBC and Wrath.**
 
 Looking around CurseForge, it looks like bulk of the original code came from kAutoOpen.
 
