@@ -6,12 +6,12 @@ Automatically opens items in containers as you loot (as soon as you are out of c
 
 NOTE: Due to API changes in Wrath, "UseContainerItem" no longer works on clams.
 
-https://wowpedia.fandom.com/wiki/API_C_Container.UseContainerItem
+- https://wowpedia.fandom.com/wiki/API_C_Container.UseContainerItem
 
 
 ### Download from CurseForge
 
-https://beta.curseforge.com/wow/addons/auto-open-items
+- https://beta.curseforge.com/wow/addons/auto-open-items
 
 
 ### Similar Add-ons
