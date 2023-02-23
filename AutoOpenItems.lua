@@ -4,7 +4,7 @@ AutoOpenItems:SetScript('OnEvent', function(self, event, ...) self[event](...) e
 
 local Whitelist = {
 
-    -- Classic
+ -- Classic
 
     [10456]   =  true,  -- A Bulging Coin Purse
     [15902]   =  true,  -- A Crazy Grab Bag
@@ -137,7 +137,7 @@ local Whitelist = {
     [19154]   =  true,  -- Outrider Basic Care Package
     [19155]   =  true,  -- Outrider Standard Care Package
     [11912]   =  true,  -- Package of Empty Ooze Containers
-    [9276]    =  true,  -- Pirate's Footlocker
+ -- [9276]    =  true,  -- Pirate's Footlocker (Can Contain BoP)
     [22155]   =  true,  -- Pledge of Adoration: Darnassus
     [22154]   =  true,  -- Pledge of Adoration: Ironforge
     [22156]   =  true,  -- Pledge of Adoration: Orgrimmar
@@ -189,7 +189,7 @@ local Whitelist = {
     [22137]   =  true,  -- Ysida's Satchel
     [22233]   =  true,  -- Zigris' Footlocker
 
-    -- The Burning Crusade
+ -- The Burning Crusade
 
     [34587]   =  true,  -- Aldor Supplies Package
     [34583]   =  true,  -- Aldor Supplies Package
@@ -201,8 +201,8 @@ local Whitelist = {
     [35348]   =  true,  -- Bag of Fishing Treasures
     [25423]   =  true,  -- Bag of Premium Gems
     [33844]   =  true,  -- Barrel of Fish
-    -- [34846]   =  true,  -- Black Sack of Gems
-    -- [191060]  =  true,  -- Black Sack of Gems
+ -- [34846]   =  true,  -- Black Sack of Gems (Drops from Raid Boss)
+ -- [191060]  =  true,  -- Black Sack of Gems (Drops from Raid Boss)
     [35313]   =  true,  -- Bloated Barbed Gill Trout
     [35286]   =  true,  -- Bloated Giant Sunfish
     [28135]   =  true,  -- Bomb Crate
@@ -259,10 +259,10 @@ local Whitelist = {
     [30260]   =  true,  -- Voren'thal's Package
     [34426]   =  true,  -- Winter Veil Gift
 
-    -- Wrath of the Lich King
+ -- Wrath of the Lich King
 
     [44663]   =  true,  -- Abandoned Adventurer's Satchel
-    -- [46110]   =  true,  -- Alchemist's Cache
+ -- [46110]   =  true,  -- Alchemist's Cache (Drops from Raid Boss)
     [44161]   =  true,  -- Arcane Tarot
     [39903]   =  true,  -- Argent Crusade Gratuity
     [39904]   =  true,  -- Argent Crusade Gratuity
@@ -292,8 +292,8 @@ local Whitelist = {
     [44943]   =  true,  -- Icy Prism
     [54535]   =  true,  -- Keg-Shaped Treasure Chest
     [50301]   =  true,  -- Landro's Pet Box
-    -- [45878]   =  true,  -- Large Sack of Ulduar Spoils
-    -- [43346]   =  true,  -- Large Satchel of Spoils
+ -- [45878]   =  true,  -- Large Sack of Ulduar Spoils (Drops from Raid Boss)
+ -- [43346]   =  true,  -- Large Satchel of Spoils (Drops from Raid Boss)
     [54516]   =  true,  -- Loot-Filled Pumpkin
     [50160]   =  true,  -- Lovely Dress Box
     [35792]   =  true,  -- Mage Hunter Personal Effects
@@ -310,7 +310,7 @@ local Whitelist = {
     [44718]   =  true,  -- Ripe Disgusting Jar
     [52006]   =  true,  -- Sack of Frosty Treasures
     [38539]   =  true,  -- Sack of Gold
-    -- [45875]   =  true,  -- Sack of Ulduar Spoils
+ -- [45875]   =  true,  -- Sack of Ulduar Spoils (Drops from Raid Boss)
     [54536]   =  true,  -- Satchel of Chilled Goods
     [51999]   =  true,  -- Satchel of Helpful Goods
     [52000]   =  true,  -- Satchel of Helpful Goods
@@ -319,7 +319,7 @@ local Whitelist = {
     [52003]   =  true,  -- Satchel of Helpful Goods
     [52001]   =  true,  -- Satchel of Helpful Goods
     [52002]   =  true,  -- Satchel of Helpful Goods
-    -- [43347]   =  true,  -- Satchel of Spoils
+ -- [43347]   =  true,  -- Satchel of Spoils (Drops from Raid Boss)
     [44163]   =  true,  -- Shadowy Tarot
     [44113]   =  true,  -- Small Spice Bag
     [41888]   =  true,  -- Small Velvet Bag
