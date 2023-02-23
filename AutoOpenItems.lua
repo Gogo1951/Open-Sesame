@@ -8,11 +8,21 @@ local AllowedItemsList = {
    
    
    -- TODO Compare Lists from WoWHead to List from WoW DB
-   -- https://wotlkdb.com/?items&filter=cr=11:10;crs=1:2;crv=0:0#0+1-2
-
-
+   
+   -- https://wotlkdb.com/?items&filter=cr=11:10:161;crs=1:2:1;crv=0:0:0 234 Items
+   -- 234 Total Items
+   
+   -- vs.
+   
+   -- https://www.wowhead.com/wotlk/items?filter=11:10:166:161;1:2:1:1;0:0:0:0 182 Items
+   -- https://www.wowhead.com/wotlk/items?filter=11:10:166:161;1:2:2:1;0:0:0:0 67 Items
+   -- https://www.wowhead.com/wotlk/items?filter=11:10:166:161;1:2:3:1;0:0:0:0 68 Items
+   -- 317 Total Items
+   
+   -- WoWHead has MORE items, but list from WotLKDB.com needs to be validated.
+   
    -- Classic 
-   -- https://www.wowhead.com/wotlk/items?filter=11:10:166;1:2:1;0:0:0
+   -- https://www.wowhead.com/wotlk/items?filter=11:10:166:161;1:2:1:1;0:0:0:0
 
    [10456]   =  true,  -- A Bulging Coin Purse
    [15902]   =  true,  -- A Crazy Grab Bag
@@ -198,7 +208,7 @@ local AllowedItemsList = {
    -- [22233]   =  true,  -- Zigris' Footlocker (Seems like bad data; a dupe of #13247)
 
    -- The Burning Crusade
-   -- https://www.wowhead.com/wotlk/items?filter=11:10:166;1:2:2;0:0:0
+   -- https://www.wowhead.com/wotlk/items?filter=11:10:166:161;1:2:2:1;0:0:0:0
 
    [34587]   =  true,  -- Aldor Supplies Package
    [34583]   =  true,  -- Aldor Supplies Package
@@ -269,7 +279,7 @@ local AllowedItemsList = {
    [34426]   =  true,  -- Winter Veil Gift
 
    -- Wrath of the Lich King
-   -- https://www.wowhead.com/wotlk/items?filter=11:10:166;1:2:3;0:0:0
+   -- https://www.wowhead.com/wotlk/items?filter=11:10:166:161;1:2:3:1;0:0:0:0
 
    [44663]   =  true,  -- Abandoned Adventurer's Satchel
    -- [46110]   =  true,  -- Alchemist's Cache (Drops from Raid Boss)
