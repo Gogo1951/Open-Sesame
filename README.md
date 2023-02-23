@@ -12,6 +12,7 @@ Automatically opens containers under the following conditions:
 - The container is not locked.
 - The contianer did not drop off a raid boss.
 - The contianer does not contain a BoP item.
+- The contianer does not contain a unique item.
 
 
 ### Download from CurseForge
