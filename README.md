@@ -20,7 +20,7 @@ Just a simple add-on that does what the title says.
 
 ### How It Works
 
-AutoOpenItems looks for items on a [whitelist](https://github.com/Gogo1951/AutoOpenItems/blob/main/AutoOpenItems.lua) (containers that meet the above stated criteria), and runs a "UseContainerItem" on those items to open them as soon as they land in your inventory. 
+AutoOpenItems looks for items on a [whitelist](https://github.com/Gogo1951/AutoOpenItems/blob/main/AutoOpenItems.lua#L7) (containers that meet the above stated criteria), and runs a "UseContainerItem" on those items to open them as soon as they land in your inventory. 
 
 - https://wowpedia.fandom.com/wiki/API_C_Container.UseContainerItem
 
