@@ -5,14 +5,14 @@ Just a simple add-on that does what the title says.
 Automatically opens containers under the following conditions:
 
 - You are not in combat.
+- The container is not locked.
+- The container did not drop off a raid boss.
+- The container is tradable, but does not contain a BoP item.
+- The container is tradable, but does not contain a unique item.
 - You do not have a Merchant Window Open.
 - You do not have your Bank Window Open.
 - You do not have your Guild Bank Window Open.
 - You do not have your Mailbox Window Open.
-- The container is not locked.
-- The contianer did not drop off a raid boss.
-- The contianer is tradable, but does not contain a BoP item.
-- The contianer is tradable, but does not contain a unique item.
 
 
 ### Download from CurseForge
@@ -22,7 +22,7 @@ Automatically opens containers under the following conditions:
 
 ### How It Works
 
-AutoOpenItems looks for items on a whitelist (containers that meet the above stated criteria), and runs a "UseContainerItem" on those items to open them as soon as they land in your inentory. 
+AutoOpenItems looks for items on a whitelist (containers that meet the above stated criteria), and runs a "UseContainerItem" on those items to open them as soon as they land in your inventory. 
 
 - https://wowpedia.fandom.com/wiki/API_C_Container.UseContainerItem
 
