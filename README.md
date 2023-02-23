@@ -4,11 +4,11 @@ Just a simple add-on that does what the title says.
 
 Automatically opens containers under the following conditions:
 
-- You are NOT in combat.
-- You do NOT have a Merchant Window Open.
-- You do NOT have your Bank Window Open.
-- You do NOT have your Guild Bank Window Open.
-- You do NOT have your Mailbox Window Open.
+- You are not in combat.
+- You do not have a Merchant Window Open.
+- You do not have your Bank Window Open.
+- You do not have your Guild Bank Window Open.
+- You do not have your Mailbox Window Open.
 - The container is not locked.
 - The contianer did not drop off a raid boss.
 - The contianer is tradable, but does not contain a BoP item.
