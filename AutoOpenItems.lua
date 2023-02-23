@@ -6,7 +6,8 @@ local atBank, atMail, atMerchant, inCombat, isLooting
 
 local AllowedItemsList = {
 
-   -- Classic
+   -- Classic 
+   -- https://www.wowhead.com/wotlk/items?filter=11:10:166;1:2:1;0:0:0
 
    [10456]   =  true,  -- A Bulging Coin Purse
    [15902]   =  true,  -- A Crazy Grab Bag
@@ -192,6 +193,7 @@ local AllowedItemsList = {
    -- [22233]   =  true,  -- Zigris' Footlocker (Seems like bad data; a dupe of #13247)
 
    -- The Burning Crusade
+   -- https://www.wowhead.com/wotlk/items?filter=11:10:166;1:2:2;0:0:0
 
    [34587]   =  true,  -- Aldor Supplies Package
    [34583]   =  true,  -- Aldor Supplies Package
@@ -262,6 +264,7 @@ local AllowedItemsList = {
    [34426]   =  true,  -- Winter Veil Gift
 
    -- Wrath of the Lich King
+   -- https://www.wowhead.com/wotlk/items?filter=11:10:166;1:2:3;0:0:0
 
    [44663]   =  true,  -- Abandoned Adventurer's Satchel
    -- [46110]   =  true,  -- Alchemist's Cache (Drops from Raid Boss)
