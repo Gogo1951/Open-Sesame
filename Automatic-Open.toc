@@ -1,8 +1,8 @@
 ## Interface: 30401
-## Title: AutoOpenItems
+## Title: Automatic Open (Wrath Classic)
 ## Notes: Automatically open the things you loot.
 ## Author: Gogo#0298 & TechnoHunter#2706
 ## Version: 2023-02-23
 ## DefaultState: enabled
 
-AutoOpenItems.lua
+Automatic-Open.lua
