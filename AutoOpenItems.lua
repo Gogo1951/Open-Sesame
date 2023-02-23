@@ -6,6 +6,9 @@ local atBank, atMail, atMerchant, inCombat, isLooting
 
 local AllowedItemsList = {
 
+   -- TODO Compare Lists from WoWHead to List from WoW DB
+   -- https://wotlkdb.com/?items&filter=cr=11:10;crs=1:2;crv=0:0#0+1-2
+   
    -- Classic 
    -- https://www.wowhead.com/wotlk/items?filter=11:10:166;1:2:1;0:0:0
 
