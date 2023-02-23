@@ -6,7 +6,6 @@ local atBank, atMail, atMerchant, inCombat, isLooting
 
 local AllowedItemsList = {
    
-   
    -- TODO Compare Lists from WoWHead to List from WoW DB
    
    -- https://wotlkdb.com/?items&filter=cr=11:10:161;crs=1:2:1;crv=0:0:0 234 Items
@@ -19,7 +18,8 @@ local AllowedItemsList = {
    -- https://www.wowhead.com/wotlk/items?filter=11:10:166:161;1:2:3:1;0:0:0:0 68 Items
    -- 317 Total Items
    
-   -- WoWHead has MORE items, but list from WotLKDB.com needs to be validated.
+   -- WoWHead has MORE items, and after inspecting list from WotLKDB I think we're good with what we have.
+   -- Excluded are some items from the Trading Card Game... this is good to exclude those things as people likely don't want them auto-opened.
    
    -- Classic 
    -- https://www.wowhead.com/wotlk/items?filter=11:10:166:161;1:2:1:1;0:0:0:0
