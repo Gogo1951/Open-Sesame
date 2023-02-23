@@ -2,11 +2,13 @@
 
 Just a simple add-on that does what the title says.
 
-Automatically opens items in containers as you loot (as soon as you are out of combat).
-
-NOTE: Due to API changes in Wrath, "UseContainerItem" no longer works on clams.
+Automatically opens white listed containers as you loot (as soon as you are out of combat).
 
 - https://wowpedia.fandom.com/wiki/API_C_Container.UseContainerItem
+
+NOTE: Due to API changes in Wrath, "UseContainerItem" no longer works on clams. Likely has something to do with the Clam Weaving patch.
+
+- https://www.youtube.com/watch?v=h3YO7jeoOWs
 
 
 ### Download from CurseForge
