@@ -5,6 +5,7 @@ Just a simple add-on that does what the title says.
 ⚙️ Automatically opens containers in your inventory under the following conditions:
 
 - You are not in combat.
+- You are not actively trying to loot something else.
 - The container is not locked.
 - The container did not drop off a raid boss.
 - The container is tradable, but does not contain a BoP item.
