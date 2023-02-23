@@ -4,13 +4,15 @@ Just a simple add-on that does what the title says.
 
 Automatically opens items in containers as you loot (as soon as you are out of combat).
 
-Due to API changes in Wrath, it no longer works on "stack-able" items, like Clams.
+NOTE: Due to API changes in Wrath, "UseContainerItem" no longer works on clams.
 
-Cheers!
+https://wowpedia.fandom.com/wiki/API_C_Container.UseContainerItem
+
 
 ### Download from CurseForge
 
 https://beta.curseforge.com/wow/addons/auto-open-items
+
 
 ### Similar Add-ons
 
