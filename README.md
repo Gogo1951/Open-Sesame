@@ -32,7 +32,7 @@ AutoOpenItems looks for items on a whitelist (containers that meet the above sta
 
 👏 **NOTE: I didn't create this add-on, I just updated it for TBC and Wrath.**
 
-Looking around CurseForge, it looks like code originated from kAutoOpen.
+Looking around CurseForge, it looks like bulk of the original code came from kAutoOpen.
 
 - https://beta.curseforge.com/wow/addons/kautoopen
 - https://beta.curseforge.com/wow/addons/kautoopen-dragonflight
