@@ -330,7 +330,7 @@ local Whitelist = {
     [43504]   =  true,  -- Winter Veil Gift
     [46740]   =  true,  -- Winter Veil Gift
 
-    -- Clams! (Clams don't work with the Wrath API, but they are still included in case we can find a fix.)
+ -- Clams! (Clams don't work with the Wrath API, but they are still included in case we can find a fix.)
 
     [15874]   =  true,  -- Soft-shelled Clam
     [5523]    =  true,  -- Small Barnacled Clam
