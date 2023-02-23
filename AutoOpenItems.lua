@@ -351,50 +351,74 @@ function AutoOpenItems:Register(event, func)
 end
 end
 
+-- https://wowpedia.fandom.com/wiki/BANKFRAME_OPENED
+-- Fired when the bank frame is opened.
 AutoOpenItems:Register('BANKFRAME_OPENED', function()
 atBank = true
 end)
 
+-- https://wowpedia.fandom.com/wiki/BANKFRAME_CLOSED
+-- Fired twice when the bank window is closed.
 AutoOpenItems:Register('BANKFRAME_CLOSED', function()
 atBank = false
 end)
 
+-- https://wowpedia.fandom.com/wiki/GUILDBANKFRAME_OPENED
+-- Fired when the guild-bank frame is opened. 
 AutoOpenItems:Register('GUILDBANKFRAME_OPENED', function()
 atBank = true
 end)
 
+-- https://wowpedia.fandom.com/wiki/GUILDBAKFRAME_CLOSED
+-- Fired when the guild-bank frame is closed. 
 AutoOpenItems:Register('GUILDBANKFRAME_CLOSED', function()
 atBank = false
 end)
 
+-- https://wowpedia.fandom.com/wiki/MAIL_SHOW
+-- Fired when the mailbox is first opened. 
 AutoOpenItems:Register('MAIL_SHOW', function()
 atMail = true
 end)
 
+-- https://wowpedia.fandom.com/wiki/MAIL_CLOSED
+-- Fired when the mailbox window is closed. 
 AutoOpenItems:Register('MAIL_CLOSED', function()
 atMail = false
 end)
 
+-- https://wowpedia.fandom.com/wiki/MERCHANT_SHOW
+-- Fired when the merchant frame is shown. 
 AutoOpenItems:Register('MERCHANT_SHOW', function()
 atMerchant = true
 end)
 
+-- https://wowpedia.fandom.com/wiki/MERCHANT_CLOSED
+-- Fired when a merchant frame closes. (Called twice). 
 AutoOpenItems:Register('MERCHANT_CLOSED', function()
 atMerchant = false
 end)
 
+-- https://wowpedia.fandom.com/wiki/LOOT_OPENED
+-- Fires when a corpse is looted, after LOOT_READY. 
 AutoOpenItems:Register('LOOT_OPENED', function()
 isLooting = true
 end)
 
+-- https://wowpedia.fandom.com/wiki/LOOT_CLOSED
+-- Fired when a player ceases looting a corpse. Note that this will fire before the last CHAT_MSG_LOOT event for that loot. 
 AutoOpenItems:Register('LOOT_CLOSED', function()
 isLooting = false
 end)
 
+-- https://wowpedia.fandom.com/wiki/PLAYER_REGEN_DISABLED
+-- Fired whenever you enter combat, as normal regen rates are disabled during combat. This means that either you are in the hate list of a NPC or that you've been taking part in a pvp action (either as attacker or victim). 
 AutoOpenItems:Register('PLAYER_REGEN_DISABLED', function()
 inCombat = true
 end)
 
+-- https://wowpedia.fandom.com/wiki/PLAYER_REGEN_ENABLED
+-- Fired after ending combat, as regen rates return to normal. Useful for determining when a player has left combat. This occurs when you are not on the hate list of any NPC, or a few seconds after the latest pvp attack that you were involved with. 
 AutoOpenItems:Register('PLAYER_REGEN_ENABLED', function()
 inCombat = false
 end)
