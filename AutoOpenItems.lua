@@ -383,6 +383,14 @@ AutoOpenItems:Register('MERCHANT_CLOSED', function()
 atMerchant = false
 end)
 
+AutoOpenItems:Register('LOOT_OPENED', function()
+isLooting = true
+end)
+
+AutoOpenItems:Register('LOOT_CLOSED', function()
+isLooting = false
+end)
+
 AutoOpenItems:Register('PLAYER_REGEN_DISABLED', function()
 inCombat = true
 end)
@@ -392,7 +400,7 @@ inCombat = false
 end)
 
 function OpenThings()
-if (atBank or atMail or atMerchant or inCombat) then return end
+if (atBank or atMail or atMerchant or inCombat or isLooting) then return end
 for bag = 0, 4 do
    for slot = 0, C_Container.GetContainerNumSlots(bag) do
       local id = C_Container.GetContainerItemID(bag, slot)
