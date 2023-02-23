@@ -387,11 +387,11 @@ AutoOpenItems:Register('BAG_UPDATE_DELAYED', function(bag)
 	if (InCombatLockdown()) or (atBank or atMail or atMerchant) then return end
 	
 	for bag = 0, 4 do
-		for slot = 0, GetContainerNumSlots(bag) do
-			local id = GetContainerItemID(bag, slot)
+		for slot = 0, C_Container.GetContainerNumSlots(bag) do
+			local id = C_Container.GetContainerItemID(bag, slot)
 			if id and autoOpenItems[id] then
 				-- DEFAULT_CHAT_FRAME:AddMessage("|cff00FF80Auto Open Items : Opening " .. GetContainerItemLink(bag, slot))
-				UseContainerItem(bag, slot)
+				C_Container.UseContainerItem(bag, slot)
 				return
 			end
 		end
