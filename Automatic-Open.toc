@@ -1,5 +1,5 @@
 ## Interface: 30401
-## Title: Automatic Open (Wrath Classic)
+## Title: Automatic-Open
 ## Notes: Automatically open the things you loot.
 ## Author: Gogo#0298 & TechnoHunter#2706
 ## Version: 2023-02-23
