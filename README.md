@@ -26,14 +26,14 @@ AutoOpenItems looks for items on a whitelist (containers that meet the above sta
 
 - https://wowpedia.fandom.com/wiki/API_C_Container.UseContainerItem
 
-NOTE: Due to API changes in Wrath, "UseContainerItem" no longer works on clams. Likely has something to do with the "Clam Weaving" patch.
+🚫 NOTE: Due to API changes in Wrath, "UseContainerItem" no longer works on clams. Likely has something to do with the "Clam Weaving" hack.
 
 - https://www.youtube.com/watch?v=h3YO7jeoOWs
 
 
 ### Similar Add-ons
 
-NOTE: I didn't create this add-on, I just updated it for TBC and Wrath.
+👏 **NOTE: I didn't create this add-on, I just updated it for TBC and Wrath.**
 
 Looking around CurseForge, it looks like code originated from kAutoOpen.
 
