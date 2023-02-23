@@ -18,6 +18,8 @@ Just a simple add-on that does what the title says.
 
 ⏬ Auto Open Items on CurseForge : https://beta.curseforge.com/wow/addons/auto-open-items
 
+⏬ Auto Open Items on GitHub : https://github.com/Gogo1951/AutoOpenItems
+
 ### How It Works
 
 AutoOpenItems looks for items in your inventory [that are on the whitelist](https://github.com/Gogo1951/AutoOpenItems/blob/main/AutoOpenItems.lua#L7) (containers that meet the above stated criteria), and runs a the "[C_Container.UseContainerItem](https://wowpedia.fandom.com/wiki/API_C_Container.UseContainerItem)" public API call on those items to open them as soon as it detects them. AutoOpenItems runs on less than 3kb of memory; it's very lightweight and won't impact performance. 
