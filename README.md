@@ -17,7 +17,7 @@ Just a simple add-on that does what the title says.
 
 ### Download
 
-⏬ Auto Open Items on CurseForge : https://www.curseforge.com/wow/addons/automatic-open-wrath-classic
+⏬ Auto Open Items on CurseForge : https://www.curseforge.com/wow/addons/automatic-open
 
 ⏬ Auto Open Items on GitHub : https://github.com/Gogo1951/Automatic-Open
 
