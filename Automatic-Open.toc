@@ -4,5 +4,6 @@
 ## Author: Gogo#0298 & TechnoHunter#2706
 ## Version: 2023-02-23
 ## DefaultState: enabled
+## X-Curse-Project-ID: 830638
 
 Automatic-Open.lua
