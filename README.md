@@ -26,7 +26,7 @@ AutoOpenItems looks for items on a whitelist (containers that meet the above sta
 
 - https://wowpedia.fandom.com/wiki/API_C_Container.UseContainerItem
 
-NOTE: Due to API changes in Wrath, "UseContainerItem" no longer works on clams. Likely has something to do with the Clam Weaving patch.
+NOTE: Due to API changes in Wrath, "UseContainerItem" no longer works on clams. Likely has something to do with the "Clam Weaving" patch.
 
 - https://www.youtube.com/watch?v=h3YO7jeoOWs
 
