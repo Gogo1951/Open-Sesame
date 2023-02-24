@@ -450,6 +450,7 @@ function OpenThings()
       for slot = 0, C_Container.GetContainerNumSlots(bag) do
          local id = C_Container.GetContainerItemID(bag, slot)
          if id and AllowedItemsList[id] then
+            if not C_Container_GetContainerItemInfo(bag, slot).isLocked then
             -- DEFAULT_CHAT_FRAME:AddMessage("|cff00FF80Automatic-Open : Opening " .. C_Container.GetContainerItemLink(bag, slot))
             C_Container.UseContainerItem(bag, slot)
          return
