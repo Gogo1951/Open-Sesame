@@ -8,6 +8,7 @@ Just a simple add-on that does what the title says.
 - You are not actively trying to loot something else.
 - The container is not locked.
 - The container did not drop off a raid boss.
+- The container is Bind on Pickup (BoP), and is not tradable.
 - The container is tradable, but does not contain a BoP item.
 - The container is tradable, but does not contain a unique item.
 - You do not have a Merchant Window Open.
