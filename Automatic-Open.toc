@@ -2,7 +2,7 @@
 ## Title: Automatic-Open
 ## Notes: Automatically open the things you loot.
 ## Author: Gogo#0298 & TechnoHunter#2706
-## Version: 3.0.0
+## Version: 3.1.0
 ## DefaultState: enabled
 ## X-Curse-Project-ID: 830638
 
