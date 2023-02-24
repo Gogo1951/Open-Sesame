@@ -1,6 +1,8 @@
 local AutomaticOpen = CreateFrame('Frame')
 
-AutomaticOpen:SetScript('OnEvent', function(self, event, ...) self[event](...) end)
+AutomaticOpen:SetScript('OnEvent', function(self, event, ...) self[event](event, ...) end)
+
+-- print("|cff00FF00Automatic-Open Loaded Version: Wrath Classic WoW")
 
 local atBank, atMail, atMerchant, inCombat, isLooting
 
@@ -362,102 +364,104 @@ local AllowedItemsList = {
 
 }
 
-function AutomaticOpen:Register(event, func)
-   self:RegisterEvent(event)
-   self[event] = function(...)
-   func(...)
+-- *** EVENT HANDLERS ***
+
+-- https://wowpedia.fandom.com/wiki/PLAYER_INTERACTION_MANAGER_FRAME_SHOW
+-- Fires when the PLAYER_INTERACTION_MANAGER_FRAME UI opens. (no summary on page)
+function AutomaticOpen:PLAYER_INTERACTION_MANAGER_FRAME_SHOW(paneType)
+   if paneType ==  Enum.PlayerInteractionType.Merchant then 
+      atMerchant = true
+   end
+   if paneType ==  Enum.PlayerInteractionType.Banker then 
+      atBank = true
+   end
+	if paneType ==  Enum.PlayerInteractionType.GuildBanker then 
+      atBank = true
+   end
+   if paneType ==  Enum.PlayerInteractionType.MailInfo then 
+      atMail = true
+   end
 end
+
+-- https://wowpedia.fandom.com/wiki/PLAYER_INTERACTION_MANAGER_FRAME_HIDE
+-- Fires when the PLAYER_INTERACTION_MANAGER_FRAME UI closes. (no summary on page)
+function AutomaticOpen:PLAYER_INTERACTION_MANAGER_FRAME_HIDE(paneType)
+   if paneType ==  Enum.PlayerInteractionType.Merchant then 
+      atMerchant = false
+      OpenThings()
+   end
+   if paneType ==  Enum.PlayerInteractionType.Banker then 
+      atBank = false
+      OpenThings()
+   end
+	if paneType ==  Enum.PlayerInteractionType.GuildBanker then 
+      atBank = false
+      OpenThings()
+   end
+	if paneType ==  Enum.PlayerInteractionType.MailInfo then 
+      atMail = false
+      OpenThings()
+   end
 end
-
--- https://wowpedia.fandom.com/wiki/BANKFRAME_OPENED
--- Fired when the bank frame is opened.
-AutomaticOpen:Register('BANKFRAME_OPENED', function()
-atBank = true
-end)
-
--- https://wowpedia.fandom.com/wiki/BANKFRAME_CLOSED
--- Fired twice when the bank window is closed.
-AutomaticOpen:Register('BANKFRAME_CLOSED', function()
-atBank = false
-end)
-
--- https://wowpedia.fandom.com/wiki/GUILDBANKFRAME_OPENED
--- Fired when the guild-bank frame is opened. 
-AutomaticOpen:Register('GUILDBANKFRAME_OPENED', function()
-atBank = true
-end)
-
--- https://wowpedia.fandom.com/wiki/GUILDBAKFRAME_CLOSED
--- Fired when the guild-bank frame is closed. 
-AutomaticOpen:Register('GUILDBANKFRAME_CLOSED', function()
-atBank = false
-end)
-
--- https://wowpedia.fandom.com/wiki/MAIL_SHOW
--- Fired when the mailbox is first opened. 
-AutomaticOpen:Register('MAIL_SHOW', function()
-atMail = true
-end)
-
--- https://wowpedia.fandom.com/wiki/MAIL_CLOSED
--- Fired when the mailbox window is closed. 
-AutomaticOpen:Register('MAIL_CLOSED', function()
-atMail = false
-end)
-
--- https://wowpedia.fandom.com/wiki/MERCHANT_SHOW
--- Fired when the merchant frame is shown. 
-AutomaticOpen:Register('MERCHANT_SHOW', function()
-atMerchant = true
-end)
-
--- https://wowpedia.fandom.com/wiki/MERCHANT_CLOSED
--- Fired when a merchant frame closes. (Called twice). 
-AutomaticOpen:Register('MERCHANT_CLOSED', function()
-atMerchant = false
-end)
 
 -- https://wowpedia.fandom.com/wiki/LOOT_OPENED
 -- Fires when a corpse is looted, after LOOT_READY. 
-AutomaticOpen:Register('LOOT_OPENED', function()
-isLooting = true
-end)
+function AutomaticOpen:LOOT_OPENED()
+   isLooting = true
+end
 
 -- https://wowpedia.fandom.com/wiki/LOOT_CLOSED
--- Fired when a player ceases looting a corpse. Note that this will fire before the last CHAT_MSG_LOOT event for that loot. 
-AutomaticOpen:Register('LOOT_CLOSED', function()
-isLooting = false
-end)
+-- Fired when a player ceases looting a corpse.
+-- Note that this will fire before the last CHAT_MSG_LOOT event for that loot. 
+function AutomaticOpen:LOOT_CLOSED()
+   isLooting = false
+   OpenThings()
+end
 
 -- https://wowpedia.fandom.com/wiki/PLAYER_REGEN_DISABLED
--- Fired whenever you enter combat, as normal regen rates are disabled during combat. This means that either you are in the hate list of a NPC or that you've been taking part in a pvp action (either as attacker or victim). 
-AutomaticOpen:Register('PLAYER_REGEN_DISABLED', function()
-inCombat = true
-end)
+-- Fired whenever you enter combat, as normal regen rates
+-- are disabled during combat. This means that either you
+-- are in the hate list of a NPC or that you've been taking
+-- part in a pvp action (either as attacker or victim). 
+function AutomaticOpen:PLAYER_REGEN_DISABLED()
+   inCombat = true
+end
 
 -- https://wowpedia.fandom.com/wiki/PLAYER_REGEN_ENABLED
--- Fired after ending combat, as regen rates return to normal. Useful for determining when a player has left combat. This occurs when you are not on the hate list of any NPC, or a few seconds after the latest pvp attack that you were involved with. 
-AutomaticOpen:Register('PLAYER_REGEN_ENABLED', function()
-inCombat = false
-end)
+-- Fired after ending combat, as regen rates return to normal.
+-- Useful for determining when a player has left combat.
+-- This occurs when you are not on the hate list of any NPC,
+-- or a few seconds after the latest pvp attack that you were involved with. 
+function AutomaticOpen:PLAYER_REGEN_ENABLED()
+   inCombat = false
+   OpenThings()
+end
+
+-- https://wowpedia.fandom.com/wiki/BAG_UPDATE_DELAYED
+-- Fired after all applicable BAG_UPDATE events for a specific action have been fired.
+function AutomaticOpen:BAG_UPDATE_DELAYED()
+   OpenThings()
+end
+
 
 function OpenThings()
-if (atBank or atMail or atMerchant or inCombat or isLooting) then return end
-for bag = 0, 4 do
-   for slot = 0, C_Container.GetContainerNumSlots(bag) do
-      local id = C_Container.GetContainerItemID(bag, slot)
-      if id and AllowedItemsList[id] then
-         -- DEFAULT_CHAT_FRAME:AddMessage("|cff00FF80Auto Open Items : Opening " .. GetContainerItemLink(bag, slot))
-         C_Container.UseContainerItem(bag, slot)
+   if (atBank or atMail or atMerchant or inCombat or isLooting) then return end
+   for bag = 0, 4 do
+      for slot = 0, C_Container.GetContainerNumSlots(bag) do
+         local id = C_Container.GetContainerItemID(bag, slot)
+         if id and AllowedItemsList[id] then
+            DEFAULT_CHAT_FRAME:AddMessage("|cff00FF80Automatic-Open : Opening " .. C_Container.GetContainerItemLink(bag, slot))
+            C_Container.UseContainerItem(bag, slot)
          return
+         end
       end
    end
 end
-end
 
-AutomaticOpen:Register('BAG_UPDATE_DELAYED', OpenThings)
-AutomaticOpen:Register('BANKFRAME_CLOSED', OpenThings)
-AutomaticOpen:Register('GUILDBANKFRAME_CLOSED', OpenThings)
-AutomaticOpen:Register('MAIL_CLOSED', OpenThings)
-AutomaticOpen:Register('MERCHANT_CLOSED', OpenThings)
-AutomaticOpen:Register('PLAYER_REGEN_ENABLED', OpenThings)
+AutomaticOpen:RegisterEvent('PLAYER_REGEN_DISABLED')
+AutomaticOpen:RegisterEvent('LOOT_OPENED')
+AutomaticOpen:RegisterEvent('PLAYER_INTERACTION_MANAGER_FRAME_SHOW')
+AutomaticOpen:RegisterEvent('PLAYER_INTERACTION_MANAGER_FRAME_HIDE')
+AutomaticOpen:RegisterEvent('PLAYER_REGEN_ENABLED')
+AutomaticOpen:RegisterEvent('LOOT_CLOSED')
+AutomaticOpen:RegisterEvent('BAG_UPDATE_DELAYED')
