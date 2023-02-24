@@ -23,7 +23,9 @@ Just a simple add-on that does what the title says.
 
 ### How It Works
 
-Automatic Open looks for items in your inventory [that are on the list](https://github.com/Gogo1951/Automatic-Open/blob/main/Automatic-Open.lua#L7) (containers that meet the above stated criteria), and runs [a public API call](https://wowpedia.fandom.com/wiki/API_C_Container.UseContainerItem) to open them as soon as they are detected. AutoOpenItems runs on less than 3kb of memory; it's very lightweight and won't impact performance. 
+Automatic Open looks for items in your inventory [that are on the list](https://github.com/Gogo1951/Automatic-Open/blob/main/Automatic-Open.lua#L7) (containers that meet the above stated criteria), and runs [a public API call](https://wowpedia.fandom.com/wiki/API_C_Container.UseContainerItem) to open them as soon as they are detected. 
+
+Automatic Open runs on less than 35kb of memory; it's very lightweight and won't impact performance. 
 
 🚫 **Due to API changes in Wrath, "UseContainerItem" no longer works on clams. Likely has something to do with the "[Clam Weaving](https://www.youtube.com/watch?v=h3YO7jeoOWs)" hack.**
 
