@@ -1,4 +1,4 @@
-# Automatic Open (Wrath Classic)
+# Automatic Open
 
 Just a simple add-on that does what the title says.
 
