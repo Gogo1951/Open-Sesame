@@ -1,9 +1,9 @@
-name: Package and release
+name: Package Addon
 
 on:
   push:
-    tags:
-      - '**'
+    branches: [ main ]
+    tags: [ "*" ]
 
 jobs:
   release:
@@ -11,16 +11,16 @@ jobs:
 
     env:
       CF_API_KEY: ${{ secrets.CF_API_KEY }}
-      WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
       GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
+      WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
 
     steps:
       - name: Clone project
-        uses: actions/checkout@v3
+        uses: actions/checkout@v1
         with:
-          fetch-depth: 0
+          fetch-depth: 10
 
       - name: Package and release Wrath
         uses: BigWigsMods/packager@master
         with:
-          args: "-o -u -S -m .pkgmeta -g wrath"
+          args: -g wrath
