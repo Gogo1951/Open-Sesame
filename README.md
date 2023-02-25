@@ -30,14 +30,15 @@ Automatic Open runs on less than 35kb of memory; it's very lightweight and won't
 
 🚫 **Due to API changes in Wrath, "UseContainerItem" no longer works on clams. Likely has something to do with the "[Clam Weaving](https://www.youtube.com/watch?v=h3YO7jeoOWs)" hack.**
 
-### Similar Add-ons
+### Similar Add-ons & Weak Auras
 
 👏 **I didn't create this add-on, I just updated it for TBC and Wrath.**
 
 Looking around CurseForge, it looks like bulk of the original code came from kAutoOpen.
 
-- https://www.curseforge.com/wow/addons/auto-open-items
-- https://www.curseforge.com/wow/addons/autoclam
-- https://www.curseforge.com/wow/addons/autoopen
-- https://www.curseforge.com/wow/addons/kautoopen
-- https://www.curseforge.com/wow/addons/kautoopen-dragonflight
+- [Auto Open Items](https://www.curseforge.com/wow/addons/auto-open-items)
+- [AutoClam](https://www.curseforge.com/wow/addons/autoclam)
+- [AutoOpen](https://www.curseforge.com/wow/addons/autoopen)
+- [kAutoOpen Dragonflight](https://www.curseforge.com/wow/addons/kautoopen-dragonflight)
+- [kAutoOpen](https://www.curseforge.com/wow/addons/kautoopen)
+- [Openables (Weak Aura)](https://wago.io/gtRVJZetK)
