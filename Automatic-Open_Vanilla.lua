@@ -2,7 +2,7 @@ local AutomaticOpen = CreateFrame('Frame')
 
 AutomaticOpen:SetScript('OnEvent', function(self, event, ...) self[event](...) end)
 
-local Whitelist = {
+local AllowedItemsList = {
 
   [10456]  =  true,  -- A Bulging Coin Purse 
   [15902]  =  true,  -- A Crazy Grab Bag 
@@ -225,7 +225,7 @@ function CheckBag()
        for bag = 0, 4 do
            for slot = 0, GetContainerNumSlots(bag) do
                local id = GetContainerItemID(bag, slot)
-               if id and Whitelist[id] then
+               if id and AllowedItemsList[id] then
                    UseContainerItem(bag, slot)
                    -- DEFAULT_CHAT_FRAME:AddMessage("|cff00FF80Auto Open Items : " .. GetContainerItemLink(bag, slot)) -- You can re-enable the chat message by un-commenting out this line
                    return
