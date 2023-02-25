@@ -13,4 +13,4 @@
 ## DefaultState: enabled
 
 
-Automatic-Open_Mainline.lua
+Automatic-Open_Wrath.lua
