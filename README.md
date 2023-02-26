@@ -6,8 +6,9 @@ Just a simple add-on that automatically opens containers in your inventory.
 
 - You are not in combat (anything looted during combat will be opened as soon as combat is over).
 - You are not actively trying to loot something else.
-- The container is not locked.
-- The container did not drop off a raid boss.
+- You are not actively trading with another player.
+- The container is not locked (anything that you unlock will be opened).
+- The container did not drop off a "current" raid boss.
 - The container is Bind on Pickup (BoP), and is not tradable.
 - The container is tradable, but does not contain a BoP item.
 - The container is tradable, but does not contain a unique item.
@@ -15,6 +16,8 @@ Just a simple add-on that automatically opens containers in your inventory.
 - You do not have your Bank Window Open.
 - You do not have your Guild Bank Window Open.
 - You do not have your Mailbox Window Open.
+
+🚫 **The "UseContainerItem" API call no longer works on clams. This likely has something to do with the "[Clam Weaving](https://www.youtube.com/watch?v=h3YO7jeoOWs)" hack.**
 
 ### Game Version Notes
 
@@ -29,8 +32,6 @@ Just a simple add-on that automatically opens containers in your inventory.
 Open Sesame! looks for items in your inventory [that are on the list](https://github.com/Gogo1951/Open-Sesame/blob/main/Automatic-Open.lua#L7) (containers that meet the above stated criteria), and runs [a public API call](https://wowpedia.fandom.com/wiki/API_C_Container.UseContainerItem) to open them as soon as they are detected. 
 
 Open Sesame! runs on less than 35kb of memory; it's very lightweight and won't impact performance. 
-
-🚫 **Due to API changes in Wrath Classic, "UseContainerItem" no longer works on clams. This likely has something to do with the "[Clam Weaving](https://www.youtube.com/watch?v=h3YO7jeoOWs)" hack.**
 
 ### Download
 
