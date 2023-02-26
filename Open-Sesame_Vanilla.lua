@@ -1,6 +1,6 @@
-local AutomaticOpen = CreateFrame('Frame')
+local Open-Sesame = CreateFrame('Frame')
 
-AutomaticOpen:SetScript('OnEvent', function(self, event, ...) self[event](...) end)
+Open-Sesame:SetScript('OnEvent', function(self, event, ...) self[event](...) end)
 
 local AllowedItemsList = {
 
@@ -213,7 +213,7 @@ local AllowedItemsList = {
 
 }
 
-function AutomaticOpen:Register(event, func)
+function Open-Sesame:Register(event, func)
    self:RegisterEvent(event)
    self[event] = function(...)
       func(...)
@@ -235,8 +235,8 @@ function CheckBag()
     end
 end
 
-AutomaticOpen:Register('BAG_UPDATE_DELAYED', CheckBag)
+Open-Sesame:Register('BAG_UPDATE_DELAYED', CheckBag)
 
-AutomaticOpen:Register('PLAYER_REGEN_ENABLED', CheckBag)
+Open-Sesame:Register('PLAYER_REGEN_ENABLED', CheckBag)
 
-AutomaticOpen:Register('MERCHANT_CLOSED', CheckBag)
+Open-Sesame:Register('MERCHANT_CLOSED', CheckBag)
