@@ -1,0 +1,25 @@
+## Title: Open-Sesame
+## Notes: Automatically opens containers in your inventory.
+## Author: Gogo#0298 & TechnoHunter#2706
+
+## X-Curse-Project-ID: 830638
+
+## Interface: 11403
+
+## Version: @project-version@
+
+## DefaultState: enabled
+
+Open-Sesame_Vanilla.lua
+
+# Open Sesame! on CurseForge : https://www.curseforge.com/wow/addons/open-sesame
+# Open Sesame! on GitHub : https://github.com/Gogo1951/Open-Sesame
+# 
+# Looking around CurseForge, it looks like the bulk of the original code came from kAutoOpen.
+# 
+# Auto Open Items -- https://www.curseforge.com/wow/addons/auto-open-items
+# AutoClam -- https://www.curseforge.com/wow/addons/autoclam
+# AutoOpen -- https://www.curseforge.com/wow/addons/autoopen
+# kAutoOpen Dragonflight -- https://www.curseforge.com/wow/addons/kautoopen-dragonflight
+# kAutoOpen -- https://www.curseforge.com/wow/addons/kautoopen
+# Openables (Weak Aura) -- https://wago.io/gtRVJZetK
