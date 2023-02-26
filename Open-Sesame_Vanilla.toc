@@ -4,8 +4,7 @@
 
 ## X-Curse-Project-ID: 830638
 
-## Interface: 100005
-## Interface-Wrath: 30401
+## Interface: 11403
 ## Interface-Classic: 11403
 
 ## Version: @project-version@
