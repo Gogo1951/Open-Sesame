@@ -1,4 +1,4 @@
-## Title: Automatic-Open
+## Title: Open-Sesame
 ## Notes: Automatically open the things you loot.
 ## Author: Gogo#0298 & TechnoHunter#2706
 
@@ -13,4 +13,4 @@
 ## DefaultState: enabled
 
 
-Automatic-Open_Wrath.lua
+Open-Sesame_Wrath.lua
