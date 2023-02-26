@@ -16,6 +16,12 @@ Just a simple add-on that does what the title says.
 - You do not have your Guild Bank Window Open.
 - You do not have your Mailbox Window Open.
 
+### Game Version Notes
+
+- **Retail** : Needs testing!
+- **Wreath Classic** : Should be good to go!
+- **Classic** : Should be good to go!
+
 ### Download
 
 ⏬ Automatic Open on CurseForge : https://www.curseforge.com/wow/addons/automatic-open
