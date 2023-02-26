@@ -2,6 +2,8 @@
 
 Just a simple add-on that automatically opens containers in your inventory.
 
+<br>
+
 ⚙️ Works under the following conditions:
 
 - You are not in combat (anything looted during combat will be opened as soon as combat is over).
@@ -20,9 +22,9 @@ Just a simple add-on that automatically opens containers in your inventory.
 
 ### Game Version Notes
 
-- **Retail** : Needs testing! Please report any issues you find!
-- **Wreath Classic** : Good to go!
-- **Classic** : Good to go!
+- 🚧 **Retail** : Needs testing! Please report any issues you find!
+- ✅ **Wreath Classic** : Good to go!
+- ✅ **Classic Era** : Good to go!
 
 <br>
 
