@@ -1,5 +1,5 @@
 ## Title: Open-Sesame
-## Notes: utomatically opens containers in your inventory.
+## Notes: Automatically opens containers in your inventory.
 ## Author: Gogo#0298 & TechnoHunter#2706
 
 ## X-Curse-Project-ID: 830638
@@ -12,5 +12,7 @@
 
 ## DefaultState: enabled
 
-
 Open-Sesame_Mainline.lua
+
+# Open Sesame! on CurseForge : https://www.curseforge.com/wow/addons/open-sesame
+# Open Sesame! on GitHub : https://github.com/Gogo1951/Open-Sesame
