@@ -36,7 +36,9 @@ Open Sesame! runs on less than 35kb of memory; it's very lightweight and won't i
 
 ⏬ Open Sesame! on CurseForge : https://www.curseforge.com/wow/addons/open-sesame
 
-⏬ Open Sesame! on GitHub : https://github.com/Gogo1951/Open-Sesame
+### Provide Feedback & Report Bugs
+
+🔁 Open Sesame! on GitHub : https://github.com/Gogo1951/Open-Sesame
 
 ### Similar Add-ons & Weak Auras
 
