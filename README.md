@@ -24,12 +24,6 @@ Just a simple add-on that automatically opens containers in your inventory.
 
 ✅ **Classic Era** : Good to go!
 
-### Download
-
-⏬ Open Sesame! on CurseForge : https://www.curseforge.com/wow/addons/open-sesame
-
-⏬ Open Sesame! on GitHub : https://github.com/Gogo1951/Open-Sesame
-
 ### How It Works
 
 Open Sesame! looks for items in your inventory [that are on the list](https://github.com/Gogo1951/Open-Sesame/blob/main/Automatic-Open.lua#L7) (containers that meet the above stated criteria), and runs [a public API call](https://wowpedia.fandom.com/wiki/API_C_Container.UseContainerItem) to open them as soon as they are detected. 
@@ -37,6 +31,12 @@ Open Sesame! looks for items in your inventory [that are on the list](https://gi
 Open Sesame! runs on less than 35kb of memory; it's very lightweight and won't impact performance. 
 
 🚫 **Due to API changes in Wrath Classic, "UseContainerItem" no longer works on clams. This likely has something to do with the "[Clam Weaving](https://www.youtube.com/watch?v=h3YO7jeoOWs)" hack.**
+
+### Download
+
+⏬ Open Sesame! on CurseForge : https://www.curseforge.com/wow/addons/open-sesame
+
+⏬ Open Sesame! on GitHub : https://github.com/Gogo1951/Open-Sesame
 
 ### Similar Add-ons & Weak Auras
 
