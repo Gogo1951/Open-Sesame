@@ -1,8 +1,8 @@
-local Open-Sesame = CreateFrame('Frame')
+local OpenSesame = CreateFrame('Frame')
 
-Open-Sesame:SetScript('OnEvent', function(self, event, ...) self[event](event, ...) end)
+OpenSesame:SetScript('OnEvent', function(self, event, ...) self[event](event, ...) end)
 
--- print("|cff00FF00Open-Sesame Loaded Version: Wrath Classic WoW")
+-- print("|cff00FF00OpenSesame Loaded Version: Wrath Classic WoW")
 
 local atBank, atMail, atMerchant, inCombat, isLooting
 
@@ -367,7 +367,7 @@ local AllowedItemsList = {
 
 -- https://wowpedia.fandom.com/wiki/PLAYER_INTERACTION_MANAGER_FRAME_SHOW
 -- Fires when the PLAYER_INTERACTION_MANAGER_FRAME UI opens. (no summary on page)
-function Open-Sesame:PLAYER_INTERACTION_MANAGER_FRAME_SHOW(paneType)
+function OpenSesame:PLAYER_INTERACTION_MANAGER_FRAME_SHOW(paneType)
    if paneType ==  Enum.PlayerInteractionType.Merchant then 
       atMerchant = true
    end
@@ -384,37 +384,37 @@ end
 
 -- https://wowpedia.fandom.com/wiki/PLAYER_INTERACTION_MANAGER_FRAME_HIDE
 -- Fires when the PLAYER_INTERACTION_MANAGER_FRAME UI closes. (no summary on page)
-function Open-Sesame:PLAYER_INTERACTION_MANAGER_FRAME_HIDE(paneType)
+function OpenSesame:PLAYER_INTERACTION_MANAGER_FRAME_HIDE(paneType)
    if paneType ==  Enum.PlayerInteractionType.Merchant then 
       atMerchant = false
-      OpenThings()
+      AutomaticOpener()
    end
    if paneType ==  Enum.PlayerInteractionType.Banker then 
       atBank = false
-      OpenThings()
+      AutomaticOpener()
    end
 	if paneType ==  Enum.PlayerInteractionType.GuildBanker then 
       atBank = false
-      OpenThings()
+      AutomaticOpener()
    end
 	if paneType ==  Enum.PlayerInteractionType.MailInfo then 
       atMail = false
-      OpenThings()
+      AutomaticOpener()
    end
 end
 
 -- https://wowpedia.fandom.com/wiki/LOOT_OPENED
 -- Fires when a corpse is looted, after LOOT_READY. 
-function Open-Sesame:LOOT_OPENED()
+function OpenSesame:LOOT_OPENED()
    isLooting = true
 end
 
 -- https://wowpedia.fandom.com/wiki/LOOT_CLOSED
 -- Fired when a player ceases looting a corpse.
 -- Note that this will fire before the last CHAT_MSG_LOOT event for that loot. 
-function Open-Sesame:LOOT_CLOSED()
+function OpenSesame:LOOT_CLOSED()
    isLooting = false
-   OpenThings()
+   AutomaticOpener()
 end
 
 -- https://wowpedia.fandom.com/wiki/PLAYER_REGEN_DISABLED
@@ -422,7 +422,7 @@ end
 -- are disabled during combat. This means that either you
 -- are in the hate list of a NPC or that you've been taking
 -- part in a pvp action (either as attacker or victim). 
-function Open-Sesame:PLAYER_REGEN_DISABLED()
+function OpenSesame:PLAYER_REGEN_DISABLED()
    inCombat = true
 end
 
@@ -431,26 +431,26 @@ end
 -- Useful for determining when a player has left combat.
 -- This occurs when you are not on the hate list of any NPC,
 -- or a few seconds after the latest pvp attack that you were involved with. 
-function Open-Sesame:PLAYER_REGEN_ENABLED()
+function OpenSesame:PLAYER_REGEN_ENABLED()
    inCombat = false
-   OpenThings()
+   AutomaticOpener()
 end
 
 -- https://wowpedia.fandom.com/wiki/BAG_UPDATE_DELAYED
 -- Fired after all applicable BAG_UPDATE events for a specific action have been fired.
-function Open-Sesame:BAG_UPDATE_DELAYED()
-   OpenThings()
+function OpenSesame:BAG_UPDATE_DELAYED()
+   AutomaticOpener()
 end
 
 
-function OpenThings()
+function AutomaticOpener()
    if (atBank or atMail or atMerchant or inCombat or isLooting) then return end
    for bag = 0, 4 do
       for slot = 0, C_Container.GetContainerNumSlots(bag) do
          local id = C_Container.GetContainerItemID(bag, slot)
          if id and AllowedItemsList[id] then
             if C_Container.GetContainerItemInfo(bag, slot).isLocked then return end
-            -- DEFAULT_CHAT_FRAME:AddMessage("|cff00FF80Open-Sesame : Opening " .. C_Container.GetContainerItemLink(bag, slot))
+            -- DEFAULT_CHAT_FRAME:AddMessage("|cff00FF80OpenSesame : Opening " .. C_Container.GetContainerItemLink(bag, slot))
             C_Container.UseContainerItem(bag, slot)
          return
          end
@@ -458,10 +458,10 @@ function OpenThings()
    end
 end
 
-Open-Sesame:RegisterEvent('PLAYER_REGEN_DISABLED')
-Open-Sesame:RegisterEvent('LOOT_OPENED')
-Open-Sesame:RegisterEvent('PLAYER_INTERACTION_MANAGER_FRAME_SHOW')
-Open-Sesame:RegisterEvent('PLAYER_INTERACTION_MANAGER_FRAME_HIDE')
-Open-Sesame:RegisterEvent('PLAYER_REGEN_ENABLED')
-Open-Sesame:RegisterEvent('LOOT_CLOSED')
-Open-Sesame:RegisterEvent('BAG_UPDATE_DELAYED')
+OpenSesame:RegisterEvent('PLAYER_REGEN_DISABLED')
+OpenSesame:RegisterEvent('LOOT_OPENED')
+OpenSesame:RegisterEvent('PLAYER_INTERACTION_MANAGER_FRAME_SHOW')
+OpenSesame:RegisterEvent('PLAYER_INTERACTION_MANAGER_FRAME_HIDE')
+OpenSesame:RegisterEvent('PLAYER_REGEN_ENABLED')
+OpenSesame:RegisterEvent('LOOT_CLOSED')
+OpenSesame:RegisterEvent('BAG_UPDATE_DELAYED')

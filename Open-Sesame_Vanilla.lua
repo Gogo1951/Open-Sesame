@@ -1,6 +1,6 @@
-local Open-Sesame = CreateFrame('Frame')
+local OpenSesame = CreateFrame('Frame')
 
-Open-Sesame:SetScript('OnEvent', function(self, event, ...) self[event](...) end)
+OpenSesame:SetScript('OnEvent', function(self, event, ...) self[event](...) end)
 
 local AllowedItemsList = {
 
@@ -213,14 +213,14 @@ local AllowedItemsList = {
 
 }
 
-function Open-Sesame:Register(event, func)
+function OpenSesame:Register(event, func)
    self:RegisterEvent(event)
    self[event] = function(...)
       func(...)
    end
 end
 
-function CheckBag()
+function AutomaticOpener()
     if (not InCombatLockdown()) and (not (MerchantFrame and MerchantFrame:IsShown())) then
        for bag = 0, 4 do
            for slot = 0, GetContainerNumSlots(bag) do
@@ -235,8 +235,8 @@ function CheckBag()
     end
 end
 
-Open-Sesame:Register('BAG_UPDATE_DELAYED', CheckBag)
+OpenSesame:Register('BAG_UPDATE_DELAYED', AutomaticOpener)
 
-Open-Sesame:Register('PLAYER_REGEN_ENABLED', CheckBag)
+OpenSesame:Register('PLAYER_REGEN_ENABLED', AutomaticOpener)
 
-Open-Sesame:Register('MERCHANT_CLOSED', CheckBag)
+OpenSesame:Register('MERCHANT_CLOSED', AutomaticOpener)
