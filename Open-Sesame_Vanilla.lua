@@ -3,7 +3,7 @@ local OpenSesame = CreateFrame('Frame')
 OpenSesame:SetScript('OnEvent', function(self, event, ...) self[event](...) end)
 
 -- If you want to see Startup Messages, simply un-comment the next line.
--- print("|cff00FF00OpenSesame Loaded Version: WoW Classic Era")
+-- print("|cff00FF80OpenSesame : Loaded WoW Classic Era")
 
 local AllowedItemsList = {
 
