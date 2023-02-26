@@ -15,10 +15,6 @@ Open-Sesame_Vanilla.lua
 # Open Sesame! on CurseForge : https://www.curseforge.com/wow/addons/open-sesame
 # Open Sesame! on GitHub : https://github.com/Gogo1951/Open-Sesame
 # 
-# Similar Add-ons & Weak Auras
-# 
-# 👏 I didn't create this add-on, I just updated it for TBC and Wrath.
-# 
 # Looking around CurseForge, it looks like the bulk of the original code came from kAutoOpen.
 # 
 # Auto Open Items -- https://www.curseforge.com/wow/addons/auto-open-items
