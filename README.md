@@ -23,7 +23,7 @@ Just a simple add-on that automatically opens containers in your inventory.
 
 ⚠️ **Retail** : Needs testing! Please report any issues you find!
 
-✅ **Wreath Classic** : Good to go!
+✅ **Wrath Classic** : Good to go!
 
 ✅ **Classic Era** : Good to go!
 
