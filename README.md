@@ -19,8 +19,8 @@ Just a simple add-on that does what the title says.
 ### Game Version Notes
 
 - **Retail** : Needs testing!
-- **Wreath Classic** : Should be good to go!
-- **Classic** : Should be good to go!
+- **Wreath Classic** : Good to go!
+- **Classic** : Good to go!
 
 ### Download
 
