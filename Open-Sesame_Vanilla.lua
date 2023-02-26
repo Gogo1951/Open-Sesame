@@ -230,7 +230,7 @@ if (not InCombatLockdown()) and (not (MerchantFrame and MerchantFrame:IsShown())
          if id and AllowedItemsList[id] then
             UseContainerItem(bag, slot)
             -- If you want to see messages in chat every time something is opened, un-comment the next line.
-            -- DEFAULT_CHAT_FRAME:AddMessage("|cff00FF80OpenSesame  : " .. GetContainerItemLink(bag, slot)) -- You can re-enable the chat message by un-commenting out this line
+            -- DEFAULT_CHAT_FRAME:AddMessage("|cff00FF80OpenSesame : Opening " .. GetContainerItemLink(bag, slot))
             return
          end
       end
