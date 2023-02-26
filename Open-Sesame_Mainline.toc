@@ -6,7 +6,7 @@
 
 ## Interface: 100005
 
-## Version: 3.2.5
+## Version: @project-version@
 
 ## DefaultState: enabled
 
