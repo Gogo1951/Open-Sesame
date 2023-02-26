@@ -2,7 +2,7 @@ local OpenSesame = CreateFrame('Frame')
 
 OpenSesame:SetScript('OnEvent', function(self, event, ...) self[event](event, ...) end)
 
--- print("|cff00FF00OpenSesame Loaded Version: Wrath Classic WoW")
+-- print("|cff00FF00OpenSesame Loaded Version: WoW Wrath Classic")
 
 local atBank, atMail, atMerchant, inCombat, isLooting
 
@@ -368,7 +368,16 @@ local AllowedItemsList = {
 -- https://wowpedia.fandom.com/wiki/PLAYER_INTERACTION_MANAGER_FRAME_SHOW
 -- Fires when the PLAYER_INTERACTION_MANAGER_FRAME UI opens. (no summary on page)
 function OpenSesame:PLAYER_INTERACTION_MANAGER_FRAME_SHOW(paneType)
+   if paneType ==  Enum.PlayerInteractionType.TradePartner then 
+      isLooting = true
+   end
    if paneType ==  Enum.PlayerInteractionType.Merchant then 
+      atMerchant = true
+   end
+  if paneType ==  Enum.PlayerInteractionType.Vendor then 
+      atMerchant = true
+   end
+  if paneType ==  Enum.PlayerInteractionType.TabardVendor then 
       atMerchant = true
    end
    if paneType ==  Enum.PlayerInteractionType.Banker then 
@@ -385,21 +394,26 @@ end
 -- https://wowpedia.fandom.com/wiki/PLAYER_INTERACTION_MANAGER_FRAME_HIDE
 -- Fires when the PLAYER_INTERACTION_MANAGER_FRAME UI closes. (no summary on page)
 function OpenSesame:PLAYER_INTERACTION_MANAGER_FRAME_HIDE(paneType)
+   if paneType ==  Enum.PlayerInteractionType.TradePartner then 
+      isLooting = false
+   end
    if paneType ==  Enum.PlayerInteractionType.Merchant then 
       atMerchant = false
-      AutomaticOpener()
+   end
+  if paneType ==  Enum.PlayerInteractionType.Vendor then 
+      atMerchant = false
+   end
+  if paneType ==  Enum.PlayerInteractionType.TabardVendor then 
+      atMerchant = false
    end
    if paneType ==  Enum.PlayerInteractionType.Banker then 
       atBank = false
-      AutomaticOpener()
    end
-	if paneType ==  Enum.PlayerInteractionType.GuildBanker then 
+  if paneType ==  Enum.PlayerInteractionType.GuildBanker then 
       atBank = false
-      AutomaticOpener()
    end
-	if paneType ==  Enum.PlayerInteractionType.MailInfo then 
+   if paneType ==  Enum.PlayerInteractionType.MailInfo then 
       atMail = false
-      AutomaticOpener()
    end
 end
 

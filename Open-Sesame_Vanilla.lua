@@ -2,6 +2,8 @@ local OpenSesame = CreateFrame('Frame')
 
 OpenSesame:SetScript('OnEvent', function(self, event, ...) self[event](...) end)
 
+-- print("|cff00FF00OpenSesame Loaded Version: WoW Classic Era")
+
 local AllowedItemsList = {
 
   [10456]  =  true,  -- A Bulging Coin Purse 
