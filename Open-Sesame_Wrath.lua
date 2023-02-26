@@ -3,7 +3,7 @@ local OpenSesame = CreateFrame('Frame')
 OpenSesame:SetScript('OnEvent', function(self, event, ...) self[event](event, ...) end)
 
 -- If you want to see Startup Messages, simply un-comment the next line.
--- print("|cff00FF00OpenSesame Loaded Version: WoW Wrath Classic")
+-- print("|cff00FF80OpenSesame : Loaded WoW Wrath Classic")
 
 local atBank, atMail, atMerchant, inCombat, isLooting
 
