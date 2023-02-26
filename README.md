@@ -16,17 +16,23 @@ Just a simple add-on that automatically opens containers in your inventory.
 - You do not have your Guild Bank Window Open.
 - You do not have your Mailbox Window Open.
 
+<br>
+
 ### Game Version Notes
 
 - **Retail** : Needs testing! Please report any issues you find!
 - **Wreath Classic** : Good to go!
 - **Classic** : Good to go!
 
+<br>
+
 ### Download
 
 ⏬ Open Sesame! on CurseForge : https://www.curseforge.com/wow/addons/open-sesame
 
 ⏬ Open Sesame! on GitHub : https://github.com/Gogo1951/Open-Sesame
+
+<br>
 
 ### How It Works
 
@@ -35,6 +41,8 @@ Open Sesame! looks for items in your inventory [that are on the list](https://gi
 Open Sesame! runs on less than 35kb of memory; it's very lightweight and won't impact performance. 
 
 🚫 **Due to API changes in Wrath Classic, "UseContainerItem" no longer works on clams. This likely has something to do with the "[Clam Weaving](https://www.youtube.com/watch?v=h3YO7jeoOWs)" hack.**
+
+<br>
 
 ### Similar Add-ons & Weak Auras
 
