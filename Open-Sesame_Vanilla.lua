@@ -238,7 +238,5 @@ end
 end
 
 OpenSesame:Register('BAG_UPDATE_DELAYED', AutomaticOpener)
-
 OpenSesame:Register('PLAYER_REGEN_ENABLED', AutomaticOpener)
-
 OpenSesame:Register('MERCHANT_CLOSED', AutomaticOpener)
