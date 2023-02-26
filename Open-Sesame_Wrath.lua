@@ -464,6 +464,7 @@ function AutomaticOpener()
          local id = C_Container.GetContainerItemID(bag, slot)
          if id and AllowedItemsList[id] then
             if C_Container.GetContainerItemInfo(bag, slot).isLocked then return end
+            -- If you want to see messages in chat every time something is opened, un-comment the next line.
             -- DEFAULT_CHAT_FRAME:AddMessage("|cff00FF80OpenSesame : Opening " .. C_Container.GetContainerItemLink(bag, slot))
             C_Container.UseContainerItem(bag, slot)
             return
