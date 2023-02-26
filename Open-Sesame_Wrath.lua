@@ -1,8 +1,8 @@
-local AutomaticOpen = CreateFrame('Frame')
+local Open-Sesame = CreateFrame('Frame')
 
-AutomaticOpen:SetScript('OnEvent', function(self, event, ...) self[event](event, ...) end)
+Open-Sesame:SetScript('OnEvent', function(self, event, ...) self[event](event, ...) end)
 
--- print("|cff00FF00Automatic-Open Loaded Version: Wrath Classic WoW")
+-- print("|cff00FF00Open-Sesame Loaded Version: Wrath Classic WoW")
 
 local atBank, atMail, atMerchant, inCombat, isLooting
 
@@ -367,7 +367,7 @@ local AllowedItemsList = {
 
 -- https://wowpedia.fandom.com/wiki/PLAYER_INTERACTION_MANAGER_FRAME_SHOW
 -- Fires when the PLAYER_INTERACTION_MANAGER_FRAME UI opens. (no summary on page)
-function AutomaticOpen:PLAYER_INTERACTION_MANAGER_FRAME_SHOW(paneType)
+function Open-Sesame:PLAYER_INTERACTION_MANAGER_FRAME_SHOW(paneType)
    if paneType ==  Enum.PlayerInteractionType.Merchant then 
       atMerchant = true
    end
@@ -384,7 +384,7 @@ end
 
 -- https://wowpedia.fandom.com/wiki/PLAYER_INTERACTION_MANAGER_FRAME_HIDE
 -- Fires when the PLAYER_INTERACTION_MANAGER_FRAME UI closes. (no summary on page)
-function AutomaticOpen:PLAYER_INTERACTION_MANAGER_FRAME_HIDE(paneType)
+function Open-Sesame:PLAYER_INTERACTION_MANAGER_FRAME_HIDE(paneType)
    if paneType ==  Enum.PlayerInteractionType.Merchant then 
       atMerchant = false
       OpenThings()
@@ -405,14 +405,14 @@ end
 
 -- https://wowpedia.fandom.com/wiki/LOOT_OPENED
 -- Fires when a corpse is looted, after LOOT_READY. 
-function AutomaticOpen:LOOT_OPENED()
+function Open-Sesame:LOOT_OPENED()
    isLooting = true
 end
 
 -- https://wowpedia.fandom.com/wiki/LOOT_CLOSED
 -- Fired when a player ceases looting a corpse.
 -- Note that this will fire before the last CHAT_MSG_LOOT event for that loot. 
-function AutomaticOpen:LOOT_CLOSED()
+function Open-Sesame:LOOT_CLOSED()
    isLooting = false
    OpenThings()
 end
@@ -422,7 +422,7 @@ end
 -- are disabled during combat. This means that either you
 -- are in the hate list of a NPC or that you've been taking
 -- part in a pvp action (either as attacker or victim). 
-function AutomaticOpen:PLAYER_REGEN_DISABLED()
+function Open-Sesame:PLAYER_REGEN_DISABLED()
    inCombat = true
 end
 
@@ -431,14 +431,14 @@ end
 -- Useful for determining when a player has left combat.
 -- This occurs when you are not on the hate list of any NPC,
 -- or a few seconds after the latest pvp attack that you were involved with. 
-function AutomaticOpen:PLAYER_REGEN_ENABLED()
+function Open-Sesame:PLAYER_REGEN_ENABLED()
    inCombat = false
    OpenThings()
 end
 
 -- https://wowpedia.fandom.com/wiki/BAG_UPDATE_DELAYED
 -- Fired after all applicable BAG_UPDATE events for a specific action have been fired.
-function AutomaticOpen:BAG_UPDATE_DELAYED()
+function Open-Sesame:BAG_UPDATE_DELAYED()
    OpenThings()
 end
 
@@ -450,7 +450,7 @@ function OpenThings()
          local id = C_Container.GetContainerItemID(bag, slot)
          if id and AllowedItemsList[id] then
             if C_Container.GetContainerItemInfo(bag, slot).isLocked then return end
-            -- DEFAULT_CHAT_FRAME:AddMessage("|cff00FF80Automatic-Open : Opening " .. C_Container.GetContainerItemLink(bag, slot))
+            -- DEFAULT_CHAT_FRAME:AddMessage("|cff00FF80Open-Sesame : Opening " .. C_Container.GetContainerItemLink(bag, slot))
             C_Container.UseContainerItem(bag, slot)
          return
          end
@@ -458,10 +458,10 @@ function OpenThings()
    end
 end
 
-AutomaticOpen:RegisterEvent('PLAYER_REGEN_DISABLED')
-AutomaticOpen:RegisterEvent('LOOT_OPENED')
-AutomaticOpen:RegisterEvent('PLAYER_INTERACTION_MANAGER_FRAME_SHOW')
-AutomaticOpen:RegisterEvent('PLAYER_INTERACTION_MANAGER_FRAME_HIDE')
-AutomaticOpen:RegisterEvent('PLAYER_REGEN_ENABLED')
-AutomaticOpen:RegisterEvent('LOOT_CLOSED')
-AutomaticOpen:RegisterEvent('BAG_UPDATE_DELAYED')
+Open-Sesame:RegisterEvent('PLAYER_REGEN_DISABLED')
+Open-Sesame:RegisterEvent('LOOT_OPENED')
+Open-Sesame:RegisterEvent('PLAYER_INTERACTION_MANAGER_FRAME_SHOW')
+Open-Sesame:RegisterEvent('PLAYER_INTERACTION_MANAGER_FRAME_HIDE')
+Open-Sesame:RegisterEvent('PLAYER_REGEN_ENABLED')
+Open-Sesame:RegisterEvent('LOOT_CLOSED')
+Open-Sesame:RegisterEvent('BAG_UPDATE_DELAYED')
