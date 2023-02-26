@@ -5,9 +5,8 @@
 ## X-Curse-Project-ID: 830638
 
 ## Interface: 30401
-## Interface-Wrath: 30401
 
-## Version: @project-version@
+## Version: 3.2.5
 
 ## DefaultState: enabled
 
@@ -15,3 +14,17 @@ Open-Sesame_Wrath.lua
 
 # Open Sesame! on CurseForge : https://www.curseforge.com/wow/addons/open-sesame
 # Open Sesame! on GitHub : https://github.com/Gogo1951/Open-Sesame
+# 
+# Similar Add-ons & Weak Auras
+# 
+# 👏 I didn't create this add-on, I just updated it for TBC and Wrath.
+# 
+# Looking around CurseForge, it looks like the bulk of the original code came from kAutoOpen.
+# 
+# Auto Open Items -- https://www.curseforge.com/wow/addons/auto-open-items
+# AutoClam -- https://www.curseforge.com/wow/addons/autoclam
+# AutoOpen -- https://www.curseforge.com/wow/addons/autoopen
+# kAutoOpen Dragonflight -- https://www.curseforge.com/wow/addons/kautoopen-dragonflight
+# kAutoOpen -- https://www.curseforge.com/wow/addons/kautoopen
+# Openables (Weak Aura) -- https://wago.io/gtRVJZetK
+
