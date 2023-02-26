@@ -18,7 +18,7 @@ Just a simple add-on that does what the title says.
 
 ### Game Version Notes
 
-- **Retail** : Needs testing!
+- **Retail** : Needs testing! Please report any issues you find!
 - **Wreath Classic** : Good to go!
 - **Classic** : Good to go!
 
