@@ -21,7 +21,9 @@ Just a simple add-on that automatically opens containers in your inventory.
 
 ### Game Version Notes
 
-⚠️ **Retail** : Needs testing! Please report any issues you find!
+We feel this is good to go, but please report any issues you find!
+
+✅ **Retail** : Good to go!
 
 ✅ **Wrath Classic** : Good to go!
 
