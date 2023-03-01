@@ -1466,7 +1466,6 @@ function OpenSesame:BAG_UPDATE_DELAYED()
    AutomaticOpener()
 end
 
-
 function AutomaticOpener()
    if (atBank or atMail or atMerchant or inCombat or isLooting) then return end
    for bag = 0, 4 do
