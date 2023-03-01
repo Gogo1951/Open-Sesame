@@ -5,6 +5,8 @@ OpenSesame:SetScript('OnEvent', function(self, event, ...) self[event](...) end)
 -- If you want to see Startup Messages, simply un-comment the next line.
 -- print("|cff00FF80OpenSesame : Loaded WoW Classic Era")
 
+local atBank, atMail, atMerchant, inCombat, isLooting, inTrade
+
 local AllowedItemsList = {
 
    [10456]  =  true,  -- A Bulging Coin Purse
@@ -224,21 +226,110 @@ end
 end
 
 function AutomaticOpener()
-if (not InCombatLockdown()) and (not (MerchantFrame and MerchantFrame:IsShown())) then
-   for bag = 0, 4 do
-      for slot = 0, GetContainerNumSlots(bag) do
-         local id = GetContainerItemID(bag, slot)
-         if id and AllowedItemsList[id] then
-            UseContainerItem(bag, slot)
-            -- If you want to see messages in chat every time something is opened, un-comment the next line.
-            -- DEFAULT_CHAT_FRAME:AddMessage("|cff00FF80OpenSesame : Opening " .. GetContainerItemLink(bag, slot))
-            return
-         end
+if (atBank or atMail or atMerchant or inCombat or isLooting or inTrade) then
+   return
+end
+for bag = 0, 4 do
+   for slot = 0, GetContainerNumSlots(bag) do
+      local id = GetContainerItemID(bag, slot)
+      if id and AllowedItemsList[id] then
+         UseContainerItem(bag, slot)
+         -- If you want to see messages in chat every time something is opened, un-comment the next line.
+         -- DEFAULT_CHAT_FRAME:AddMessage("|cff00FF80OpenSesame : Opening " .. GetContainerItemLink(bag, slot))
+         return
       end
    end
 end
 end
 
-OpenSesame:Register('BAG_UPDATE_DELAYED', AutomaticOpener)
-OpenSesame:Register('PLAYER_REGEN_ENABLED', AutomaticOpener)
-OpenSesame:Register('MERCHANT_CLOSED', AutomaticOpener)
+-- https://wowpedia.fandom.com/wiki/BANKFRAME_OPENED
+-- Fired when the bank frame is opened.
+OpenSesame:Register('BANKFRAME_OPENED', function()
+atBank = true
+end)
+
+-- https://wowpedia.fandom.com/wiki/BANKFRAME_CLOSED
+-- Fired twice when the bank window is closed.
+OpenSesame:Register('BANKFRAME_CLOSED', function()
+atBank = false
+AutomaticOpener()
+end)
+
+-- https://wowpedia.fandom.com/wiki/MAIL_SHOW
+-- Fired when the mailbox is first opened.
+OpenSesame:Register('MAIL_SHOW', function()
+atMail = true
+end)
+
+-- https://wowpedia.fandom.com/wiki/MAIL_CLOSED
+-- Fired when the mailbox window is closed.
+OpenSesame:Register('MAIL_CLOSED', function()
+atMail = false
+AutomaticOpener()
+end)
+
+-- https://wowpedia.fandom.com/wiki/MERCHANT_SHOW
+-- Fired when the merchant frame is shown.
+OpenSesame:Register('MERCHANT_SHOW', function()
+atMerchant = true
+end)
+
+-- https://wowpedia.fandom.com/wiki/MERCHANT_CLOSED
+-- Fired when a merchant frame closes. (Called twice).
+OpenSesame:Register('MERCHANT_CLOSED', function()
+atMerchant = false
+AutomaticOpener()
+end)
+
+-- https://wowpedia.fandom.com/wiki/TRADE_SHOW
+-- Fired when the Trade window appears after a
+-- trade request has been accepted or auto-accepted.
+OpenSesame:Register('TRADE_SHOW', function()
+inTrade = true
+end)
+
+-- https://wowpedia.fandom.com/wiki/TRADE_CLOSED
+-- Fired when the trade window is closed by the
+-- trade being accepted, or the player or target closes the window.
+OpenSesame:Register('TRADE_CLOSED', function()
+inTrade = false
+AutomaticOpener()
+end)
+
+-- https://wowpedia.fandom.com/wiki/LOOT_OPENED
+-- Fires when a corpse is looted, after LOOT_READY.
+OpenSesame:Register('LOOT_OPENED', function()
+isLooting = true
+end)
+
+-- https://wowpedia.fandom.com/wiki/LOOT_CLOSED
+-- Fired when a player ceases looting a corpse.
+-- Note that this will fire before the last CHAT_MSG_LOOT event for that loot.
+OpenSesame:Register('LOOT_CLOSED', function()
+isLooting = false
+AutomaticOpener()
+end)
+
+-- https://wowpedia.fandom.com/wiki/PLAYER_REGEN_DISABLED
+-- Fired whenever you enter combat, as normal regen rates are disabled during combat.
+-- This means that either you are in the hate list of a NPC or that you've been
+-- taking part in a pvp action (either as attacker or victim).
+OpenSesame:Register('PLAYER_REGEN_DISABLED', function()
+inCombat = true
+end)
+
+-- https://wowpedia.fandom.com/wiki/PLAYER_REGEN_ENABLED
+-- Fired after ending combat, as regen rates return to normal.
+-- Useful for determining when a player has left combat.
+-- This occurs when you are not on the hate list of any NPC,
+-- or a few seconds after the latest pvp attack that you were involved with.
+OpenSesame:Register('PLAYER_REGEN_ENABLED', function()
+inCombat = false
+AutomaticOpener()
+end)
+
+-- https://wowpedia.fandom.com/wiki/BAG_UPDATE_DELAYED
+-- Fired after all applicable BAG_UPDATE events for a specific action have been fired.
+OpenSesame:Register('BAG_UPDATE_DELAYED', function()
+AutomaticOpener()
+end)
