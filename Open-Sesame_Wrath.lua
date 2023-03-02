@@ -416,6 +416,7 @@ function OpenSesame:PLAYER_INTERACTION_MANAGER_FRAME_HIDE(paneType)
    if paneType ==  Enum.PlayerInteractionType.MailInfo then
       atMail = false
    end
+   AutomaticOpener()
 end
 
 -- https://wowpedia.fandom.com/wiki/LOOT_OPENED
