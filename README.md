@@ -21,13 +21,13 @@ Just a simple add-on that automatically opens containers in your inventory.
 
 ### Game Version Notes
 
-We feel this is good to go, but please report any issues you find!
+We feel this is good to go, but please report any issues you find.
 
-✅ **Retail** : Good to go!
+✅ **Retail** : Tested; good to go!
 
-✅ **Wrath Classic** : Good to go!
+✅ **Wrath Classic** : Tested; good to go!
 
-✅ **Classic Era** : Good to go!
+✅ **Classic Era** : Tested; good to go!
 
 ### How It Works
 
