@@ -7,7 +7,7 @@ Just a simple add-on that automatically opens containers in your inventory.
 - You are not in combat (anything looted during combat will be opened as soon as combat is over).
 - You are not actively trying to loot something else.
 - You are not actively trading with another player.
-- The container is not locked (anything that you unlock will be opened).
+- The container is not locked.
 - The container did not drop off a "current" raid boss.
 - The container is Bind on Pickup (BoP), and is not tradable.
 - The container is tradable, but does not contain a BoP item.
