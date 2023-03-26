@@ -8,7 +8,7 @@ Just a simple add-on that automatically opens containers in your inventory.
 - You are not actively trying to loot something else.
 - You are not actively trading with another player.
 - You are not actively crafting.
-- The container is not locked (anything that you unlock will be opened).
+- The container is not locked.
 - The container did not drop off a "current" raid boss.
 - The container is Bind on Pickup (BoP), and is not tradable.
 - The container is tradable, but does not contain a BoP item.
@@ -22,13 +22,13 @@ Just a simple add-on that automatically opens containers in your inventory.
 
 ### Game Version Notes
 
-We feel this is good to go, but please report any issues you find!
+We feel this is good to go, but please report any issues you find.
 
-✅ **Retail** : Good to go!
+✅ **Retail** : Tested; good to go!
 
-✅ **Wrath Classic** : Good to go!
+✅ **Wrath Classic** : Tested; good to go!
 
-✅ **Classic Era** : Good to go!
+✅ **Classic Era** : Tested; good to go!
 
 ### How It Works
 
