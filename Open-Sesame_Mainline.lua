@@ -5,7 +5,7 @@ OpenSesame:SetScript('OnEvent', function(self, event, ...) self[event](event, ..
 -- If you want to see Startup Messages, simply un-comment the next line.
 -- print("|cff00FF80OpenSesame : Loaded WoW Retail")
 
-local atBank, atMail, atMerchant, inCombat, isLooting
+local atBank, atMail, atMerchant, inCombat, isLooting, isCrafting
 
 local AllowedItemsList = {
 
@@ -1428,6 +1428,19 @@ function OpenSesame:PLAYER_INTERACTION_MANAGER_FRAME_HIDE(paneType)
    AutomaticOpener()
 end
 
+-- https://wowpedia.fandom.com/wiki/TRADE_SKILL_SHOW
+-- Fired when a trade skill window is opened.
+function OpenSesame:TRADE_SKILL_SHOW()
+   isCrafting = true
+end
+
+-- https://wowpedia.fandom.com/wiki/TRADE_SKILL_CLOSE
+-- Fired when a trade skill window is closed.
+function OpenSesame:TRADE_SKILL_CLOSE()
+   isCrafting = false
+   AutomaticOpener()
+end
+
 -- https://wowpedia.fandom.com/wiki/LOOT_OPENED
 -- Fires when a corpse is looted, after LOOT_READY.
 function OpenSesame:LOOT_OPENED()
@@ -1468,7 +1481,7 @@ function OpenSesame:BAG_UPDATE_DELAYED()
 end
 
 function AutomaticOpener()
-   if (atBank or atMail or atMerchant or inCombat or isLooting) then return end
+   if (atBank or atMail or atMerchant or inCombat or isLooting or isCrafting) then return end
    for bag = 0, 4 do
       for slot = 0, C_Container.GetContainerNumSlots(bag) do
          local id = C_Container.GetContainerItemID(bag, slot)
@@ -1483,10 +1496,12 @@ function AutomaticOpener()
    end
 end
 
-OpenSesame:RegisterEvent('PLAYER_REGEN_DISABLED')
-OpenSesame:RegisterEvent('LOOT_OPENED')
 OpenSesame:RegisterEvent('PLAYER_INTERACTION_MANAGER_FRAME_SHOW')
 OpenSesame:RegisterEvent('PLAYER_INTERACTION_MANAGER_FRAME_HIDE')
-OpenSesame:RegisterEvent('PLAYER_REGEN_ENABLED')
+OpenSesame:RegisterEvent('TRADE_SKILL_SHOW')
+OpenSesame:RegisterEvent('TRADE_SKILL_CLOSE')
+OpenSesame:RegisterEvent('LOOT_OPENED')
 OpenSesame:RegisterEvent('LOOT_CLOSED')
+OpenSesame:RegisterEvent('PLAYER_REGEN_DISABLED')
+OpenSesame:RegisterEvent('PLAYER_REGEN_ENABLED')
 OpenSesame:RegisterEvent('BAG_UPDATE_DELAYED')
