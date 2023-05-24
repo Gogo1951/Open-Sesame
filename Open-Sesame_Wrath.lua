@@ -247,6 +247,7 @@ local AllowedItemsList = {
    [11912]  =  true,  -- Package of Empty Ooze Containers
    [24402]  =  true,  -- Package of Identified Plants
    [43556]  =  true,  -- Patroller's Pack
+   [45902]  =  true,  -- Phantom Ghostfish (Cooking Daily)
    -- [9276]  =  true,  -- Pirate's Footlocker (Can Contain BoP)
    [22155]  =  true,  -- Pledge of Adoration: Darnassus
    [22154]  =  true,  -- Pledge of Adoration: Ironforge
