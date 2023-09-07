@@ -4,7 +4,7 @@
 
 ## X-Curse-Project-ID: 830638
 
-## Interface: 100007
+## Interface: 100105
 
 ## Version: @project-version@
 

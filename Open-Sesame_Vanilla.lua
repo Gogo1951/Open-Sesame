@@ -1,11 +1,11 @@
 local OpenSesame = CreateFrame('Frame')
 
-OpenSesame:SetScript('OnEvent', function(self, event, ...) self[event](...) end)
+OpenSesame:SetScript('OnEvent', function(self, event, ...) self[event](event, ...) end)
 
 -- If you want to see Startup Messages, simply un-comment the next line.
 -- print("|cff00FF80OpenSesame : Loaded WoW Classic Era")
 
-local atBank, atMail, atMerchant, inCombat, isLooting, inTrade, inCraft
+local atBank, atMail, atMerchant, inCombat, isLooting, isCrafting
 
 local AllowedItemsList = {
 
@@ -27,7 +27,7 @@ local AllowedItemsList = {
    [11955]  =  true,  -- Bag of Empty Ooze Containers
    [20603]  =  true,  -- Bag of Spoils
    [6356]  =  true,  -- Battered Chest
-   --[16882]  =  true,  -- Battered Junkbox (Locked)
+   -- [16882]  =  true,  -- Battered Junkbox (Locked)
    [7973]  =  true,  -- Big-mouth Clam
    [6646]  =  true,  -- Bloated Albacore
    [6647]  =  true,  -- Bloated Catfish
@@ -70,7 +70,7 @@ local AllowedItemsList = {
    [8647]  =  true,  -- Egg Crate
    [10752]  =  true,  -- Emerald Encrusted Chest
    [11617]  =  true,  -- Eridan's Supplies
-   --[5760]  =  true,  -- Eternium Lockbox (Locked)
+   -- [5760]  =  true,  -- Eternium Lockbox (Locked)
    [11024]  =  true,  -- Evergreen Herb Casing
    [11937]  =  true,  -- Fat Sack of Coins
    [10834]  =  true,  -- Felhound Tracker Kit
@@ -104,11 +104,11 @@ local AllowedItemsList = {
    [19296]  =  true,  -- Greater Darkmoon Prize
    [17963]  =  true,  -- Green Sack of Gems
    [10773]  =  true,  -- Hakkari Urn
-   --[4633]  =  true,  -- Heavy Bronze Lockbox (Locked)
+   -- [4633]  =  true,  -- Heavy Bronze Lockbox (Locked)
    [8503]  =  true,  -- Heavy Bronze Lotterybox
    [13874]  =  true,  -- Heavy Crate
    [8505]  =  true,  -- Heavy Iron Lotterybox
-   --[16885]  =  true,  -- Heavy Junkbox (Locked)
+   -- [16885]  =  true,  -- Heavy Junkbox (Locked)
    [8507]  =  true,  -- Heavy Mithril Lotterybox
    [22648]  =  true,  -- Hive'Ashi Dossier
    [22649]  =  true,  -- Hive'Regal Dossier
@@ -118,9 +118,9 @@ local AllowedItemsList = {
    [9529]  =  true,  -- Internal Warrior Equipment Kit L25
    [9532]  =  true,  -- Internal Warrior Equipment Kit L30
    [21150]  =  true,  -- Iron Bound Trunk
-   --[4634]  =  true,  -- Iron Lockbox (Locked)
+   -- [4634]  =  true,  -- Iron Lockbox (Locked)
    [8504]  =  true,  -- Iron Lotterybox
-   --[13875]  =  true,  -- Ironbound Locked Chest (Locked)
+   -- [13875]  =  true,  -- Ironbound Locked Chest (Locked)
    [10479]  =  true,  -- Kovic's Trading Satchel
    [10595]  =  true,  -- Kum'isha's Junk
    [12122]  =  true,  -- Kum'isha's Junk
@@ -136,7 +136,7 @@ local AllowedItemsList = {
    [6307]  =  true,  -- Message in a Bottle
    [19298]  =  true,  -- Minor Darkmoon Prize
    [21228]  =  true,  -- Mithril Bound Trunk
-   --[5758]  =  true,  -- Mithril Lockbox (Locked)
+   -- [5758]  =  true,  -- Mithril Lockbox (Locked)
    [8506]  =  true,  -- Mithril Lotterybox
    [22320]  =  true,  -- Mux's Quality Goods
    [19425]  =  true,  -- Mysterious Lockbox
@@ -144,7 +144,7 @@ local AllowedItemsList = {
    [15876]  =  true,  -- Nathanos' Chest
    [9537]  =  true,  -- Neatly Wrapped Box
    [20768]  =  true,  -- Oozing Bag
-   --[4632]  =  true,  -- Ornate Bronze Lockbox (Locked)
+   -- [4632]  =  true,  -- Ornate Bronze Lockbox (Locked)
    [19153]  =  true,  -- Outrider Advanced Care Package
    [19154]  =  true,  -- Outrider Basic Care Package
    [19155]  =  true,  -- Outrider Standard Care Package
@@ -164,8 +164,8 @@ local AllowedItemsList = {
    [22163]  =  true,  -- Pledge of Friendship: Undercity
    [13247]  =  true,  -- Quartermaster Zigris' Footlocker
    [17969]  =  true,  -- Red Sack of Gems
-   --[13918]  =  true,  -- Reinforced Locked Chest (Locked)
-   --[4638]  =  true,  -- Reinforced Steel Lockbox (Locked)
+   -- [13918]  =  true,  -- Reinforced Locked Chest (Locked)
+   -- [4638]  =  true,  -- Reinforced Steel Lockbox (Locked)
    [6715]  =  true,  -- Ruined Jumper Cables
    [18636]  =  true,  -- Ruined Jumper Cables XL
    [11938]  =  true,  -- Sack of Gems
@@ -179,10 +179,10 @@ local AllowedItemsList = {
    [19150]  =  true,  -- Sentinel Basic Care Package
    [19151]  =  true,  -- Sentinel Standard Care Package
    [20766]  =  true,  -- Slimy Bag
-   [5523]  =  true,  -- Small Barnacled Clam
+   -- [5523]  =  true,  -- Small Barnacled Clam (Clams are likely Blocked by Blizzard API Due to "Clam Weaving" Hack)
    [15699]  =  true,  -- Small Brown-wrapped Package
    [6353]  =  true,  -- Small Chest
-   --[6354]  =  true,  -- Small Locked Chest (Locked)
+   -- [6354]  =  true,  -- Small Locked Chest (Locked)
    [21740]  =  true,  -- Small Rocket Recipes
    [11966]  =  true,  -- Small Sack of Coins
    [21216]  =  true,  -- Smokywood Pastures Extra-Special Gift
@@ -190,20 +190,20 @@ local AllowedItemsList = {
    [17685]  =  true,  -- Smokywood Pastures Sampler
    [17726]  =  true,  -- Smokywood Pastures Special Gift
    [21315]  =  true,  -- Smokywood Satchel
-   [15874]  =  true,  -- Soft-shelled Clam
+   -- [15874]  =  true,  -- Soft-shelled Clam (Clams are likely Blocked by Blizzard API Due to "Clam Weaving" Hack)
    [9363]  =  true,  -- Sparklematic-Wrapped Box
-   --[4637]  =  true,  -- Steel Lockbox (Locked)
-   --[4636]  =  true,  -- Strong Iron Lockbox (Locked)
-   --[16884]  =  true,  -- Sturdy Junkbox (Locked)
-   --[6355]  =  true,  -- Sturdy Locked Chest (Locked)
+   -- [4637]  =  true,  -- Steel Lockbox (Locked)
+   -- [4636]  =  true,  -- Strong Iron Lockbox (Locked)
+   -- [16884]  =  true,  -- Sturdy Junkbox (Locked)
+   -- [6355]  =  true,  -- Sturdy Locked Chest (Locked)
    [23224]  =  true,  -- Summer Gift Package
    [20809]  =  true,  -- Tactical Assignment
-   --[7209]  =  true,  -- Tazan's Satchel (Locked)
+   -- [7209]  =  true,  -- Tazan's Satchel (Locked)
    [7870]  =  true,  -- Thaumaturgy Vessel Lockbox
-   --[12033]  =  true,  -- Thaurissan Family Jewels (Locked)
-   [5524]  =  true,  -- Thick-shelled Clam
-   --[7868]  =  true,  -- Thieven' Kit (Locked)
-   --[5759]  =  true,  -- Thorium Lockbox (Locked)
+   -- [12033]  =  true,  -- Thaurissan Family Jewels (Locked)
+   -- [5524]  =  true,  -- Thick-shelled Clam (Clams are likely Blocked by Blizzard API Due to "Clam Weaving" Hack)
+   -- [7868]  =  true,  -- Thieven' Kit (Locked)
+   -- [5759]  =  true,  -- Thorium Lockbox (Locked)
    [21327]  =  true,  -- Ticking Present
    [20708]  =  true,  -- Tightly Sealed Trunk
    [11568]  =  true,  -- Torwa's Pouch
@@ -211,138 +211,142 @@ local AllowedItemsList = {
    [12339]  =  true,  -- Vaelan's Gift
    [6352]  =  true,  -- Waterlogged Crate
    [21113]  =  true,  -- Watertight Trunk
-   --[16883]  =  true,  -- Worn Junkbox (Locked)
+   -- [16883]  =  true,  -- Worn Junkbox (Locked)
    [17965]  =  true,  -- Yellow Sack of Gems
    [22137]  =  true,  -- Ysida's Satchel
    -- [22233]  =  true,  -- Zigris' Footlocker (Seems like bad data; a dupe of #13247)
 
 }
 
-function OpenSesame:Register(event, func)
-      self:RegisterEvent(event)
-      self[event] = function(...)
-      func(...)
+-- *** EVENT HANDLERS ***
+
+-- https://wowpedia.fandom.com/wiki/PLAYER_INTERACTION_MANAGER_FRAME_SHOW
+-- Fires when the PLAYER_INTERACTION_MANAGER_FRAME UI opens. (no summary on page)
+function OpenSesame:PLAYER_INTERACTION_MANAGER_FRAME_SHOW(paneType)
+   if paneType ==  Enum.PlayerInteractionType.TradePartner then
+      isLooting = true
+   end
+   if paneType ==  Enum.PlayerInteractionType.Merchant then
+      atMerchant = true
+   end
+   if paneType ==  Enum.PlayerInteractionType.Vendor then
+      atMerchant = true
+   end
+   if paneType ==  Enum.PlayerInteractionType.TabardVendor then
+      atMerchant = true
+   end
+   if paneType ==  Enum.PlayerInteractionType.Banker then
+      atBank = true
+   end
+   if paneType ==  Enum.PlayerInteractionType.GuildBanker then
+      atBank = true
+   end
+   if paneType ==  Enum.PlayerInteractionType.MailInfo then
+      atMail = true
    end
 end
 
-function AutomaticOpener()
-   if (atBank or atMail or atMerchant or inCombat or isLooting or inTrade or inCraft) then
-      return
+-- https://wowpedia.fandom.com/wiki/PLAYER_INTERACTION_MANAGER_FRAME_HIDE
+-- Fires when the PLAYER_INTERACTION_MANAGER_FRAME UI closes. (no summary on page)
+function OpenSesame:PLAYER_INTERACTION_MANAGER_FRAME_HIDE(paneType)
+   if paneType ==  Enum.PlayerInteractionType.TradePartner then
+      isLooting = false
    end
-   for bag = 0, 4 do
-      for slot = 0, GetContainerNumSlots(bag) do
-         local id = GetContainerItemID(bag, slot)
-         if id and AllowedItemsList[id] then
-            UseContainerItem(bag, slot)
-            -- If you want to see messages in chat every time something is opened, un-comment the next line.
-            -- DEFAULT_CHAT_FRAME:AddMessage("|cff00FF80OpenSesame : Opening " .. GetContainerItemLink(bag, slot))
-            return
-         end
-      end
+   if paneType ==  Enum.PlayerInteractionType.Merchant then
+      atMerchant = false
    end
+   if paneType ==  Enum.PlayerInteractionType.Vendor then
+      atMerchant = false
+   end
+   if paneType ==  Enum.PlayerInteractionType.TabardVendor then
+      atMerchant = false
+   end
+   if paneType ==  Enum.PlayerInteractionType.Banker then
+      atBank = false
+   end
+   if paneType ==  Enum.PlayerInteractionType.GuildBanker then
+      atBank = false
+   end
+   if paneType ==  Enum.PlayerInteractionType.MailInfo then
+      atMail = false
+   end
+   AutomaticOpener()
 end
-
--- https://wowpedia.fandom.com/wiki/BANKFRAME_OPENED
--- Fired when the bank frame is opened.
-OpenSesame:Register('BANKFRAME_OPENED', function()
-   atBank = true
-end)
-
--- https://wowpedia.fandom.com/wiki/BANKFRAME_CLOSED
--- Fired twice when the bank window is closed.
-OpenSesame:Register('BANKFRAME_CLOSED', function()
-   atBank = false
-   AutomaticOpener()
-end)
-
--- https://wowpedia.fandom.com/wiki/MAIL_SHOW
--- Fired when the mailbox is first opened.
-OpenSesame:Register('MAIL_SHOW', function()
-   atMail = true
-end)
-
--- https://wowpedia.fandom.com/wiki/MAIL_CLOSED
--- Fired when the mailbox window is closed.
-OpenSesame:Register('MAIL_CLOSED', function()
-   atMail = false
-   AutomaticOpener()
-end)
-
--- https://wowpedia.fandom.com/wiki/MERCHANT_SHOW
--- Fired when the merchant frame is shown.
-OpenSesame:Register('MERCHANT_SHOW', function()
-   atMerchant = true
-end)
-
--- https://wowpedia.fandom.com/wiki/MERCHANT_CLOSED
--- Fired when a merchant frame closes. (Called twice).
-OpenSesame:Register('MERCHANT_CLOSED', function()
-   atMerchant = false
-   AutomaticOpener()
-end)
-
--- https://wowpedia.fandom.com/wiki/TRADE_SHOW
--- Fired when the Trade window appears after a
--- trade request has been accepted or auto-accepted.
-OpenSesame:Register('TRADE_SHOW', function()
-   inTrade = true
-end)
-
--- https://wowpedia.fandom.com/wiki/TRADE_CLOSED
--- Fired when the trade window is closed by the
--- trade being accepted, or the player or target closes the window.
-OpenSesame:Register('TRADE_CLOSED', function()
-   inTrade = false
-   AutomaticOpener()
-end)
 
 -- https://wowpedia.fandom.com/wiki/TRADE_SKILL_SHOW
 -- Fired when a trade skill window is opened.
-OpenSesame:Register('TRADE_SKILL_SHOW', function()
-   inCraft = true
-end)
+function OpenSesame:TRADE_SKILL_SHOW()
+   isCrafting = true
+end
 
 -- https://wowpedia.fandom.com/wiki/TRADE_SKILL_CLOSE
 -- Fired when a trade skill window is closed.
-OpenSesame:Register('TRADE_SKILL_CLOSE', function()
-   inCraft = false
+function OpenSesame:TRADE_SKILL_CLOSE()
+   isCrafting = false
    AutomaticOpener()
-end)
+end
 
 -- https://wowpedia.fandom.com/wiki/LOOT_OPENED
 -- Fires when a corpse is looted, after LOOT_READY.
-OpenSesame:Register('LOOT_OPENED', function()
+function OpenSesame:LOOT_OPENED()
    isLooting = true
-end)
+end
 
 -- https://wowpedia.fandom.com/wiki/LOOT_CLOSED
 -- Fired when a player ceases looting a corpse.
 -- Note that this will fire before the last CHAT_MSG_LOOT event for that loot.
-OpenSesame:Register('LOOT_CLOSED', function()
+function OpenSesame:LOOT_CLOSED()
    isLooting = false
    AutomaticOpener()
-end)
+end
 
 -- https://wowpedia.fandom.com/wiki/PLAYER_REGEN_DISABLED
--- Fired whenever you enter combat, as normal regen rates are disabled during combat.
--- This means that either you are in the hate list of a NPC or that you've been
--- taking part in a pvp action (either as attacker or victim).
-OpenSesame:Register('PLAYER_REGEN_DISABLED', function()
+-- Fired whenever you enter combat, as normal regen rates
+-- are disabled during combat. This means that either you
+-- are in the hate list of a NPC or that you've been taking
+-- part in a pvp action (either as attacker or victim).
+function OpenSesame:PLAYER_REGEN_DISABLED()
    inCombat = true
-end)
+end
 
 -- https://wowpedia.fandom.com/wiki/PLAYER_REGEN_ENABLED
 -- Fired after ending combat, as regen rates return to normal.
 -- Useful for determining when a player has left combat.
 -- This occurs when you are not on the hate list of any NPC,
 -- or a few seconds after the latest pvp attack that you were involved with.
-OpenSesame:Register('PLAYER_REGEN_ENABLED', function()
+function OpenSesame:PLAYER_REGEN_ENABLED()
    inCombat = false
    AutomaticOpener()
-end)
+end
 
 -- https://wowpedia.fandom.com/wiki/BAG_UPDATE_DELAYED
 -- Fired after all applicable BAG_UPDATE events for a specific action have been fired.
-OpenSesame:Register('BAG_UPDATE_DELAYED', function()
+function OpenSesame:BAG_UPDATE_DELAYED()
    AutomaticOpener()
-end)
+end
+
+function AutomaticOpener()
+   if (atBank or atMail or atMerchant or inCombat or isLooting or isCrafting) then return end
+   for bag = 0, 4 do
+      for slot = 0, C_Container.GetContainerNumSlots(bag) do
+         local id = C_Container.GetContainerItemID(bag, slot)
+         if id and AllowedItemsList[id] then
+            if C_Container.GetContainerItemInfo(bag, slot).isLocked then return end
+            -- If you want to see messages in chat every time something is opened, un-comment the next line.
+            -- DEFAULT_CHAT_FRAME:AddMessage("|cff00FF80OpenSesame : Opening " .. C_Container.GetContainerItemLink(bag, slot))
+            C_Container.UseContainerItem(bag, slot)
+            return
+         end
+      end
+   end
+end
+
+OpenSesame:RegisterEvent('PLAYER_INTERACTION_MANAGER_FRAME_SHOW')
+OpenSesame:RegisterEvent('PLAYER_INTERACTION_MANAGER_FRAME_HIDE')
+OpenSesame:RegisterEvent('TRADE_SKILL_SHOW')
+OpenSesame:RegisterEvent('TRADE_SKILL_CLOSE')
+OpenSesame:RegisterEvent('LOOT_OPENED')
+OpenSesame:RegisterEvent('LOOT_CLOSED')
+OpenSesame:RegisterEvent('PLAYER_REGEN_DISABLED')
+OpenSesame:RegisterEvent('PLAYER_REGEN_ENABLED')
+OpenSesame:RegisterEvent('BAG_UPDATE_DELAYED')
