@@ -10,7 +10,7 @@
 
 ## DefaultState: enabled
 
-Open-Sesame.lua
+Open-Sesame_Vanilla.lua
 
 # Open Sesame! on CurseForge : https://www.curseforge.com/wow/addons/open-sesame
 # Open Sesame! on GitHub : https://github.com/Gogo1951/Open-Sesame
