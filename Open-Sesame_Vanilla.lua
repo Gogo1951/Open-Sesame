@@ -224,15 +224,22 @@ frame:SetScript("OnEvent", OnEvent)
 
 -- Function to check if any specified windows or conditions are active
 local function WindowOpen()
-    return TradeFrame and TradeFrame:IsVisible() or MerchantFrame and MerchantFrame:IsVisible() or
+    -- Check for windows like Trade, Merchant, Bank, etc.
+    return TradeFrame and TradeFrame:IsVisible() or 
+        MerchantFrame and MerchantFrame:IsVisible() or
         BankFrame and BankFrame:IsVisible() or
-        (ContainerFrame1 and ContainerFrame1:IsVisible()) or
+        (ContainerFrame1 and ContainerFrame1:IsVisible()) or  -- Backpack
+        (ContainerFrame2 and ContainerFrame2:IsVisible()) or  -- First bag
+        (ContainerFrame3 and ContainerFrame3:IsVisible()) or  -- Second bag
+        (ContainerFrame4 and ContainerFrame4:IsVisible()) or  -- Third bag
+        (ContainerFrame5 and ContainerFrame5:IsVisible()) or  -- Fourth bag
         (GossipFrame and GossipFrame:IsVisible()) or
         (AuctionFrame and AuctionFrame:IsVisible()) or
         (ReagentBankFrame and ReagentBankFrame:IsVisible()) or
         (CraftFrame and CraftFrame:IsVisible()) or
         (TradeSkillFrame and TradeSkillFrame:IsVisible()) or
-        LootFrame and LootFrame:IsVisible()
+        LootFrame and LootFrame:IsVisible() or
+        MailFrame and MailFrame:IsVisible()
 end
 
 -- Function to check if there are fewer than 4 free bag spaces in generic bags
