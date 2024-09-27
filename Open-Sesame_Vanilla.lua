@@ -1140,12 +1140,16 @@ local AllowedDeleteItems = {
 -- Allow BagButler to Delete these quest items if their associated quests are completed.
 local AllowedDeleteQuestItems = {
     -- Example: [ItemID] = {QuestID1, QuestID2, ...}
-    [1358] = {138}, -- Item Name | Quest Name(s), Quest Name(s)
-    [1361] = {139}, 
-    [1362] = {140}, 
-    [7907] = {2282}, 
-    [8046] = {2359}, 
-    [16991] = {6624, 6622}, -- Example of item with quests for both factions
+    [1358]      = {138}, -- Item Name | Quest Name(s), Quest Name(s)
+    [1361]      = {139}, 
+    [1362]      = {140}, 
+    [16991]     = {6624, 6622}, -- Example of item with quests for both factions
+    [7667]      = {2200},
+    [7668]      = {2201, 2339},
+    [7846]      = {2258, 2500},
+    [7907]      = {2282}, 
+    [8046]      = {2359}, 
+    [8047]      = {17, 2202},
     -- Add more ItemID/QuestID pairs as needed
 }
 
@@ -1237,7 +1241,7 @@ local function DeleteLowValue()
             -- If the item is worth at least 1 gold
             print(
                 string.format(
-                    "|cff4FC3F7Open Sesame : %dx %s has been deleted. It was worth %d Gold, %d Silver, %d Copper.|r",
+                    "|cff4FC3F7Open Sesame : %dx %s (%d g, %d s, %d c) has been deleted.|r",
                     lowestStackCount,
                     lowestItemLink,
                     gold,
@@ -1249,7 +1253,7 @@ local function DeleteLowValue()
             -- If the item is worth less than 1 gold but at least 1 silver
             print(
                 string.format(
-                    "|cff4FC3F7Open Sesame : %dx %s has been deleted. It was worth %d Silver, %d Copper.|r",
+                    "|cff4FC3F7Open Sesame : %dx %s (%d s, %d c) has been deleted.|r",
                     lowestStackCount,
                     lowestItemLink,
                     silver,
@@ -1260,7 +1264,7 @@ local function DeleteLowValue()
             -- If the item is worth only copper (less than 1 silver)
             print(
                 string.format(
-                    "|cff4FC3F7Open Sesame : %dx %s has been deleted. It was worth %d Copper.|r",
+                    "|cff4FC3F7Open Sesame : %dx %s (%d c) has been deleted.|r",
                     lowestStackCount,
                     lowestItemLink,
                     copper
