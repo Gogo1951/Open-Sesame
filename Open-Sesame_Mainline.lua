@@ -1,3 +1,6 @@
+CreateFrame("GameTooltip", "OpenSesameTip", nil, "GameTooltipTemplate")
+OpenSesameTip:SetOwner(WorldFrame, "ANCHOR_NONE")
+
 local OpenSesame = CreateFrame('Frame')
 
 OpenSesame:SetScript('OnEvent', function(self, event, ...) self[event](event, ...) end)
@@ -1480,18 +1483,37 @@ function OpenSesame:BAG_UPDATE_DELAYED()
    AutomaticOpener()
 end
 
+local function FindLocked()
+    local i=1
+    while _G["OpenSesameTipTextLeft" .. i] do
+        local text = _G["OpenSesameTipTextLeft" .. i]:GetText()
+        if text and text == "Locked" then return true end
+        i = i + 1
+    end
+    return false
+end
+
 function AutomaticOpener()
    if (atBank or atMail or atMerchant or inCombat or isLooting or isCrafting) then return end
    for bag = 0, 4 do
       for slot = 0, C_Container.GetContainerNumSlots(bag) do
-         local id = C_Container.GetContainerItemID(bag, slot)
-         if id and AllowedItemsList[id] then
-            if C_Container.GetContainerItemInfo(bag, slot).isLocked then return end
-            -- If you want to see messages in chat every time something is opened, un-comment the next line.
-            -- DEFAULT_CHAT_FRAME:AddMessage("|cff00FF80OpenSesame : Opening " .. C_Container.GetContainerItemLink(bag, slot))
-            C_Container.UseContainerItem(bag, slot)
-            return
-         end
+         local container_item_info = C_Container.GetContainerItemInfo(bag,slot)
+         if container_item_info then
+	   local lootable = container_item_info["hasLoot"]
+	   local id = container_item_info["itemID"]
+	   local a,a,a,a,lvl = C_Item.GetItemInfo(id)
+	   if (not lvl or lvl <= UnitLevel("player")) and (lootable or (id and AllowedItemsList[id])) then
+	      -- If you want to see messages in chat every time something is opened, un-comment the next line.
+              OpenSesameTip:SetBagItem(bag,slot)
+              if FindLocked() then
+                -- print(container_item_info["hyperlink"] .. " is locked")
+              else
+                -- DEFAULT_CHAT_FRAME:AddMessage("|cff00FF80OpenSesame : Opening " .. C_Container.GetContainerItemLink(bag, slot))
+                C_Container.UseContainerItem(bag, slot)
+                return
+              end
+	   end
+	 end
       end
    end
 end
