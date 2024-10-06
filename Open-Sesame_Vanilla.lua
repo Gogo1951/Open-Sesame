@@ -214,7 +214,7 @@ local function OnEvent(self, event, ...)
     if event == "PLAYER_ENTERING_WORLD" then
         print("|cff4FC3F7Open Sesame|r : WARNING This is a beta build! Use at your own risk.")
         print(
-            "|cff4FC3F7Open Sesame|r : Use |cff81C784/magiceraser|r to clean up your bags by removing completed quest items, low-level consumables you don't need, or the least valuable vendor item."
+            "|cff4FC3F7Open Sesame|r : Use |cff81C784/MagicEraser|r to clean up your bags by removing completed quest items, low-level consumables you don't need, or the least valuable vendor item."
         )
     end
 end
@@ -285,7 +285,7 @@ local function ProcessItems()
     if not BagSpaceCheck() then
         if not isPaused then
             print(
-                "|cff4FC3F7Open Sesame|r : Paused until you have at least 4 free bag spaces available. Use |cff81C784/magiceraser|r to make some more room."
+                "|cff4FC3F7Open Sesame|r : Paused until you have at least 4 free bag spaces available. Use |cff81C784/MagicEraser|r to make some more room."
             )
             isPaused = true
         end
@@ -1215,18 +1215,25 @@ local AllowedDeleteItems = {
 
 -- Allow BagButler to Delete these quest items if their associated quests are completed.
 local AllowedDeleteQuestItems = {
-    -- Example: [ItemID] = {QuestID1, QuestID2, ...}
-    [1358] = {138},          -- Item Name | Quest Name(s), Quest Name(s)
-    [1361] = {139},
-    [1362] = {140},
-    [16991] = {6624, 6622},  -- Example of item with quests for both factions
-    [7667] = {2200},
-    [7668] = {2201, 2339},
-    [7846] = {2258, 2500},
-    [7907] = {2282},
-    [8046] = {2359},
-    [8047] = {17, 2202}
+    -- Example: [ItemID]     = {QuestID1, QuestID2, ...}
+    [10515]  = {3463},
+    [1358]   = {138},          -- Item Name | Quest Name(s), Quest Name(s)
+    [1361]   = {139},
+    [1362]   = {140},
+    [16991]  = {6624, 6622},  -- Example of item with quests for both factions
+    [2154]   = {231},
+    [3248]   = {253},
+    [5884]   = {1206},
+    [7667]   = {2200},
+    [7668]   = {2201, 2339},
+    [7846]   = {2258, 2500},
+    [7907]   = {2282},
+    [8046]   = {2359},
+    [8047]   = {17, 2202},
+    [9279]   = {2930},
+    [9326]   = {2945},
     -- Add more ItemID/QuestID pairs as needed
+    -- TODO
 }
 
 -- Function to check if the player has completed any quest in the list
@@ -1360,5 +1367,5 @@ local function DeleteLowValue()
 end
 
 -- Slash command to run the function in-game
-SLASH_DELETELOWGRAY1 = "/magiceraser"
+SLASH_DELETELOWGRAY1 = "/MagicEraser"
 SlashCmdList["DELETELOWGRAY"] = DeleteLowValue
