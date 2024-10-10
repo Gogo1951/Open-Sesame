@@ -1231,9 +1231,12 @@ local AllowedDeleteQuestItems = {
     [8046]   = {2359},
     [8047]   = {17, 2202},
     [9279]   = {2930},
+    [9309]   = {2928},
     [9326]   = {2945},
     -- Add more ItemID/QuestID pairs as needed
-    -- TODO
+    -- TODO 
+    -- Check for items like [Owatanka's Tailspike] that are not available to your current race, and discard if found.
+    -- Add Stack Count when deleting.
 }
 
 -- Function to check if the player has completed any quest in the list
@@ -1329,7 +1332,7 @@ local function DeleteLowValue()
             -- If the item is worth at least 1 gold
             print(
                 string.format(
-                    "|cff4FC3F7Open Sesame|r : Erasing %dx %s (|cffffd700%dg|r |cffc0c0c0%ds|r |cffcd7f32%dc|r)!",
+                    "|cff4FC3F7Open Sesame|r : Deleted %dx %s - worth %d|cffffd700g|r %d|cffc0c0c0s|r %d|cffcd7f32c|r.",
                     lowestStackCount,
                     lowestItemLink,
                     gold,
@@ -1341,7 +1344,7 @@ local function DeleteLowValue()
             -- If the item is worth less than 1 gold but at least 1 silver
             print(
                 string.format(
-                    "|cff4FC3F7Open Sesame|r : Erasing %dx %s (|cffc0c0c0%ds|r |cffcd7f32%dc|r)!",
+                    "|cff4FC3F7Open Sesame|r : Deleted %dx %s - worth %d|cffc0c0c0s|r %d|cffcd7f32c|r.",
                     lowestStackCount,
                     lowestItemLink,
                     silver,
@@ -1352,7 +1355,7 @@ local function DeleteLowValue()
             -- If the item is worth only copper (less than 1 silver)
             print(
                 string.format(
-                    "|cff4FC3F7Open Sesame|r : Erasing %dx %s (|cffcd7f32%dc|r)!",
+                    "|cff4FC3F7Open Sesame|r : Deleted %dx %s - worth %d|cffcd7f32c|r.",
                     lowestStackCount,
                     lowestItemLink,
                     copper
