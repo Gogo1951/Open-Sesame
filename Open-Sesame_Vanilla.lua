@@ -1216,15 +1216,22 @@ local AllowedDeleteItems = {
 -- Allow BagButler to Delete these quest items if their associated quests are completed.
 local AllowedDeleteQuestItems = {
     -- Example: [ItemID]     = {QuestID1, QuestID2, ...}
-    [10515]  = {3463},
     [1358]   = {138},          -- Item Name | Quest Name(s), Quest Name(s)
     [1361]   = {139},
     [1362]   = {140},
-    [16991]  = {6624, 6622},  -- Example of item with quests for both factions
     [2154]   = {231},
     [3248]   = {253},
+    [4472]   = {656},
+    [4614]   = {635},
+    [4843]   = {717},
+    [4844]   = {717},
+    [4845]   = {717},
+    [5505]   = {1023},
     [5884]   = {1206},
-    [7667]   = {2200},
+    [6842]   = {1701},
+    [6929]   = {1712},
+    [7666]   = {2198},
+    [7667]   = {2201},
     [7668]   = {2201, 2339},
     [7846]   = {2258, 2500},
     [7907]   = {2282},
@@ -1233,10 +1240,21 @@ local AllowedDeleteQuestItems = {
     [9279]   = {2930},
     [9309]   = {2928},
     [9326]   = {2945},
+    [10515]  = {3463},
+    [10575]  = {4022, 4023},
+    [11468]  = {4286},
+    [12533]  = {4867},
+    [12534]  = {4867},
+    [12650]  = {105, 211},
+    [12730]  = {4867},
+    [12738]  = {5059},
+    [16991]  = {6624, 6622},  -- Example of item with quests for both factions
+    [18501]  = {5526},
     -- Add more ItemID/QuestID pairs as needed
     -- TODO 
     -- Check for items like [Owatanka's Tailspike] that are not available to your current race, and discard if found.
     -- Add Stack Count when deleting.
+    -- ITEMS
 }
 
 -- Function to check if the player has completed any quest in the list
