@@ -7,8 +7,13 @@ name: Package and release
 # other branches or even pullrequests.
 on:
   push:
+    branches:
+      - master
     tags:
-      - '**'
+      - '*'
+  pull_request:
+    branches:
+      - master
 
 # a workflow is built up as jobs, and within these jobs are steps
 jobs:
@@ -38,4 +43,4 @@ jobs:
 
       # once cloned, we just run the GitHub Action for the packager project
       - name: Package and release
-        uses: BigWigsMods/packager@v2
+        uses: BigWigsMods/packager@master
