@@ -20,6 +20,20 @@ Just a simple add-on that automatically opens containers in your inventory.
 
 🚫 **The "UseContainerItem" API call no longer works on clams. This likely has something to do with the "[Clam Weaving](https://www.youtube.com/watch?v=h3YO7jeoOWs)" hack.**
 
+## Download
+
+You can find this on Curseforge.
+
+https://www.curseforge.com/wow/addons/open-sesame
+
+## Report Issues & Get Involved
+
+You can find this project on GitHub.
+
+https://github.com/Gogo1951/Open-Sesame
+
+Gogo1951 on Discord.
+
 ## Testing Notes
 
 🟢 Classic Era
@@ -31,20 +45,6 @@ Just a simple add-on that automatically opens containers in your inventory.
 🔴 Retail (Not Tested)
 
 Please reach out if you would like to be involved with testing!
-
-## Report Issues & Get Involved
-
-You can find this project on GitHub.
-
-https://github.com/Gogo1951/Open-Sesame
-
-Gogo1951 on Discord.
-
-## Download
-
-You can find this on Curseforge.
-
-https://www.curseforge.com/wow/addons/open-sesame
 
 ## History
 
