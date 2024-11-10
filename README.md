@@ -20,31 +20,33 @@ Just a simple add-on that automatically opens containers in your inventory.
 
 🚫 **The "UseContainerItem" API call no longer works on clams. This likely has something to do with the "[Clam Weaving](https://www.youtube.com/watch?v=h3YO7jeoOWs)" hack.**
 
-### Game Version Notes
+## Testing Notes
 
-We feel this is good to go, but please report any issues you find.
+🟢 Classic Era
 
-✅ **Retail** : Tested; good to go!
+🟡 Season of Discovery (Minimal Testing)
 
-✅ **Wrath Classic** : Tested; good to go!
+🟡 Cataclysm Classic (Minimal Testing)
 
-✅ **Classic Era** : Tested; good to go!
+🔴 Retail (Not Tested)
 
-### How It Works
+Please reach out if you would like to be involved with testing!
 
-Open Sesame! looks for items in your inventory [that are on the list](https://github.com/Gogo1951/Open-Sesame/blob/main/Automatic-Open.lua#L7) (containers that meet the above stated criteria), and runs [a public API call](https://wowpedia.fandom.com/wiki/API_C_Container.UseContainerItem) to open them as soon as they are detected. 
+## Report Issues & Get Involved
 
-Open Sesame! runs on less than 35kb of memory; it's very lightweight and won't impact performance. 
+You can find this project on GitHub.
 
-### Download
+https://github.com/Gogo1951/Open-Sesame
 
-⏬ Open Sesame! on CurseForge : https://www.curseforge.com/wow/addons/open-sesame
+Gogo1951 on Discord.
 
-### Provide Feedback & Report Bugs
+## Download
 
-🔁 Open Sesame! on GitHub : https://github.com/Gogo1951/Open-Sesame
+You can find this on Curseforge.
 
-### Similar Add-ons & Weak Auras
+https://www.curseforge.com/wow/addons/open-sesame
+
+## History
 
 👏 **I didn't create this add-on, I just updated it for TBC and Wrath.**
 
