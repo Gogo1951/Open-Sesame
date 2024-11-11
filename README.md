@@ -2,7 +2,9 @@
 
 Just a simple add-on that automatically opens containers in your inventory.
 
-⚙️ Works under the following conditions:
+❗ **Auto Loot must be enabled for Open Sesame! to work correctly!**
+
+⚙️ Open Sesame! under the following conditions:
 
 - You are not in combat (anything looted during combat will be opened as soon as combat is over).
 - You are not actively trying to loot something else.
@@ -14,6 +16,7 @@ Just a simple add-on that automatically opens containers in your inventory.
 - The container is tradable, but does not contain a BoP item.
 - The container is tradable, but does not contain a unique item.
 - You do not have a Merchant Window Open.
+- You do not have the Auction House Window Open
 - You do not have your Bank Window Open.
 - You do not have your Guild Bank Window Open.
 - You do not have your Mailbox Window Open.
