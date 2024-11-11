@@ -38,7 +38,7 @@ Gogo1951 on Discord.
 
 🟢 Classic Era
 
-🟡 Classic Hardcore (Minimal Testing)
+🟢 Classic Hardcore
 
 🟡 Season of Discovery (Minimal Testing)
 
