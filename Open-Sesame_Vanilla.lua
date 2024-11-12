@@ -1,3 +1,4 @@
+-- Allowed items that can be opened
 local AllowedOpenItems = {
 --   Allow Open Sesame! to open these items.
 
@@ -346,141 +347,89 @@ local AllowedOpenItems = {
 --  [215454] = true,    -- Tiny Strongbox
 }
 
--- Create a frame to register events
-local frame = CreateFrame("Frame")
-frame:RegisterEvent("PLAYER_ENTERING_WORLD") -- Trigger when player logs in or enters the world
-frame:SetScript("OnEvent", OnEvent)
+-- Create a frame to handle events
+local eventFrame = CreateFrame("Frame")
+eventFrame:RegisterEvent("BAG_UPDATE")
 
--- Function to check if any specified windows or conditions are active
-local function WindowOpen()
-    -- Check for windows like Trade, Merchant, Bank, etc.
-    return TradeFrame and TradeFrame:IsVisible() or MerchantFrame and MerchantFrame:IsVisible() or
-        BankFrame and BankFrame:IsVisible() or
-        (ContainerFrame1 and ContainerFrame1:IsVisible()) or -- Backpack
-        (ContainerFrame2 and ContainerFrame2:IsVisible()) or -- First bag
-        (ContainerFrame3 and ContainerFrame3:IsVisible()) or -- Second bag
-        (ContainerFrame4 and ContainerFrame4:IsVisible()) or -- Third bag
-        (ContainerFrame5 and ContainerFrame5:IsVisible()) or -- Fourth bag
-        (GossipFrame and GossipFrame:IsVisible()) or
-        (AuctionFrame and AuctionFrame:IsVisible()) or
-        (ReagentBankFrame and ReagentBankFrame:IsVisible()) or
-        (CraftFrame and CraftFrame:IsVisible()) or
-        (TradeSkillFrame and TradeSkillFrame:IsVisible()) or
-        LootFrame and LootFrame:IsVisible() or
-        MailFrame and MailFrame:IsVisible()
-        -- or (CharacterFrame and CharacterFrame:IsVisible()) -- Character Sheet, for testing purposes
+-- Coroutine-safe delay using C_Timer
+local function Delay(seconds, func)
+    C_Timer.After(seconds, func)
 end
 
--- Function to check if there are fewer than 4 free bag spaces in generic bags
+-- Function to check if any relevant windows or conditions are active
+local function WindowOpen()
+    return TradeFrame and TradeFrame:IsVisible() or MerchantFrame and MerchantFrame:IsVisible() or
+           BankFrame and BankFrame:IsVisible() or LootFrame and LootFrame:IsVisible() or
+           MailFrame and MailFrame:IsVisible() or
+           (ContainerFrame1 and ContainerFrame1:IsVisible()) or -- Backpack
+           (ContainerFrame2 and ContainerFrame2:IsVisible()) or -- First bag
+           (ContainerFrame3 and ContainerFrame3:IsVisible()) or -- Second bag
+           (ContainerFrame4 and ContainerFrame4:IsVisible()) or -- Third bag
+           (ContainerFrame5 and ContainerFrame5:IsVisible()) or -- Fourth bag
+           (GossipFrame and GossipFrame:IsVisible()) or
+           (AuctionFrame and AuctionFrame:IsVisible()) or
+           (ReagentBankFrame and ReagentBankFrame:IsVisible()) or
+           (CraftFrame and CraftFrame:IsVisible()) or
+           (TradeSkillFrame and TradeSkillFrame:IsVisible())
+end
+
+-- Function to check if the player has sufficient bag space
 local function BagSpaceCheck()
     local freeSlots = 0
-    -- Iterate over bags 0 to 4 (bag slots)
     for bag = 0, 4 do
-        -- Get the number of free slots and the item family of the bag
         local numFreeSlots, bagFamily = C_Container.GetContainerNumFreeSlots(bag)
-        -- Only count slots from generic bags (bagFamily == 0 means it's a generic bag)
-        if bagFamily == 0 then
+        if bagFamily == 0 then -- Only count generic bags
             freeSlots = freeSlots + numFreeSlots
         end
     end
     return freeSlots >= 4
 end
 
--- Track whether the function is paused to prevent message spam
-local isPaused = false
-
--- Create a frame to handle events
-local eventFrame = CreateFrame("Frame")
-
--- Coroutine for handling delays
-local function Delay(seconds)
-    local start = GetTime()
-    while GetTime() - start < seconds do
-        coroutine.yield()
-    end
-end
-
--- Function to process items in the bag
+-- Function to process items in the player's bags
 local function ProcessItems()
-    -- Check if any specified window or condition is active
+    -- If any condition prevents processing, exit early
     if WindowOpen() then
-        -- Uncomment for more verbose messages.
-        -- print("Open Sesame paused due to open window or active condition.")
+        -- Uncomment for verbose feedback: print("Paused: Window is open.")
         return
     end
 
-    -- Pause the script if fewer than 4 free bag spaces
     if not BagSpaceCheck() then
-        if not isPaused then
-            print(
-                "|cff4FC3F7Open Sesame|r : Paused until you have at least 4 free bag spaces available."
-            )
-            isPaused = true
-        end
+        print("|cff4FC3F7Open Sesame|r: Paused until you have at least 4 free bag spaces.")
         return
     end
 
-    -- Unpause if conditions allow processing
-    isPaused = false
-
-    -- Check auto-loot setting
     if not GetCVarBool("autoLootDefault") then
+        -- Uncomment for verbose feedback: print("Paused: Auto-loot is disabled.")
         return
     end
 
-    -- Coroutine for processing items
-    local co =
-        coroutine.create(
-        function()
-            -- Process allowed items in the bag
-            local itemsFound = false
-            for bag = 0, 4 do
-                local numSlots = C_Container.GetContainerNumSlots(bag)
-                for slot = 1, numSlots do
-                    local containerInfo = C_Container.GetContainerItemInfo(bag, slot)
-                    if containerInfo and containerInfo.itemID then
-                        local itemID = containerInfo.itemID
-                        if AllowedOpenItems[itemID] then
-                            C_Container.UseContainerItem(bag, slot)
-                            itemsFound = true
-                            -- Delay for 0.5 seconds
-                            Delay(0.5)
-                        end
-                    end
-                end
-            end
-
-            if not itemsFound then
-                -- If no items were found to process, unregister the event to prevent unnecessary calls
-                eventFrame:UnregisterEvent("PLAYER_REGEN_ENABLED")
+    -- Iterate through bags and slots to find allowed items
+    for bag = 0, 4 do
+        local numSlots = C_Container.GetContainerNumSlots(bag)
+        for slot = 1, numSlots do
+            local containerInfo = C_Container.GetContainerItemInfo(bag, slot)
+            if containerInfo and AllowedOpenItems[containerInfo.itemID] then
+                -- Use the item and delay the next processing
+                C_Container.UseContainerItem(bag, slot)
+                Delay(0.5, ProcessItems) -- Delay before processing the next item
+                return
             end
         end
-    )
-
-    -- Run the coroutine
-    coroutine.resume(co)
+    end
 end
 
--- Event handler function
-eventFrame:SetScript(
-    "OnEvent",
-    function(self, event)
-        if event == "BAG_UPDATE" then
-            if UnitAffectingCombat("player") then
-                -- Register to process items when combat ends
-                self:RegisterEvent("PLAYER_REGEN_ENABLED")
-                return
-            else
-                ProcessItems()
-            end
-        elseif event == "PLAYER_REGEN_ENABLED" then
-            -- Combat has ended, process items once
+-- Event handler for managing item processing and combat state
+eventFrame:SetScript("OnEvent", function(self, event)
+    if event == "BAG_UPDATE" then
+        if UnitAffectingCombat("player") then
+            -- Delay processing until combat ends
+            self:RegisterEvent("PLAYER_REGEN_ENABLED")
+        else
             ProcessItems()
-            -- Unregister the event until needed again
-            self:UnregisterEvent("PLAYER_REGEN_ENABLED")
         end
+    elseif event == "PLAYER_REGEN_ENABLED" then
+        -- Process items after combat ends and unregister the event
+        ProcessItems()
+        self:UnregisterEvent("PLAYER_REGEN_ENABLED")
     end
-)
-
--- Register events
-eventFrame:RegisterEvent("BAG_UPDATE")
+end)
