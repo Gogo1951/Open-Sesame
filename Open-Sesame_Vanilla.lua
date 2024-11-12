@@ -358,7 +358,7 @@ local function WindowOpen()
     local framesToCheck = {
         AuctionFrame,
         BankFrame,
-        CharacterFrame, -- Character Sheet
+        -- CharacterFrame, -- Character Sheet
         ContainerFrame1, -- Backpack
         ContainerFrame2, -- First bag
         ContainerFrame3, -- Second bag
