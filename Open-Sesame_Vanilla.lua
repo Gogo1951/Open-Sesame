@@ -358,7 +358,7 @@ local function WindowOpen()
     local framesToCheck = {
         AuctionFrame,
         BankFrame,
-        -- CharacterFrame, -- Character Sheet
+        CharacterFrame, -- Character Sheet
         ContainerFrame1, -- Backpack
         ContainerFrame2, -- First bag
         ContainerFrame3, -- Second bag
@@ -371,7 +371,7 @@ local function WindowOpen()
         MerchantFrame,
         ReagentBankFrame,
         TradeFrame,
-        TradeSkillFrame
+        TradeSkillFrame,
     }
 
     for _, frame in ipairs(framesToCheck) do
@@ -383,7 +383,7 @@ local function WindowOpen()
     return false
 end
 
--- Function to check if the player has sufficient bag space
+-- Function to check total free slots in normal bags
 local function BagSpaceCheck()
     local freeSlots = 0
     for bag = 0, 4 do
@@ -392,31 +392,7 @@ local function BagSpaceCheck()
             freeSlots = freeSlots + numFreeSlots
         end
     end
-    return freeSlots >= 4
-end
-
--- Function to process items in the player's bags
-local function ProcessItems()
-    if WindowOpen() then
-        return
-    end
-
-    if not BagSpaceCheck() then
-        print("|cff4FC3F7Open Sesame|r : Paused until you have at least 4 free bag spaces.")
-        return
-    end
-
-    for bag = 0, 4 do
-        local numSlots = C_Container.GetContainerNumSlots(bag)
-        for slot = 1, numSlots do
-            local containerInfo = C_Container.GetContainerItemInfo(bag, slot)
-            if containerInfo and AllowedOpenItems[containerInfo.itemID] then
-                C_Container.UseContainerItem(bag, slot)
-                Delay(0.5, ProcessItems)
-                return
-            end
-        end
-    end
+    return freeSlots
 end
 
 -- Sound IDs based on race and gender
@@ -436,7 +412,7 @@ local RaceGenderSounds = {
     ["TrollFemale"] = 1952,
     ["TrollMale"] = 1842,
     ["UndeadFemale"] = 2196,
-    ["UndeadMale"] = 2076
+    ["UndeadMale"] = 2076,
 }
 
 -- Function to play the appropriate sound
@@ -451,38 +427,64 @@ local function PlayBagFullSound()
     end
 end
 
--- Monitor window state and trigger item processing when windows close
+-- Last message and window state tracking
+local lastBagSpaceMessageTime = 0
 local lastWindowState = true
-eventFrame:SetScript(
-    "OnUpdate",
-    function(self, elapsed)
-        local currentWindowState = WindowOpen()
-        if lastWindowState and not currentWindowState then
-            -- Window just closed, try processing items
-            ProcessItems()
-        end
-        lastWindowState = currentWindowState
+
+-- Function to process items in the player's bags
+local function ProcessItems()
+    if WindowOpen() then
+        return
     end
-)
+
+    local freeSlots = BagSpaceCheck()
+    if freeSlots < 4 then
+        local currentTime = GetTime()
+        if currentTime - lastBagSpaceMessageTime > 10 then -- Throttle message to once every 10 seconds
+            print("|cff4FC3F7Open Sesame|r: Paused until you have at least 4 free bag spaces.")
+            lastBagSpaceMessageTime = currentTime
+        end
+        return
+    end
+
+    for bag = 0, 4 do
+        local numSlots = C_Container.GetContainerNumSlots(bag)
+        for slot = 1, numSlots do
+            local containerInfo = C_Container.GetContainerItemInfo(bag, slot)
+            if containerInfo and AllowedOpenItems[containerInfo.itemID] then
+                C_Container.UseContainerItem(bag, slot)
+                Delay(0.5, ProcessItems)
+                return
+            end
+        end
+    end
+end
+
+-- Monitor window state and trigger item processing when windows close
+eventFrame:SetScript("OnUpdate", function(self, elapsed)
+    local currentWindowState = WindowOpen()
+    if lastWindowState and not currentWindowState then
+        -- Window just closed, try processing items
+        ProcessItems()
+    end
+    lastWindowState = currentWindowState
+end)
 
 -- Event handler for managing item processing, combat state, and error messages
-eventFrame:SetScript(
-    "OnEvent",
-    function(self, event, ...)
-        if event == "BAG_UPDATE" or event == "LOOT_OPENED" then
-            if UnitAffectingCombat("player") then
-                self:RegisterEvent("PLAYER_REGEN_ENABLED")
-            else
-                ProcessItems()
-            end
-        elseif event == "PLAYER_REGEN_ENABLED" then
+eventFrame:SetScript("OnEvent", function(self, event, ...)
+    if event == "BAG_UPDATE" or event == "LOOT_OPENED" then
+        if UnitAffectingCombat("player") then
+            self:RegisterEvent("PLAYER_REGEN_ENABLED")
+        else
             ProcessItems()
-            self:UnregisterEvent("PLAYER_REGEN_ENABLED")
-        elseif event == "UI_ERROR_MESSAGE" then
-            local _, message = ...
-            if message == ERR_INV_FULL then -- "Inventory is full."
-                PlayBagFullSound()
-            end
+        end
+    elseif event == "PLAYER_REGEN_ENABLED" then
+        ProcessItems()
+        self:UnregisterEvent("PLAYER_REGEN_ENABLED")
+    elseif event == "UI_ERROR_MESSAGE" then
+        local _, message = ...
+        if message == ERR_INV_FULL then -- "Inventory is full."
+            PlayBagFullSound()
         end
     end
-)
+end)
