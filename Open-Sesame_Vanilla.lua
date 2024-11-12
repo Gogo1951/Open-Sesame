@@ -1,10 +1,7 @@
--- Allowed items that can be opened
 local AllowedOpenItems = {
 --   Allow Open Sesame! to open these items.
 
---  Classic Era
-
---  Openable
+--  Classic Era; Openable
 --  https://www.wowhead.com/classic/items?filter=11:10:161:82;1:2:1:4;0:0:0:11400#0+1+20
 
     [10456] = true,     -- A Bulging Coin Purse
@@ -193,7 +190,7 @@ local AllowedOpenItems = {
     [22137] = true,     -- Ysida's Satchel
     [22233] = true,     -- Zigris' Footlocker
 
---  Openable But Locked
+--  Classic Era; Openable But Locked
 --  https://www.wowhead.com/classic/items?filter=11:10:161:82;1:1:1:4;0:0:0:11400#0+1+20
 
 --  [16882] = true,     -- Battered Junkbox
@@ -217,9 +214,7 @@ local AllowedOpenItems = {
 --  [5759] = true,      -- Thorium Lockbox
 --  [16883] = true,     -- Worn Junkbox
 
---  Season of Mastery, Season of Discovery & Classic Hardcore
-
---  Openable & Unlocked
+--  Season of Mastery, Season of Discovery & Classic Hardcore; Openable
 --  https://www.wowhead.com/classic/items?filter=11:10:161:82;1:2:1:2;0:0:0:11401#0+1+20
 
     [205364] = true,    -- Acolyte's Knapsack
@@ -336,7 +331,7 @@ local AllowedOpenItems = {
     [227402] = true,    -- Wicked Helm and Chestpiece Set
     [216646] = true,    -- Ziri's Mystery Crate
 
---  Openable But Locked
+--  Season of Mastery, Season of Discovery & Classic Hardcore; Openable But Locked
 --  https://www.wowhead.com/classic/items?filter=11:10:161:82;1:1:1:2;0:0:0:11401#0-1+20
 
 --  [208838] = true,    -- Dark Iron Lockbox
