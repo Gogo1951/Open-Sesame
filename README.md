@@ -1,6 +1,6 @@
 # Open Sesame!
 
-Just a simple add-on that automatically opens containers in your inventory.
+Just a simple add-on that automatically opens clams & containers in your inventory.
 
 ❗ **Auto Loot must be enabled for Open Sesame! to work correctly!**
 
