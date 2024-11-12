@@ -1,5 +1,5 @@
 local AllowedOpenItems = {
---   Allow Open Sesame! to open these items.
+--  Allow Open Sesame! to open these items.
 
 --  Classic Era | Openable
 --  https://www.wowhead.com/classic/items?filter=11:10:161:82;1:2:1:4;0:0:0:11400#0+1+20
