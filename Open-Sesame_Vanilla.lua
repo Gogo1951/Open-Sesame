@@ -371,7 +371,7 @@ local function WindowOpen()
         MerchantFrame,
         ReagentBankFrame,
         TradeFrame,
-        TradeSkillFrame,
+        TradeSkillFrame
     }
 
     for _, frame in ipairs(framesToCheck) do
@@ -412,7 +412,7 @@ local RaceGenderSounds = {
     ["TrollFemale"] = 1952,
     ["TrollMale"] = 1842,
     ["UndeadFemale"] = 2196,
-    ["UndeadMale"] = 2076,
+    ["UndeadMale"] = 2076
 }
 
 -- Function to play the appropriate sound
@@ -441,7 +441,7 @@ local function ProcessItems()
     if freeSlots < 4 then
         local currentTime = GetTime()
         if currentTime - lastBagSpaceMessageTime > 10 then -- Throttle message to once every 10 seconds
-            print("|cff4FC3F7Open Sesame|r: Paused until you have at least 4 free bag spaces.")
+            print("|cff4FC3F7Open Sesame|r : Paused until you have at least 4 free generic bag spaces.")
             lastBagSpaceMessageTime = currentTime
         end
         return
@@ -461,30 +461,36 @@ local function ProcessItems()
 end
 
 -- Monitor window state and trigger item processing when windows close
-eventFrame:SetScript("OnUpdate", function(self, elapsed)
-    local currentWindowState = WindowOpen()
-    if lastWindowState and not currentWindowState then
-        -- Window just closed, try processing items
-        ProcessItems()
-    end
-    lastWindowState = currentWindowState
-end)
-
--- Event handler for managing item processing, combat state, and error messages
-eventFrame:SetScript("OnEvent", function(self, event, ...)
-    if event == "BAG_UPDATE" or event == "LOOT_OPENED" then
-        if UnitAffectingCombat("player") then
-            self:RegisterEvent("PLAYER_REGEN_ENABLED")
-        else
+eventFrame:SetScript(
+    "OnUpdate",
+    function(self, elapsed)
+        local currentWindowState = WindowOpen()
+        if lastWindowState and not currentWindowState then
+            -- Window just closed, try processing items
             ProcessItems()
         end
-    elseif event == "PLAYER_REGEN_ENABLED" then
-        ProcessItems()
-        self:UnregisterEvent("PLAYER_REGEN_ENABLED")
-    elseif event == "UI_ERROR_MESSAGE" then
-        local _, message = ...
-        if message == ERR_INV_FULL then -- "Inventory is full."
-            PlayBagFullSound()
+        lastWindowState = currentWindowState
+    end
+)
+
+-- Event handler for managing item processing, combat state, and error messages
+eventFrame:SetScript(
+    "OnEvent",
+    function(self, event, ...)
+        if event == "BAG_UPDATE" or event == "LOOT_OPENED" then
+            if UnitAffectingCombat("player") then
+                self:RegisterEvent("PLAYER_REGEN_ENABLED")
+            else
+                ProcessItems()
+            end
+        elseif event == "PLAYER_REGEN_ENABLED" then
+            ProcessItems()
+            self:UnregisterEvent("PLAYER_REGEN_ENABLED")
+        elseif event == "UI_ERROR_MESSAGE" then
+            local _, message = ...
+            if message == ERR_INV_FULL then -- "Inventory is full."
+                PlayBagFullSound()
+            end
         end
     end
-end)
+)
