@@ -6,7 +6,7 @@
 
 ## Interface: 11504
 
-## Version: 3.4.3
+## Version: @project-version@
 
 ## DefaultState: enabled
 
