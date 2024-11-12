@@ -1,7 +1,7 @@
 local AllowedOpenItems = {
 --   Allow Open Sesame! to open these items.
 
---  Classic Era; Openable
+--  Classic Era | Openable
 --  https://www.wowhead.com/classic/items?filter=11:10:161:82;1:2:1:4;0:0:0:11400#0+1+20
 
     [10456] = true,     -- A Bulging Coin Purse
@@ -190,7 +190,7 @@ local AllowedOpenItems = {
     [22137] = true,     -- Ysida's Satchel
     [22233] = true,     -- Zigris' Footlocker
 
---  Classic Era; Openable But Locked
+--  Classic Era | Openable But Locked
 --  https://www.wowhead.com/classic/items?filter=11:10:161:82;1:1:1:4;0:0:0:11400#0+1+20
 
 --  [16882] = true,     -- Battered Junkbox
@@ -214,7 +214,7 @@ local AllowedOpenItems = {
 --  [5759] = true,      -- Thorium Lockbox
 --  [16883] = true,     -- Worn Junkbox
 
---  Season of Mastery, Season of Discovery & Classic Hardcore; Openable
+--  Season of Mastery, Season of Discovery & Classic Hardcore | Openable
 --  https://www.wowhead.com/classic/items?filter=11:10:161:82;1:2:1:2;0:0:0:11401#0+1+20
 
     [205364] = true,    -- Acolyte's Knapsack
@@ -331,7 +331,7 @@ local AllowedOpenItems = {
     [227402] = true,    -- Wicked Helm and Chestpiece Set
     [216646] = true,    -- Ziri's Mystery Crate
 
---  Season of Mastery, Season of Discovery & Classic Hardcore; Openable But Locked
+--  Season of Mastery, Season of Discovery & Classic Hardcore | Openable But Locked
 --  https://www.wowhead.com/classic/items?filter=11:10:161:82;1:1:1:2;0:0:0:11401#0-1+20
 
 --  [208838] = true,    -- Dark Iron Lockbox
@@ -351,21 +351,36 @@ local function Delay(seconds, func)
     C_Timer.After(seconds, func)
 end
 
--- Function to check if any relevant windows or conditions are active
+-- Function to check if any specified windows or conditions are active
 local function WindowOpen()
-    return TradeFrame and TradeFrame:IsVisible() or MerchantFrame and MerchantFrame:IsVisible() or
-           BankFrame and BankFrame:IsVisible() or LootFrame and LootFrame:IsVisible() or
-           MailFrame and MailFrame:IsVisible() or
-           (ContainerFrame1 and ContainerFrame1:IsVisible()) or -- Backpack
-           (ContainerFrame2 and ContainerFrame2:IsVisible()) or -- First bag
-           (ContainerFrame3 and ContainerFrame3:IsVisible()) or -- Second bag
-           (ContainerFrame4 and ContainerFrame4:IsVisible()) or -- Third bag
-           (ContainerFrame5 and ContainerFrame5:IsVisible()) or -- Fourth bag
-           (GossipFrame and GossipFrame:IsVisible()) or
-           (AuctionFrame and AuctionFrame:IsVisible()) or
-           (ReagentBankFrame and ReagentBankFrame:IsVisible()) or
-           (CraftFrame and CraftFrame:IsVisible()) or
-           (TradeSkillFrame and TradeSkillFrame:IsVisible())
+    -- List of frames to check
+    local framesToCheck = {
+        AuctionFrame,
+        BankFrame,
+        -- CharacterFrame, -- Character Sheet, enable for testing
+        ContainerFrame1, -- Backpack
+        ContainerFrame2, -- First bag
+        ContainerFrame3, -- Second bag
+        ContainerFrame4, -- Third bag
+        ContainerFrame5, -- Fourth bag
+        CraftFrame,
+        GossipFrame,
+        LootFrame,
+        MailFrame,
+        MerchantFrame,
+        ReagentBankFrame,
+        TradeFrame,
+        TradeSkillFrame,
+    }
+
+    -- Iterate through the list and check visibility
+    for _, frame in ipairs(framesToCheck) do
+        if frame and frame:IsVisible() then
+            return true
+        end
+    end
+
+    return false
 end
 
 -- Function to check if the player has sufficient bag space
@@ -384,17 +399,11 @@ end
 local function ProcessItems()
     -- If any condition prevents processing, exit early
     if WindowOpen() then
-        -- Uncomment for verbose feedback: print("Paused: Window is open.")
-        return
+        return -- Skip if any window is open
     end
 
     if not BagSpaceCheck() then
         print("|cff4FC3F7Open Sesame|r: Paused until you have at least 4 free bag spaces.")
-        return
-    end
-
-    if not GetCVarBool("autoLootDefault") then
-        -- Uncomment for verbose feedback: print("Paused: Auto-loot is disabled.")
         return
     end
 
