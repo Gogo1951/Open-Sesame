@@ -39,15 +39,19 @@ Gogo1951 on Discord.
 
 ## Testing Notes
 
-🟢 Classic Era
+🟢 World of Warcraft Classic : Classic Era
 
-🟢 Classic Hardcore
+🟢 World of Warcraft Classic : Hardcore
 
-🟡 Season of Discovery (Minimal Testing)
+🟡 World of Warcraft Classic : Season of Discovery
 
-🟡 Cataclysm Classic (Minimal Testing)
+🟢 World of Warcraft Classic : Anniversary Realms
 
-🔴 Retail (Not Tested)
+🟢 World of Warcraft Classic : Hardcore Anniversary Realms
+
+🟡 Cataclysm Classic
+
+🔴 World of Warcraft
 
 Please reach out if you would like to be involved with testing!
 
