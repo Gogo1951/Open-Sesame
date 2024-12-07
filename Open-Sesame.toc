@@ -4,13 +4,13 @@
 
 ## X-Curse-Project-ID: 830638
 
-## Interface: 110005
+## Interface: 11505
 
 ## Version: @project-version@
 
 ## DefaultState: enabled
 
-Open-Sesame_Mainline.lua
+Open-Sesame.lua
 
 # Open Sesame! on CurseForge : https://www.curseforge.com/wow/addons/open-sesame
 # Open Sesame! on GitHub : https://github.com/Gogo1951/Open-Sesame
