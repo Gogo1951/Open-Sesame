@@ -1,4 +1,4 @@
-## Title: Open-Sesame (v @project-version@)
+## Title: Open-Sesame
 ## Notes: A simple add-on that automatically opens clams & containers in your inventory.
 ## Author: Gogo#0298 & TechnoHunter#2706
 
