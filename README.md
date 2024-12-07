@@ -41,7 +41,7 @@ https://www.curseforge.com/wow/addons/open-sesame
 
 🟢 World of Warcraft Classic : Hardcore Anniversary Realms
 
-🟡 Cataclysm Classic
+🔴 Cataclysm Classic
 
 🔴 World of Warcraft
 
