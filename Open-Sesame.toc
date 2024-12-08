@@ -10,6 +10,7 @@
 
 ## DefaultState: enabled
 
+Database/AllowedOpenItems.lua
 Open-Sesame.lua
 
 # Open Sesame! on CurseForge : https://www.curseforge.com/wow/addons/open-sesame
