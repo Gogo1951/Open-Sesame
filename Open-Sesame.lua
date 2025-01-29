@@ -74,6 +74,11 @@ local function GetAvailableBagSlots()
     return freeSlots
 end
 
+-- Utility Function: Check if the player is casting a spell
+local function IsPlayerCasting()
+    return UnitCastingInfo("player") ~= nil
+end
+
 -- Play a race and gender-specific sound for a full inventory
 local function PlayInventoryFullSound()
     local _, raceFile = UnitRace("player")
@@ -90,7 +95,7 @@ end
 
 -- Process openable items in the bags
 local function ProcessBagItems()
-    if OpenSesame.isItemProcessing or UnitAffectingCombat("player") then
+    if OpenSesame.isItemProcessing or UnitAffectingCombat("player") or IsPlayerCasting() then
         return
     end
 
@@ -142,7 +147,7 @@ eventFrame:SetScript(
     "OnEvent",
     function(self, event, ...)
         if event == "BAG_UPDATE" or event == "LOOT_OPENED" then
-            if not UnitAffectingCombat("player") then
+            if not UnitAffectingCombat("player") and not IsPlayerCasting() then
                 ProcessBagItems()
             end
         elseif event == "PLAYER_REGEN_ENABLED" then
@@ -171,7 +176,7 @@ eventFrame:SetScript(
     "OnUpdate",
     function(self, elapsed)
         local currentWindowState = IsAnyWindowOpen()
-        if OpenSesame.lastWindowState and not currentWindowState then
+        if OpenSesame.lastWindowState and not currentWindowState and not IsPlayerCasting() then
             ProcessBagItems()
         end
         OpenSesame.lastWindowState = currentWindowState
