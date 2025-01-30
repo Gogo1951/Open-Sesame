@@ -55,9 +55,9 @@ local minimapButton =
             local status =
                 OpenSesame.isPaused and "|cffFFAA00Paused|r" or
                 (OpenSesame.isEnabled and "|cff00FF00Enabled|r" or "|cffFF0000Disabled|r")
-            tooltip:AddDoubleLine("Status:", status, 1, 1, 1, 1, 1, 1)
+            tooltip:AddDoubleLine("Status :", status, 1, 1, 1, 1, 1, 1)
             tooltip:AddLine(" ", 1, 1, 1)
-            tooltip:AddLine("Click to Enable or Disable.", 0.8, 0.8, 0.8)
+            tooltip:AddLine("Click to Enable or Disable Auto-open.", 0.8, 0.8, 0.8)
         end
     }
 )
