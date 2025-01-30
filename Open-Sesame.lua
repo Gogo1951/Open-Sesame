@@ -17,9 +17,9 @@ OpenSesame.isPaused = false
 
 -- Minimap Icons
 local ICONS = {
-    enabled = "Interface\\Icons\\inv_misc_key_03",
-    disabled = "Interface\\Icons\\inv_misc_key_01",
-    paused = "Interface\\Icons\\inv_misc_key_02"
+    enabled = "Interface\\Icons\\inv_jewelcrafting_gem_01",
+    disabled = "Interface\\Icons\\inv_jewelcrafting_gem_04",
+    paused = "Interface\\Icons\\inv_jewelcrafting_gem_03"
 }
 
 -- Minimap Button Setup
@@ -40,8 +40,8 @@ local minimapButton =
                 UpdateMinimapIcon()
 
                 print(
-                    "|cff4FC3F7Open Sesame|r : Auto-open " ..
-                        (OpenSesame.isEnabled and "|cff00FF00ENABLED|r" or "|cffFF0000DISABLED|r")
+                    "|cff4FC3F7Open Sesame|r : Auto-Open " ..
+                        (OpenSesame.isEnabled and "|cff00FF00On|r" or "|cffFF0000Off|r")
                 )
 
                 if OpenSesame.isEnabled then
@@ -53,11 +53,11 @@ local minimapButton =
             tooltip:AddLine("|cff4FC3F7Open Sesame|r", 1, 1, 1)
             tooltip:AddLine(" ", 1, 1, 1)
             local status =
-                OpenSesame.isPaused and "|cffFFAA00Paused|r" or
-                (OpenSesame.isEnabled and "|cff00FF00Enabled|r" or "|cffFF0000Disabled|r")
-            tooltip:AddDoubleLine("Status :", status, 1, 1, 1, 1, 1, 1)
+                OpenSesame.isPaused and "|cffFFFF00Paused|r" or
+                (OpenSesame.isEnabled and "|cff00FF00On|r" or "|cffFF0000Off|r")
+            tooltip:AddDoubleLine("Auto-Open :", status, 1, 1, 1, 1, 1, 1)
             tooltip:AddLine(" ", 1, 1, 1)
-            tooltip:AddLine("Click to Enable or Disable Auto-open.", 0.8, 0.8, 0.8)
+            tooltip:AddLine("Click to turn Auto-Open On or Off.", 0.8, 0.8, 0.8)
         end
     }
 )
@@ -130,7 +130,7 @@ function ProcessItems()
     if OpenSesame.isPaused and freeSlots >= 4 then
         OpenSesame.isPaused = false
         UpdateMinimapIcon()
-        print("|cff4FC3F7Open Sesame|r : Auto-open Resuming!")
+        print("|cff4FC3F7Open Sesame|r : Auto-Open Resuming!")
     end
 
     for bag = 0, 4 do
@@ -182,7 +182,7 @@ eventFrame:SetScript(
         elseif event == "BAG_UPDATE" then
             local freeSlots = GetBagSpace()
             if freeSlots >= 4 and OpenSesame.isPaused then
-                print("|cff4FC3F7Open Sesame|r : Auto-open Resuming!")
+                print("|cff4FC3F7Open Sesame|r : Auto-Open Resuming!")
                 OpenSesame.isPaused = false
                 UpdateMinimapIcon()
                 ProcessItems()
