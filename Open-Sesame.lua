@@ -1,184 +1,198 @@
--- Namespace for Open Sesame Add-on
+-- Open Sesame Add-on
 local OpenSesame = {}
-OpenSesame.AllowedOpenItems = OpenSesame_AllowedOpenItems
+OpenSesame.AllowedItems = OpenSesame_AllowedOpenItems or {}
 
 -- Constants
-local BAG_FULL_MESSAGE_THROTTLE = 10 -- Time in seconds between "Bag Full" messages
-local LOOT_DELAY = 0.5 -- Delay in seconds between opening items
+local BAG_FULL_DELAY = 10 -- Delay before showing "Bag Full" messages again (seconds)
+local OPEN_ITEM_DELAY = 0.1 -- Delay between opening items
+local WORLD_LOAD_DELAY = 10 -- Delay before processing items after login
 
--- Variables
-OpenSesame.lastBagFullMessageTime = 0
-OpenSesame.isItemProcessing = false
-OpenSesame.lastWindowState = true
-OpenSesame.lastLootActionTime = 0
+local ADDON_NAME = "OpenSesame"
 
--- Race and Gender-specific Sounds
-local RaceGenderSounds = {
-    ["DwarfFemale"] = 1673,
-    ["DwarfMale"] = 1609,
-    ["GnomeFemale"] = 1787,
-    ["GnomeMale"] = 1730,
-    ["HumanFemale"] = 2021,
-    ["HumanMale"] = 1897,
-    ["NightElfFemale"] = 2251,
-    ["NightElfMale"] = 2140,
-    ["OrcFemale"] = 2363,
-    ["OrcMale"] = 2308,
-    ["TaurenFemale"] = 2441,
-    ["TaurenMale"] = 2440,
-    ["TrollFemale"] = 1952,
-    ["TrollMale"] = 1842,
-    ["UndeadFemale"] = 2196,
-    ["UndeadMale"] = 2076
+-- State Variables
+OpenSesame.lastBagFullTime = 0
+OpenSesame.isProcessing = false
+OpenSesame.isEnabled = true
+OpenSesame.isPaused = false
+
+-- Minimap Icons
+local ICONS = {
+    enabled = "Interface\\Icons\\inv_misc_key_03",
+    disabled = "Interface\\Icons\\inv_misc_key_01",
+    paused = "Interface\\Icons\\inv_misc_key_02"
 }
 
--- Utility Function: Check if any UI window is open
-local function IsAnyWindowOpen()
-    local framesToCheck = {
-        AuctionFrame,
-        BankFrame,
-        -- CharacterFrame,
-        ContainerFrame1,
-        ContainerFrame2,
-        ContainerFrame3,
-        ContainerFrame4,
-        ContainerFrame5,
-        CraftFrame,
-        GossipFrame,
-        LootFrame,
-        MailFrame,
-        MerchantFrame,
-        ReagentBankFrame,
-        TradeFrame,
-        TradeSkillFrame
-    }
+-- Minimap Button Setup
+local LDB = LibStub:GetLibrary("LibDataBroker-1.1")
+local LDBIcon = LibStub("LibDBIcon-1.0")
 
-    for _, frame in ipairs(framesToCheck) do
-        if frame and frame:IsVisible() then
-            return true
+local minimapButton =
+    LDB:NewDataObject(
+    ADDON_NAME,
+    {
+        type = "launcher",
+        text = ADDON_NAME,
+        icon = ICONS.enabled,
+        OnClick = function(_, button)
+            if button == "LeftButton" then
+                OpenSesame.isEnabled = not OpenSesame.isEnabled
+                OpenSesame.isPaused = false
+                UpdateMinimapIcon()
+
+                print(
+                    "|cff4FC3F7Open Sesame|r : Auto-open " ..
+                        (OpenSesame.isEnabled and "|cff00FF00ENABLED|r" or "|cffFF0000DISABLED|r")
+                )
+
+                if OpenSesame.isEnabled then
+                    ProcessItems()
+                end
+            end
+        end,
+        OnTooltipShow = function(tooltip)
+            tooltip:AddLine("|cff4FC3F7Open Sesame|r", 1, 1, 1)
+            tooltip:AddLine(" ", 1, 1, 1)
+            local status =
+                OpenSesame.isPaused and "|cffFFAA00Paused|r" or
+                (OpenSesame.isEnabled and "|cff00FF00Enabled|r" or "|cffFF0000Disabled|r")
+            tooltip:AddDoubleLine("Status:", status, 1, 1, 1, 1, 1, 1)
+            tooltip:AddLine(" ", 1, 1, 1)
+            tooltip:AddLine("Click to Enable or Disable.", 0.8, 0.8, 0.8)
         end
-    end
+    }
+)
 
-    return false
+LDBIcon:Register(ADDON_NAME, minimapButton, {})
+
+function UpdateMinimapIcon()
+    if minimapButton then
+        minimapButton.icon =
+            ICONS[OpenSesame.isPaused and "paused" or (OpenSesame.isEnabled and "enabled" or "disabled")]
+    end
 end
 
--- Utility Function: Check available bag space
-local function GetAvailableBagSlots()
+local function GetBagSpace()
     local freeSlots = 0
     for bag = 0, 4 do
-        local numFreeSlots, bagFamily = C_Container.GetContainerNumFreeSlots(bag)
-        if bagFamily == 0 then -- Only count generic bags
-            freeSlots = freeSlots + numFreeSlots
+        local slots, bagType = C_Container.GetContainerNumFreeSlots(bag)
+        if bagType == 0 then
+            freeSlots = freeSlots + slots
         end
     end
     return freeSlots
 end
 
--- Utility Function: Check if the player is casting a spell
+-- Check if any UI windows are open
+local function IsAnyWindowOpen()
+    return (AuctionFrame and AuctionFrame:IsVisible()) or (BankFrame and BankFrame:IsVisible()) or
+        (ContainerFrame1 and ContainerFrame1:IsVisible()) or
+        (ContainerFrame2 and ContainerFrame2:IsVisible()) or
+        (ContainerFrame3 and ContainerFrame3:IsVisible()) or
+        (ContainerFrame4 and ContainerFrame4:IsVisible()) or
+        (ContainerFrame5 and ContainerFrame5:IsVisible()) or
+        (CraftFrame and CraftFrame:IsVisible()) or
+        (GossipFrame and GossipFrame:IsVisible()) or
+        (LootFrame and LootFrame:IsVisible()) or
+        (MailFrame and MailFrame:IsVisible()) or
+        (MerchantFrame and MerchantFrame:IsVisible()) or
+        (ReagentBankFrame and ReagentBankFrame:IsVisible()) or
+        (TradeFrame and TradeFrame:IsVisible()) or
+        (TradeSkillFrame and TradeSkillFrame:IsVisible())
+end
+
 local function IsPlayerCasting()
     return UnitCastingInfo("player") ~= nil
 end
 
--- Play a race and gender-specific sound for a full inventory
-local function PlayInventoryFullSound()
-    local _, raceFile = UnitRace("player")
-    local gender = UnitSex("player") -- 2 for male, 3 for female
-    local genderString = gender == 3 and "Female" or "Male"
-    local soundID = RaceGenderSounds[raceFile .. genderString]
-
-    if soundID then
-        PlaySound(soundID)
-    else
-        print("|cff4FC3F7Open Sesame|r : Inventory is full, but no sound available for your race/gender.")
+-- Opens items one by one with a delay
+function ProcessItems()
+    if not OpenSesame.isEnabled then
+        return
     end
-end
-
--- Process openable items in the bags
-local function ProcessBagItems()
-    if OpenSesame.isItemProcessing or UnitAffectingCombat("player") or IsPlayerCasting() then
+    if OpenSesame.isProcessing or UnitAffectingCombat("player") or IsPlayerCasting() or IsAnyWindowOpen() then
         return
     end
 
-    OpenSesame.isItemProcessing = true
+    OpenSesame.isProcessing = true
+    local freeSlots = GetBagSpace()
 
-    if IsAnyWindowOpen() then
-        OpenSesame.isItemProcessing = false
-        return
-    end
-
-    local freeSlots = GetAvailableBagSlots()
     if freeSlots < 4 then
-        local currentTime = GetTime()
-        if currentTime - OpenSesame.lastBagFullMessageTime > BAG_FULL_MESSAGE_THROTTLE then
-            print("|cff4FC3F7Open Sesame|r : Paused until you have at least 4 free generic bag spaces.")
-            OpenSesame.lastBagFullMessageTime = currentTime
+        if not OpenSesame.isPaused then
+            print("|cff4FC3F7Open Sesame|r : Paused until you have at least 4 free bag slots!")
         end
-        OpenSesame.isItemProcessing = false
+        OpenSesame.isPaused = true
+        UpdateMinimapIcon()
+
+        OpenSesame.isProcessing = false
         return
+    end
+
+    if OpenSesame.isPaused and freeSlots >= 4 then
+        OpenSesame.isPaused = false
+        UpdateMinimapIcon()
+        print("|cff4FC3F7Open Sesame|r : Auto-open Resuming!")
     end
 
     for bag = 0, 4 do
-        local numSlots = C_Container.GetContainerNumSlots(bag)
-        for slot = 1, numSlots do
+        for slot = 1, C_Container.GetContainerNumSlots(bag) do
             local itemInfo = C_Container.GetContainerItemInfo(bag, slot)
-            if itemInfo and OpenSesame.AllowedOpenItems[itemInfo.itemID] then
+            if itemInfo and OpenSesame.AllowedItems[itemInfo.itemID] then
                 C_Container.UseContainerItem(bag, slot)
-                -- Schedule the next processing cycle after a delay
-                C_Timer.After(LOOT_DELAY, ProcessBagItems)
-                OpenSesame.isItemProcessing = false
-                return
+
+                -- Open one item at a time with delay
+                C_Timer.After(
+                    OPEN_ITEM_DELAY,
+                    function()
+                        OpenSesame.isProcessing = false
+                        ProcessItems()
+                    end
+                )
+                return -- Exit loop so only one item is processed at a time
             end
         end
     end
 
-    OpenSesame.isItemProcessing = false
+    OpenSesame.isProcessing = false
 end
 
--- Event Frame for Bag Updates and Loot Events
+-- Event Handling
 local eventFrame = CreateFrame("Frame")
 eventFrame:RegisterEvent("BAG_UPDATE")
 eventFrame:RegisterEvent("LOOT_OPENED")
-eventFrame:RegisterEvent("UI_ERROR_MESSAGE")
-eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
 eventFrame:RegisterEvent("LOOT_READY")
+eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD") -- Waits 10 seconds after login before processing items
+eventFrame:RegisterEvent("UI_ERROR_MESSAGE")
 
--- Event Handling Logic
 eventFrame:SetScript(
     "OnEvent",
-    function(self, event, ...)
-        if event == "BAG_UPDATE" or event == "LOOT_OPENED" then
-            if not UnitAffectingCombat("player") and not IsPlayerCasting() then
-                ProcessBagItems()
-            end
-        elseif event == "PLAYER_REGEN_ENABLED" then
-            ProcessBagItems()
-        elseif event == "UI_ERROR_MESSAGE" then
-            local _, errorMessage = ...
-            if errorMessage == ERR_INV_FULL then
-                PlayInventoryFullSound()
-            end
-        elseif event == "LOOT_READY" then
-            if GetCVarBool("autoLootDefault") ~= IsModifiedClick("AUTOLOOTTOGGLE") then
-                local currentTime = GetTime()
-                if (currentTime - OpenSesame.lastLootActionTime) >= LOOT_DELAY then
-                    for i = GetNumLootItems(), 1, -1 do
-                        LootSlot(i)
-                    end
-                    OpenSesame.lastLootActionTime = currentTime
+    function(_, event, ...)
+        if not OpenSesame.isEnabled then
+            return
+        end
+
+        if event == "PLAYER_ENTERING_WORLD" then
+            C_Timer.After(
+                WORLD_LOAD_DELAY,
+                function()
+                    OpenSesame.isProcessing = false -- Reset processing flag on login
+                    ProcessItems()
                 end
+            )
+        elseif event == "BAG_UPDATE" then
+            local freeSlots = GetBagSpace()
+            if freeSlots >= 4 and OpenSesame.isPaused then
+                print("|cff4FC3F7Open Sesame|r : Auto-open Resuming!")
+                OpenSesame.isPaused = false
+                UpdateMinimapIcon()
+                ProcessItems()
             end
+        elseif event == "LOOT_OPENED" or event == "LOOT_READY" or event == "PLAYER_REGEN_ENABLED" then
+            ProcessItems()
+        elseif event == "UI_ERROR_MESSAGE" and select(2, ...) == ERR_INV_FULL then
+            print("|cff4FC3F7Open Sesame|r : Inventory is full!")
         end
     end
 )
 
--- Monitor Window States to Trigger Item Processing
-eventFrame:SetScript(
-    "OnUpdate",
-    function(self, elapsed)
-        local currentWindowState = IsAnyWindowOpen()
-        if OpenSesame.lastWindowState and not currentWindowState and not IsPlayerCasting() then
-            ProcessBagItems()
-        end
-        OpenSesame.lastWindowState = currentWindowState
-    end
-)
+C_Timer.After(1, UpdateMinimapIcon)
