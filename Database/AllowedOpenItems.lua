@@ -1,6 +1,6 @@
 OpenSesame_AllowedOpenItems = {
-	--  Classic Era | Openable
-	--  https://www.wowhead.com/classic/items?filter=11:10:161:82;1:2:1:4;0:0:0:11400#0+1+20
+	-- Classic Era | Openable
+	-- https://www.wowhead.com/classic/items?filter=11:10:161:82;1:2:1:4;0:0:0:11400#0+1+20
 
 	[10456] = true,				-- A Bulging Coin Purse
 	[15902] = true,				-- A Crazy Grab Bag
@@ -132,7 +132,7 @@ OpenSesame_AllowedOpenItems = {
 	[19154] = true,				-- Outrider Basic Care Package
 	[19155] = true,				-- Outrider Standard Care Package
 	[11912] = true,				-- Package of Empty Ooze Containers
-	--  [9276] = true,			-- Pirate's Footlocker (Can Contain Unique Item)
+	-- [9276] = true,			-- Pirate's Footlocker (Can Contain Unique Item)
 	[22155] = true,				-- Pledge of Adoration: Darnassus
 	[22154] = true,				-- Pledge of Adoration: Ironforge
 	[22156] = true,				-- Pledge of Adoration: Orgrimmar
@@ -188,32 +188,32 @@ OpenSesame_AllowedOpenItems = {
 	[22137] = true,				-- Ysida's Satchel
 	[22233] = true,				-- Zigris' Footlocker
 	
-	--  Classic Era | Openable But Locked
-	--  https://www.wowhead.com/classic/items?filter=11:10:161:82;1:1:1:4;0:0:0:11400#0+1+20
+	-- Classic Era | Openable But Locked
+	-- https://www.wowhead.com/classic/items?filter=11:10:161:82;1:1:1:4;0:0:0:11400#0+1+20
 
-	--  [16882] = true,			-- Battered Junkbox
-	--  [5760] = true,			-- Eternium Lockbox
-	--  [4633] = true,			-- Heavy Bronze Lockbox
-	--  [16885] = true,			-- Heavy Junkbox
-	--  [4634] = true,			-- Iron Lockbox
-	--  [13875] = true,			-- Ironbound Locked Chest
-	--  [5758] = true,			-- Mithril Lockbox
-	--  [4632] = true,			-- Ornate Bronze Lockbox
-	--  [13918] = true,			-- Reinforced Locked Chest
-	--  [4638] = true,			-- Reinforced Steel Lockbox
-	--  [6354] = true,			-- Small Locked Chest
-	--  [4637] = true,			-- Steel Lockbox
-	--  [4636] = true,			-- Strong Iron Lockbox
-	--  [16884] = true,			-- Sturdy Junkbox
-	--  [6355] = true,			-- Sturdy Locked Chest
-	--  [7209] = true,			-- Tazan's Satchel
-	--  [12033] = true,			-- Thaurissan Family Jewels
-	--  [7868] = true,			-- Thieven' Kit
-	--  [5759] = true,			-- Thorium Lockbox
-	--  [16883] = true,			-- Worn Junkbox
+	-- [16882] = true,			-- Battered Junkbox
+	-- [5760] = true,			-- Eternium Lockbox
+	-- [4633] = true,			-- Heavy Bronze Lockbox
+	-- [16885] = true,			-- Heavy Junkbox
+	-- [4634] = true,			-- Iron Lockbox
+	-- [13875] = true,			-- Ironbound Locked Chest
+	-- [5758] = true,			-- Mithril Lockbox
+	-- [4632] = true,			-- Ornate Bronze Lockbox
+	-- [13918] = true,			-- Reinforced Locked Chest
+	-- [4638] = true,			-- Reinforced Steel Lockbox
+	-- [6354] = true,			-- Small Locked Chest
+	-- [4637] = true,			-- Steel Lockbox
+	-- [4636] = true,			-- Strong Iron Lockbox
+	-- [16884] = true,			-- Sturdy Junkbox
+	-- [6355] = true,			-- Sturdy Locked Chest
+	-- [7209] = true,			-- Tazan's Satchel
+	-- [12033] = true,			-- Thaurissan Family Jewels
+	-- [7868] = true,			-- Thieven' Kit
+	-- [5759] = true,			-- Thorium Lockbox
+	-- [16883] = true,			-- Worn Junkbox
 
-	--  Season of Mastery, Season of Discovery & Classic Hardcore | Openable
-	--  https://www.wowhead.com/classic/items?filter=11:10:161:82;1:2:1:2;0:0:0:11401#0+1+20
+	-- Season of Mastery, Season of Discovery & Classic Hardcore | Openable
+	-- https://www.wowhead.com/classic/items?filter=11:10:161:82;1:2:1:2;0:0:0:11401#0+1+20
 
 	[205364] = true,			-- Acolyte's Knapsack
 	[208223] = true,			-- Acolyte's Knapsack
@@ -329,13 +329,13 @@ OpenSesame_AllowedOpenItems = {
 	[227402] = true,			-- Wicked Helm and Chestpiece Set
 	[216646] = true,			-- Ziri's Mystery Crate
 
-	--  Season of Mastery, Season of Discovery & Classic Hardcore | Openable But Locked
-	--  https://www.wowhead.com/classic/items?filter=11:10:161:82;1:1:1:2;0:0:0:11401#0-1+20
+	-- Season of Mastery, Season of Discovery & Classic Hardcore | Openable But Locked
+	-- https://www.wowhead.com/classic/items?filter=11:10:161:82;1:1:1:2;0:0:0:11401#0-1+20
 
-	--  [208838] = true,			-- Dark Iron Lockbox
-	--  [215451] = true,			-- Large Strongbox
-	--  [215452] = true,			-- Medium Strongbox
-	--  [227937] = true,			-- Puzzle Box
-	--  [215453] = true,			-- Small Strongbox
-	--  [215454] = true,			-- Tiny Strongbox
+	-- [208838] = true,			-- Dark Iron Lockbox
+	-- [215451] = true,			-- Large Strongbox
+	-- [215452] = true,			-- Medium Strongbox
+	-- [227937] = true,			-- Puzzle Box
+	-- [215453] = true,			-- Small Strongbox
+	-- [215454] = true,			-- Tiny Strongbox
 }
