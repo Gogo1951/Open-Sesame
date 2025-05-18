@@ -59,14 +59,15 @@ end
 local function IsAnyWindowOpen()
     -- Blizzard standard frames
     if
-        (AuctionFrame and AuctionFrame:IsVisible()) or (BankFrame and BankFrame:IsVisible()) or
-            (CraftFrame and CraftFrame:IsVisible()) or
-            (GossipFrame and GossipFrame:IsVisible()) or
-            (MailFrame and MailFrame:IsVisible()) or
-            (MerchantFrame and MerchantFrame:IsVisible()) or
-            (TradeFrame and TradeFrame:IsVisible()) or
-            (TradeSkillFrame and TradeSkillFrame:IsVisible()) or
-            (LootFrame and LootFrame:IsVisible())
+        (AuctionFrame and AuctionFrame:IsVisible()) or 
+        (BankFrame and BankFrame:IsVisible()) or
+        (CraftFrame and CraftFrame:IsVisible()) or
+        (GossipFrame and GossipFrame:IsVisible()) or
+        (MailFrame and MailFrame:IsVisible()) or
+        (MerchantFrame and MerchantFrame:IsVisible()) or
+        (TradeFrame and TradeFrame:IsVisible()) or
+        (TradeSkillFrame and TradeSkillFrame:IsVisible()) or
+        (LootFrame and LootFrame:IsVisible())
      then -- Check for loot frame explicitly
         return true
     end
