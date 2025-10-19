@@ -1,25 +1,15 @@
 # Open Sesame!
 
-A simple add-on that automatically opens clams & containers in your inventory.
+A simple add-on that automatically opens clams, treat bags, and other containers in your inventory — no clicks required.
 
-❗ **Auto Loot must be enabled for Open Sesame! to work correctly!**
+⚠️ **Auto Loot must be enabled for Open Sesame to work correctly!**
 
-⚙️ Open Sesame! under the following conditions:
+## Usage
 
-- You are not in combat (anything looted during combat will be opened as soon as combat is over).
-- You are not actively trying to loot something else.
-- You are not actively trading with another player.
-- You are not actively crafting.
-- The container is not locked.
-- The container did not drop off a "current" raid boss.
-- The container is Bind on Pickup (BoP), and is not tradable.
-- The container is tradable, but does not contain a BoP item.
-- The container is tradable, but does not contain a unique item.
-- You do not have a Merchant Window Open.
-- You do not have the Auction House Window Open
-- You do not have your Bank Window Open.
-- You do not have your Guild Bank Window Open.
-- You do not have your Mailbox Window Open.
+* Left-click the minimap icon to toggle enable/disable. (Open Sesame is on by default when installed.)
+* The addon automatically pauses when you have **fewer than 4 free bag slots**, and resumes once you have **5 or more**.
+* Containers won’t open during combat or while interaction windows are up (vendors, mail, quests, gossip, etc.), or when the container is known to contain a BoP or Unique item.
+* That’s it — everything else is automatic.
 
 🚫 **The "UseContainerItem" API call no longer works on clams. This likely has something to do with the "[Clam Weaving](https://www.youtube.com/watch?v=h3YO7jeoOWs)" hack.**
 
@@ -41,9 +31,9 @@ https://www.curseforge.com/wow/addons/open-sesame
 
 🟢 World of Warcraft Classic : Hardcore Anniversary Realms
 
-🔴 Mists of Pandaria Classic
+🟡 Mists of Pandaria Classic
 
-🔴 World of Warcraft
+🟡 World of Warcraft
 
 Please reach out if you would like to be involved with testing!
 
