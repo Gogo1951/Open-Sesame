@@ -32,6 +32,39 @@ local scanPending = false
 local openTimerLive = false
 local lastBagFullAt = 0
 local lastFreeSlots = nil
+local quietUntil = 0
+local lastStatusMsg, lastStatusAt = nil, 0
+
+local function IsQuiet()
+    return GetTime() < quietUntil
+end
+
+local function SetQuiet(seconds)
+    local now = GetTime()
+    local untilTS = now + (seconds or 0)
+    if untilTS > quietUntil then
+        quietUntil = untilTS
+    end
+end
+
+local function StatusPrint(msg, a, b, c, d)
+    if IsQuiet() then
+        return
+    end
+    local text = (a ~= nil) and string.format(msg, a, b, c, d) or msg
+    local now = GetTime()
+    if text == lastStatusMsg and (now - lastStatusAt) < 5 then
+        return
+    end
+    lastStatusMsg, lastStatusAt = text, now
+    local PREFIX = ("|cff00ff88%s|r // "):format(ADDON_NAME)
+    local out = PREFIX .. text
+    if DEFAULT_CHAT_FRAME then
+        DEFAULT_CHAT_FRAME:AddMessage(out)
+    else
+        print(out)
+    end
+end
 
 local PREFIX = ("|cff00ff88%s|r // "):format(ADDON_NAME)
 local function Print(msg, a, b, c, d)
@@ -231,9 +264,9 @@ local function ScheduleScan()
                     OpenSesame.isPaused = shouldPause
                     if shouldPause then
                         StopOpenTimer()
-                        Print("Paused until you have at least %d empty bag slots.", MIN_FREE_SLOTS)
+                        StatusPrint("Paused until you have at least %d empty bag slots.", MIN_FREE_SLOTS)
                     else
-                        Print("Resumed.")
+                        StatusPrint("Resumed.")
                     end
                     OpenSesame_UpdateMinimapIcon()
                 end
@@ -307,11 +340,9 @@ if LDB then
                     return
                 end
                 ToggleEnabled(not OpenSesame.isEnabled)
-
                 if not (frame and frame:IsMouseOver()) then
                     return
                 end
-
                 local tt = GameTooltip
                 if tt and tt:IsShown() and tt:IsOwned(frame) then
                     tt:ClearLines()
@@ -319,7 +350,6 @@ if LDB then
                     tt:Show()
                     return
                 end
-
                 local onEnter = frame:GetScript("OnEnter")
                 if onEnter then
                     C_Timer.After(
@@ -333,7 +363,6 @@ if LDB then
             OnTooltipShow = function(tt)
                 tt:AddLine("|cff00ff80Open Sesame|r")
                 tt:AddLine(" ")
-
                 local statusColor
                 if not OpenSesame.isEnabled then
                     statusColor = "|cffff0000Disabled|r"
@@ -344,7 +373,7 @@ if LDB then
                 end
                 tt:AddLine("Status : " .. statusColor)
                 tt:AddLine(" ")
-                tt:AddLine("Left-click: Toggle Enable or Disable.", 1, 1, 1)
+                tt:AddLine("Left-click : Toggle Enable or Disable.", 1, 1, 1)
                 tt:AddLine(" ")
                 tt:AddLine("Open Sesame will automatically pause when you have less than 5 empty bag slots.", 1, 1, 1)
             end
@@ -370,6 +399,8 @@ f:RegisterEvent("MERCHANT_CLOSED")
 f:RegisterEvent("MAIL_CLOSED")
 f:RegisterEvent("BANKFRAME_CLOSED")
 f:RegisterEvent("TRADE_CLOSED")
+f:RegisterEvent("LOADING_SCREEN_ENABLED")
+f:RegisterEvent("LOADING_SCREEN_DISABLED")
 
 f:SetScript(
     "OnEvent",
@@ -392,6 +423,8 @@ f:SetScript(
                         OpenSesame_UpdateMinimapIcon()
                     end
                 )
+            else
+                SetQuiet(2)
             end
         elseif event == "BAG_UPDATE" then
             local bagId = ...
@@ -417,6 +450,10 @@ f:SetScript(
          then
             fullScanNeeded = true
             ScheduleScan()
+        elseif event == "LOADING_SCREEN_ENABLED" then
+            SetQuiet(10)
+        elseif event == "LOADING_SCREEN_DISABLED" then
+            SetQuiet(3)
         elseif event == "UI_ERROR_MESSAGE" then
             local errTypeOrID, msg = ...
             local isBagFull =
@@ -433,7 +470,7 @@ f:SetScript(
                     OpenSesame.isPaused = true
                     StopOpenTimer()
                     OpenSesame_UpdateMinimapIcon()
-                    Print("Inventory is full!")
+                    StatusPrint("Inventory is full!")
                 end
             end
         end
