@@ -11,6 +11,10 @@ A simple add-on that automatically opens clams, treat bags, and other containers
 * Containers won’t open during combat or while interaction windows are up (vendors, mail, quests, gossip, etc.), or when the container is known to contain a BoP or Unique item.
 * That’s it — everything else is automatic.
 
+<img width="250" alt="image" src="https://github.com/user-attachments/assets/2f649bae-80ae-4ded-8d3e-976422010d4d" />
+
+<img width="250" alt="image" src="https://github.com/user-attachments/assets/ebb4fc5a-2a96-474b-b3b3-f10d238bb1be" />
+
 🚫 **The "UseContainerItem" API call no longer works on clams. This likely has something to do with the "[Clam Weaving](https://www.youtube.com/watch?v=h3YO7jeoOWs)" hack.**
 
 ## Download
