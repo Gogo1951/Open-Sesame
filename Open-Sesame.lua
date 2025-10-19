@@ -302,22 +302,51 @@ if LDB then
             label = ADDON_NAME,
             icon = ICONS[(not OpenSesame.isEnabled) and "off" or (OpenSesame.isPaused and "paused" or "on")],
             text = ADDON_NAME .. " : " .. StatusText(),
-            OnClick = function(_, button)
-                if button == "LeftButton" then
-                    ToggleEnabled(not OpenSesame.isEnabled)
+            OnClick = function(frame, button)
+                if button ~= "LeftButton" then
+                    return
+                end
+                ToggleEnabled(not OpenSesame.isEnabled)
+
+                if not (frame and frame:IsMouseOver()) then
+                    return
+                end
+
+                local tt = GameTooltip
+                if tt and tt:IsShown() and tt:IsOwned(frame) then
+                    tt:ClearLines()
+                    ldbObject.OnTooltipShow(tt)
+                    tt:Show()
+                    return
+                end
+
+                local onEnter = frame:GetScript("OnEnter")
+                if onEnter then
+                    C_Timer.After(
+                        0,
+                        function()
+                            onEnter(frame)
+                        end
+                    )
                 end
             end,
             OnTooltipShow = function(tt)
-                tt:AddLine(ADDON_NAME)
+                tt:AddLine("|cff00ff80Open Sesame|r")
                 tt:AddLine(" ")
-                tt:AddLine("Left-click: Enable/Disable", 0.8, 0.8, 0.8)
+
+                local statusColor
+                if not OpenSesame.isEnabled then
+                    statusColor = "|cffff0000Disabled|r"
+                elseif OpenSesame.isPaused then
+                    statusColor = "|cffffff00Paused|r"
+                else
+                    statusColor = "|cff00ff00Enabled|r"
+                end
+                tt:AddLine("Status : " .. statusColor)
                 tt:AddLine(" ")
-                tt:AddLine(
-                    "Will automatically pause when you have " .. MIN_FREE_SLOTS .. " or fewer free bag slots",
-                    0.8,
-                    0.8,
-                    0.8
-                )
+                tt:AddLine("Left-click: Toggle Enable or Disable.", 1, 1, 1)
+                tt:AddLine(" ")
+                tt:AddLine("Open Sesame will automatically pause when you have less than 5 empty bag slots.", 1, 1, 1)
             end
         }
     )
@@ -377,7 +406,6 @@ f:SetScript(
                 ScheduleScan()
             end
         elseif event == "PLAYER_INTERACTION_MANAGER_FRAME_SHOW" then
-            -- no-op
         elseif event == "PLAYER_INTERACTION_MANAGER_FRAME_HIDE" then
             fullScanNeeded = true
             ScheduleScan()
