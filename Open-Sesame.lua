@@ -83,7 +83,7 @@ local function PrintEnabledStatus()
     if IsAutoLootOn() then
         Print("Enabled.")
     else
-        Print("Enabled, but Open Sesame works properly when Auto Loot is also turned on.")
+        Print("Enabled, but Open Sesame also requires Auto Loot be turned on in order to function properly.")
     end
 end
 
@@ -519,3 +519,4 @@ f:SetScript(
         end
     end
 )
+
