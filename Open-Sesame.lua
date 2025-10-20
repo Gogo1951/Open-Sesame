@@ -72,6 +72,21 @@ local function Print(msg, a, b, c, d)
     end
 end
 
+local function IsAutoLootOn()
+    if GetCVarBool then
+        return GetCVarBool("autoLootDefault")
+    end
+    return GetCVar and (GetCVar("autoLootDefault") == "1") or false
+end
+
+local function PrintEnabledStatus()
+    if IsAutoLootOn() then
+        Print("Enabled.")
+    else
+        Print("Enabled, but Open Sesame works properly when Auto Loot is also turned on.")
+    end
+end
+
 local function GetFreeSlots()
     local free = 0
     for bag = 0, 4 do
@@ -110,7 +125,8 @@ local function IsInteractionActive()
         end
     end
     if
-        (MerchantFrame and MerchantFrame:IsShown()) or (MailFrame and MailFrame:IsShown()) or
+        (MerchantFrame and MerchantFrame:IsShown()) or 
+            (MailFrame and MailFrame:IsShown()) or
             (TradeFrame and TradeFrame:IsShown()) or
             (BankFrame and BankFrame:IsShown()) or
             (GossipFrame and GossipFrame:IsShown()) or
@@ -350,7 +366,7 @@ local function ToggleEnabled(newState)
         OpenSesame.isPaused = ShouldPause(lastFreeSlots)
         fullScanNeeded = true
         ScheduleScan(true)
-        Print("Enabled.")
+        PrintEnabledStatus()
     end
     OpenSesame_UpdateMinimapIcon()
 end
@@ -445,7 +461,7 @@ f:SetScript(
                             OpenSesame.isPaused = ShouldPause(lastFreeSlots)
                             fullScanNeeded = true
                             ScheduleScan(true)
-                            Print("Enabled.")
+                            PrintEnabledStatus()
                         end
                         OpenSesame_UpdateMinimapIcon()
                     end
@@ -467,7 +483,9 @@ f:SetScript(
             end
         elseif event == "PLAYER_INTERACTION_MANAGER_FRAME_SHOW" then
         elseif
-            event == "PLAYER_INTERACTION_MANAGER_FRAME_HIDE" or event == "GOSSIP_CLOSED" or event == "QUEST_FINISHED" or
+            event == "PLAYER_INTERACTION_MANAGER_FRAME_HIDE" or 
+                event == "GOSSIP_CLOSED" or 
+                event == "QUEST_FINISHED" or
                 event == "MERCHANT_CLOSED" or
                 event == "MAIL_CLOSED" or
                 event == "BANKFRAME_CLOSED" or
