@@ -4,7 +4,7 @@
 
 ## X-Curse-Project-ID: 830638
 
-## Interface: 11507
+## Interface: 11508
 
 ## Version: @project-version@
 
@@ -24,3 +24,4 @@ Open-Sesame.lua
 # kAutoOpen Dragonflight -- https://www.curseforge.com/wow/addons/kautoopen-dragonflight
 # kAutoOpen -- https://www.curseforge.com/wow/addons/kautoopen
 # Openables (Weak Aura) -- https://wago.io/gtRVJZetK
+
