@@ -138,6 +138,16 @@ local function IsInteractionActive()
     return false
 end
 
+local function IsCasting()
+    if UnitCastingInfo and UnitCastingInfo("player") then
+        return true
+    end
+    if UnitChannelInfo and UnitChannelInfo("player") then
+        return true
+    end
+    return false
+end
+
 local function ShouldPause(free)
     if OpenSesame.isPaused then
         return free < (MIN_FREE_SLOTS + 1)
@@ -154,6 +164,9 @@ local function IsSafeToOpen()
         return false
     end
     if IsInteractionActive() then
+        return false
+    end
+    if IsCasting() then
         return false
     end
     lastFreeSlots = GetFreeSlots()
@@ -430,22 +443,28 @@ if LDB then
 end
 
 local f = CreateFrame("Frame")
-f:RegisterEvent("PLAYER_ENTERING_WORLD")
-f:RegisterEvent("BAG_UPDATE")
-f:RegisterEvent("PLAYER_REGEN_ENABLED")
-f:RegisterEvent("UI_ERROR_MESSAGE")
 f:RegisterEvent("BAG_NEW_ITEMS_UPDATED")
-f:RegisterEvent("CHAT_MSG_LOOT")
-f:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_SHOW")
-f:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_HIDE")
-f:RegisterEvent("GOSSIP_CLOSED")
-f:RegisterEvent("QUEST_FINISHED")
-f:RegisterEvent("MERCHANT_CLOSED")
-f:RegisterEvent("MAIL_CLOSED")
+f:RegisterEvent("BAG_UPDATE")
 f:RegisterEvent("BANKFRAME_CLOSED")
-f:RegisterEvent("TRADE_CLOSED")
-f:RegisterEvent("LOADING_SCREEN_ENABLED")
+f:RegisterEvent("CHAT_MSG_LOOT")
+f:RegisterEvent("GOSSIP_CLOSED")
 f:RegisterEvent("LOADING_SCREEN_DISABLED")
+f:RegisterEvent("LOADING_SCREEN_ENABLED")
+f:RegisterEvent("MAIL_CLOSED")
+f:RegisterEvent("MERCHANT_CLOSED")
+f:RegisterEvent("PLAYER_ENTERING_WORLD")
+f:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_HIDE")
+f:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_SHOW")
+f:RegisterEvent("PLAYER_REGEN_ENABLED")
+f:RegisterEvent("QUEST_FINISHED")
+f:RegisterEvent("TRADE_CLOSED")
+f:RegisterEvent("UI_ERROR_MESSAGE")
+f:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
+f:RegisterEvent("UNIT_SPELLCAST_CHANNEL_STOP")
+f:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED")
+f:RegisterEvent("UNIT_SPELLCAST_START")
+f:RegisterEvent("UNIT_SPELLCAST_STOP")
+f:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 
 f:SetScript(
     "OnEvent",
@@ -484,11 +503,11 @@ f:SetScript(
         elseif event == "PLAYER_INTERACTION_MANAGER_FRAME_SHOW" then
         elseif
             event == "PLAYER_INTERACTION_MANAGER_FRAME_HIDE" or 
-                event == "GOSSIP_CLOSED" or 
-                event == "QUEST_FINISHED" or
-                event == "MERCHANT_CLOSED" or
-                event == "MAIL_CLOSED" or
                 event == "BANKFRAME_CLOSED" or
+                event == "GOSSIP_CLOSED" or 
+                event == "MAIL_CLOSED" or
+                event == "MERCHANT_CLOSED" or
+                event == "QUEST_FINISHED" or
                 event == "TRADE_CLOSED"
          then
             fullScanNeeded = true
@@ -497,6 +516,17 @@ f:SetScript(
             SetQuiet(10)
         elseif event == "LOADING_SCREEN_DISABLED" then
             SetQuiet(3)
+        elseif
+            event == "UNIT_SPELLCAST_STOP" or 
+                event == "UNIT_SPELLCAST_CHANNEL_STOP" or
+                event == "UNIT_SPELLCAST_INTERRUPTED" or
+                event == "UNIT_SPELLCAST_SUCCEEDED"
+         then
+            local unit = ...
+            if unit == "player" then
+                fullScanNeeded = true
+                ScheduleScan(true)
+            end
         elseif event == "UI_ERROR_MESSAGE" then
             local errTypeOrID, msg = ...
             local isBagFull =
@@ -519,4 +549,3 @@ f:SetScript(
         end
     end
 )
-
