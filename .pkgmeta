@@ -1,0 +1,11 @@
+# .pkgmeta
+package-as: Open-Sesame
+
+ignore:
+    - .git
+    - .gitignore
+    - .idea
+    - .pkgmeta
+    - .vscode
+    - LICENSE
+    - README.md
