@@ -423,10 +423,12 @@ if LDB then
                 end
             end,
             OnTooltipShow = function(tt)
-                tt:AddLine(ADDON_NAME, 1, 0.82, 0)
-
+                local version = "@project-version@"
+                if version:find("project-version", 1, true) then
+                    version = "Dev"
+                end
+                tt:AddDoubleLine(ADDON_NAME, "|cFFAAAAAA" .. version .. "|r", 1, 0.82, 0, 1, 1, 1)
                 tt:AddLine(" ")
-
                 local statusText
                 if not OpenSesame.isEnabled then
                     statusText = "|cFFFF0000Disabled|r"
@@ -435,15 +437,10 @@ if LDB then
                 else
                     statusText = "|cFF00FF00Enabled|r"
                 end
-
                 tt:AddDoubleLine("Auto-Opening", statusText)
-
                 tt:AddLine(" ")
-
                 tt:AddDoubleLine("|cFF66BBFFLeft-Click|r", "|cFFFFFFFFToggle Auto-Opening|r")
-
                 tt:AddLine(" ")
-
                 tt:AddLine("|cFFaaaaaaAuto-pauses when you have less than 5 empty bag slots.|r", nil, nil, nil, true)
             end
         }
