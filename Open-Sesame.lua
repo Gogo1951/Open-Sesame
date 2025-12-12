@@ -397,10 +397,13 @@ if LDB then
                 if button ~= "LeftButton" then
                     return
                 end
+
                 ToggleEnabled(not OpenSesame.isEnabled)
+
                 if not (frame and frame:IsMouseOver()) then
                     return
                 end
+
                 local tt = GameTooltip
                 if tt and tt:IsShown() and tt:IsOwned(frame) then
                     tt:ClearLines()
@@ -408,6 +411,7 @@ if LDB then
                     tt:Show()
                     return
                 end
+
                 local onEnter = frame:GetScript("OnEnter")
                 if onEnter then
                     C_Timer.After(
@@ -419,24 +423,32 @@ if LDB then
                 end
             end,
             OnTooltipShow = function(tt)
-                tt:AddLine("|cff00ff80Open Sesame|r")
+                tt:AddLine(ADDON_NAME, 1, 0.82, 0)
+
                 tt:AddLine(" ")
-                local statusColor
+
+                local statusText
                 if not OpenSesame.isEnabled then
-                    statusColor = "|cffff0000Disabled|r"
+                    statusText = "|cFFFF0000Disabled|r"
                 elseif OpenSesame.isPaused then
-                    statusColor = "|cffffff00Paused|r"
+                    statusText = "|cFFFFD100Paused|r"
                 else
-                    statusColor = "|cff00ff00Enabled|r"
+                    statusText = "|cFF00FF00Enabled|r"
                 end
-                tt:AddLine("Status : " .. statusColor)
+
+                tt:AddDoubleLine("Auto-Opening", statusText)
+
                 tt:AddLine(" ")
-                tt:AddLine("Left-click : Toggle Enable or Disable.", 1, 1, 1)
+
+                tt:AddDoubleLine("|cFF66BBFFLeft-Click|r", "|cFFFFFFFFToggle Auto-Opening|r")
+
                 tt:AddLine(" ")
-                tt:AddLine("Open Sesame will automatically pause when you have less than 5 empty bag slots.", 1, 1, 1)
+
+                tt:AddLine("|cFFaaaaaaAuto-pauses when you have less than 5 empty bag slots.|r", nil, nil, nil, true)
             end
         }
     )
+
     if LDBIcon then
         LDBIcon:Register(ADDON_NAME, ldbObject, OpenSesame_MinimapOptions)
     end
@@ -503,8 +515,8 @@ f:SetScript(
         elseif event == "PLAYER_INTERACTION_MANAGER_FRAME_SHOW" then
         elseif
             event == "PLAYER_INTERACTION_MANAGER_FRAME_HIDE" or 
-                event == "BANKFRAME_CLOSED" or
-                event == "GOSSIP_CLOSED" or 
+                event == "BANKFRAME_CLOSED" or 
+                event == "GOSSIP_CLOSED" or
                 event == "MAIL_CLOSED" or
                 event == "MERCHANT_CLOSED" or
                 event == "QUEST_FINISHED" or
@@ -517,8 +529,7 @@ f:SetScript(
         elseif event == "LOADING_SCREEN_DISABLED" then
             SetQuiet(3)
         elseif
-            event == "UNIT_SPELLCAST_STOP" or 
-                event == "UNIT_SPELLCAST_CHANNEL_STOP" or
+            event == "UNIT_SPELLCAST_STOP" or event == "UNIT_SPELLCAST_CHANNEL_STOP" or
                 event == "UNIT_SPELLCAST_INTERRUPTED" or
                 event == "UNIT_SPELLCAST_SUCCEEDED"
          then
