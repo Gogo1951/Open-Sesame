@@ -1,75 +1,94 @@
-local ADDON_NAME = "Open Sesame"
-local OpenSesame = OpenSesame or {}
-OpenSesame.AllowedItems = OpenSesame_AllowedOpenItems or {}
+----------------------------------------------------------------------
+-- NAMESPACE & CONSTANTS
+----------------------------------------------------------------------
+local ADDON_NAME, OS = ...
+local CHAT_NAME = "Open Sesame"
 
-local MIN_FREE_SLOTS = 4
-local WORLD_LOAD_DELAY = 6
-local SCAN_DEBOUNCE = 0.5
-local OPEN_TICK_INTERVAL = 0.5
-local BAG_FULL_COOLDOWN = 10
+OS.Version = "@project-version@"
+if OS.Version:find("project-version", 1, true) then
+    OS.Version = "Dev"
+end
 
-local CreateFrame, C_Timer = CreateFrame, C_Timer
-local After = C_Timer.After
+local CreateFrame, C_Timer, C_Container = CreateFrame, C_Timer, C_Container
 local UnitAffectingCombat, GetTime = UnitAffectingCombat, GetTime
-local strmatch, tonumber, type = string.match, tonumber, type
-local wipe = wipe or (table and table.wipe) or function(t)
-        for k in pairs(t) do
-            t[k] = nil
-        end
-    end
+local tonumber, type, wipe = tonumber, type, wipe
 
 local GetContainerNumSlots = (C_Container and C_Container.GetContainerNumSlots) or GetContainerNumSlots
 local GetContainerNumFreeSlots = (C_Container and C_Container.GetContainerNumFreeSlots) or GetContainerNumFreeSlots
 local UseContainerItem = (C_Container and C_Container.UseContainerItem) or UseContainerItem
 local GetContainerItemLink = (C_Container and C_Container.GetContainerItemLink) or GetContainerItemLink
 local GetContainerItemID = (C_Container and C_Container.GetContainerItemID) or GetContainerItemID
+local UnitBuff = (C_UnitAuras and C_UnitAuras.GetBuffDataByIndex) or UnitBuff
 
-OpenSesame.isEnabled = (OpenSesame.isEnabled ~= false)
-OpenSesame.isPaused = OpenSesame.isPaused or false
+local MIN_FREE_SLOTS = 4
+local WORLD_LOAD_DELAY = 6
+local SCAN_DEBOUNCE = 0.25
+local OPEN_TICK_INTERVAL = 0.5
+local BAG_FULL_COOLDOWN = 10
+local PICK_LOCK_SPELL_ID = 1804
+local SHADOWMELD_SPELL_ID = 20580
 
-local scanTimerAt, scanPending = 0, false
-local openTimerLive = false
-local lastBagFullAt = 0
-local lastFreeSlots = nil
-local quietUntil = 0
-local lastStatusMsg, lastStatusAt = nil, 0
-local fullScanNeeded = false
-local dirtyBags = {}
+local HEX_NAME = "82B1FF"
+local HEX_SEPARATOR = "2962FF"
+local HEX_TEXT = "FFFFFF"
+local COLOR_PREFIX = "|cff"
 
-local function IsQuiet()
-    return GetTime() < quietUntil
-end
-local function SetQuiet(seconds)
-    local untilTS = GetTime() + (seconds or 0)
-    if untilTS > quietUntil then
-        quietUntil = untilTS
+local BRAND_PREFIX =
+    COLOR_PREFIX ..
+    HEX_NAME .. CHAT_NAME .. "|r " .. COLOR_PREFIX .. HEX_SEPARATOR .. "//|r " .. COLOR_PREFIX .. HEX_TEXT
+
+OS.isEnabled = (OS.isEnabled ~= false)
+OS.isPaused = OS.isPaused or false
+
+local state = {
+    scanTimerAt = 0,
+    scanPending = false,
+    openTimerLive = false,
+    lastBagFullAt = 0,
+    lastFreeSlots = 0,
+    quietUntil = 0,
+    lastStatusMsg = nil,
+    lastStatusAt = 0,
+    fullScanNeeded = false,
+    dirtyBags = {}
+}
+
+----------------------------------------------------------------------
+-- UTILITY FUNCTIONS
+----------------------------------------------------------------------
+local function Print(msg, ...)
+    local text = (...) and string.format(msg, ...) or msg
+    local output = BRAND_PREFIX .. text .. "|r"
+
+    if DEFAULT_CHAT_FRAME then
+        DEFAULT_CHAT_FRAME:AddMessage(output)
+    else
+        print(output)
     end
 end
-local PREFIX = ("|cff00ff88%s|r // "):format(ADDON_NAME)
-local function StatusPrint(msg, a, b, c, d)
+
+local function IsQuiet()
+    return GetTime() < state.quietUntil
+end
+
+local function SetQuiet(seconds)
+    local untilTS = GetTime() + (seconds or 0)
+    if untilTS > state.quietUntil then
+        state.quietUntil = untilTS
+    end
+end
+
+local function StatusPrint(msg, ...)
     if IsQuiet() then
         return
     end
-    local text = (a ~= nil) and string.format(msg, a, b, c, d) or msg
+    local text = (...) and string.format(msg, ...) or msg
     local now = GetTime()
-    if text == lastStatusMsg and (now - lastStatusAt) < 5 then
+    if text == state.lastStatusMsg and (now - state.lastStatusAt) < 5 then
         return
     end
-    lastStatusMsg, lastStatusAt = text, now
-    local out = PREFIX .. text
-    if DEFAULT_CHAT_FRAME then
-        DEFAULT_CHAT_FRAME:AddMessage(out)
-    else
-        print(out)
-    end
-end
-local function Print(msg, a, b, c, d)
-    local out = (a ~= nil) and (PREFIX .. string.format(msg, a, b, c, d)) or (PREFIX .. msg)
-    if DEFAULT_CHAT_FRAME then
-        DEFAULT_CHAT_FRAME:AddMessage(out)
-    else
-        print(out)
-    end
+    state.lastStatusMsg, state.lastStatusAt = text, now
+    Print(text)
 end
 
 local function IsAutoLootOn()
@@ -77,14 +96,6 @@ local function IsAutoLootOn()
         return GetCVarBool("autoLootDefault")
     end
     return GetCVar and (GetCVar("autoLootDefault") == "1") or false
-end
-
-local function PrintEnabledStatus()
-    if IsAutoLootOn() then
-        Print("Enabled.")
-    else
-        Print("Enabled, but Open Sesame also requires Auto Loot be turned on in order to function properly.")
-    end
 end
 
 local function GetFreeSlots()
@@ -102,31 +113,66 @@ local function SafeFastItemID(bag, slot)
     if not bag or not slot or bag < 0 or bag > 4 then
         return nil
     end
-    if GetContainerItemID then
-        return GetContainerItemID(bag, slot)
+    local id = GetContainerItemID(bag, slot)
+    if id then
+        return id
     end
     local link = GetContainerItemLink(bag, slot)
     if not link then
         return nil
     end
-    local id = strmatch(link, "item:(%d+)")
-    return id and tonumber(id) or nil
+    return tonumber(link:match("item:(%d+)"))
+end
+
+----------------------------------------------------------------------
+-- TOOLTIP SCANNING
+----------------------------------------------------------------------
+local scanTooltip = CreateFrame("GameTooltip", "OS_ScanTooltip", nil, "GameTooltipTemplate")
+scanTooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
+
+local function IsItemLocked(bag, slot)
+    scanTooltip:ClearLines()
+    scanTooltip:SetBagItem(bag, slot)
+    for i = 1, scanTooltip:NumLines() do
+        local line = _G["OS_ScanTooltipTextLeft" .. i]
+        local text = line and line:GetText()
+        if text and text == LOCKED then
+            return true
+        end
+    end
+    return false
+end
+
+----------------------------------------------------------------------
+-- SAFETY CHECKS
+----------------------------------------------------------------------
+local function IsPlayerStealthed()
+    if _G.IsStealthed and _G.IsStealthed() then
+        return true
+    end
+
+    for i = 1, 40 do
+        local _, _, _, _, _, _, _, _, _, spellID = UnitBuff("player", i)
+        if not spellID then
+            break
+        end
+        if spellID == SHADOWMELD_SPELL_ID then
+            return true
+        end
+    end
+
+    return false
 end
 
 local function IsInteractionActive()
     if C_PlayerInteractionManager and C_PlayerInteractionManager.GetInteractionType then
         local t = C_PlayerInteractionManager.GetInteractionType()
-        if
-            t and
-                ((Enum and Enum.PlayerInteractionType and t ~= Enum.PlayerInteractionType.None) or
-                    (type(t) == "number" and t ~= 0))
-         then
+        if t and (t ~= 0) then
             return true
         end
     end
     if
-        (MerchantFrame and MerchantFrame:IsShown()) or 
-            (MailFrame and MailFrame:IsShown()) or
+        (MerchantFrame and MerchantFrame:IsShown()) or (MailFrame and MailFrame:IsShown()) or
             (TradeFrame and TradeFrame:IsShown()) or
             (BankFrame and BankFrame:IsShown()) or
             (GossipFrame and GossipFrame:IsShown()) or
@@ -138,26 +184,8 @@ local function IsInteractionActive()
     return false
 end
 
-local function IsCasting()
-    if UnitCastingInfo and UnitCastingInfo("player") then
-        return true
-    end
-    if UnitChannelInfo and UnitChannelInfo("player") then
-        return true
-    end
-    return false
-end
-
-local function ShouldPause(free)
-    if OpenSesame.isPaused then
-        return free < (MIN_FREE_SLOTS + 1)
-    else
-        return free < MIN_FREE_SLOTS
-    end
-end
-
 local function IsSafeToOpen()
-    if not OpenSesame.isEnabled or OpenSesame.isPaused then
+    if not OS.isEnabled or OS.isPaused then
         return false
     end
     if UnitAffectingCombat("player") then
@@ -166,21 +194,36 @@ local function IsSafeToOpen()
     if IsInteractionActive() then
         return false
     end
-    if IsCasting() then
+    if IsPlayerStealthed() then
         return false
     end
-    lastFreeSlots = GetFreeSlots()
-    return lastFreeSlots >= MIN_FREE_SLOTS
+
+    if (UnitCastingInfo and UnitCastingInfo("player")) or (UnitChannelInfo and UnitChannelInfo("player")) then
+        return false
+    end
+
+    state.lastFreeSlots = GetFreeSlots()
+    return state.lastFreeSlots >= MIN_FREE_SLOTS
 end
 
-local q, qHead, qTail = {}, 1, 0
-local function QHasItems()
-    return qHead <= qTail
+local function ShouldPause(free)
+    if OS.isPaused then
+        return free < (MIN_FREE_SLOTS + 1)
+    else
+        return free < MIN_FREE_SLOTS
+    end
 end
+
+----------------------------------------------------------------------
+-- QUEUE SYSTEM
+----------------------------------------------------------------------
+local q, qHead, qTail = {}, 1, 0
+
 local function QPush(bag, slot, id)
     qTail = qTail + 3
     q[qTail - 2], q[qTail - 1], q[qTail] = bag, slot, id
 end
+
 local function QPop()
     if qHead > qTail then
         return nil
@@ -194,56 +237,61 @@ local function QPop()
     return b, s, i
 end
 
-local function BuildQueueAll()
+local function BuildQueue(targetBag)
+    local useDirty = (not state.fullScanNeeded) and (next(state.dirtyBags) ~= nil) and (targetBag ~= "ALL")
+
     wipe(q)
     qHead, qTail = 1, 0
-    for bag = 0, 4 do
+
+    if not useDirty then
+        state.fullScanNeeded = false
+        wipe(state.dirtyBags)
+    end
+
+    local function ScanBag(bag)
         local slots = GetContainerNumSlots(bag)
-        if slots and slots > 0 then
-            for slot = 1, slots do
-                local id = SafeFastItemID(bag, slot)
-                if id and OpenSesame.AllowedItems[id] then
+        for slot = 1, (slots or 0) do
+            local id = SafeFastItemID(bag, slot)
+            if id then
+                local allowed = OS.AllowedItems[id]
+                if allowed == true then
                     QPush(bag, slot, id)
+                elseif allowed == false then
+                    if not IsItemLocked(bag, slot) then
+                        QPush(bag, slot, id)
+                    end
                 end
             end
         end
     end
+
+    if useDirty then
+        for bag in pairs(state.dirtyBags) do
+            -- Only scan inventory bags, ignore bank
+            if bag >= 0 and bag <= 4 then
+                ScanBag(bag)
+            end
+        end
+        wipe(state.dirtyBags)
+    else
+        for bag = 0, 4 do
+            ScanBag(bag)
+        end
+    end
 end
 
-local function BuildQueueDirty()
-    if fullScanNeeded or next(dirtyBags) == nil then
-        fullScanNeeded = false
-        BuildQueueAll()
-        wipe(dirtyBags)
+----------------------------------------------------------------------
+-- EXECUTION LOOP
+----------------------------------------------------------------------
+local function OpenTick()
+    state.openTimerLive = false
+
+    if (UnitCastingInfo and UnitCastingInfo("player")) or (UnitChannelInfo and UnitChannelInfo("player")) then
+        state.openTimerLive = true
+        C_Timer.After(OPEN_TICK_INTERVAL, OpenTick)
         return
     end
-    wipe(q)
-    qHead, qTail = 1, 0
-    for bag in pairs(dirtyBags) do
-        if bag == -1 then
-            wipe(dirtyBags)
-            fullScanNeeded = true
-            BuildQueueAll()
-            return
-        end
-        local slots = GetContainerNumSlots(bag)
-        if slots and slots > 0 then
-            for slot = 1, slots do
-                local id = SafeFastItemID(bag, slot)
-                if id and OpenSesame.AllowedItems[id] then
-                    QPush(bag, slot, id)
-                end
-            end
-        end
-    end
-    wipe(dirtyBags)
-    if not QHasItems() then
-        fullScanNeeded = true
-    end
-end
 
-local function OpenTick()
-    openTimerLive = false
     if not IsSafeToOpen() then
         return
     end
@@ -254,60 +302,49 @@ local function OpenTick()
     end
 
     local currentId = SafeFastItemID(bag, slot)
-    if currentId and OpenSesame.AllowedItems[currentId] then
-        if currentId == cachedId then
-            UseContainerItem(bag, slot)
 
-            C_Timer.After(
-                0.25,
-                function()
-                    local still = SafeFastItemID(bag, slot)
-                    if still == cachedId and OpenSesame.AllowedItems[still] then
+    if currentId and currentId == cachedId then
+        UseContainerItem(bag, slot)
+
+        C_Timer.After(
+            0.25,
+            function()
+                local still = SafeFastItemID(bag, slot)
+                if still == cachedId then
+                    local allowed = OS.AllowedItems[still]
+                    if allowed == true or (allowed == false and not IsItemLocked(bag, slot)) then
                         QPush(bag, slot, still)
-                        if IsSafeToOpen() and not openTimerLive then
-                            openTimerLive = true
-                            C_Timer.After(OPEN_TICK_INTERVAL, OpenTick)
-                        end
                     end
                 end
-            )
-        else
-            QPush(bag, slot, currentId)
-        end
+
+                if IsSafeToOpen() and not state.openTimerLive and qHead <= qTail then
+                    state.openTimerLive = true
+                    C_Timer.After(OPEN_TICK_INTERVAL, OpenTick)
+                end
+            end
+        )
     end
 
-    if QHasItems() then
-        openTimerLive = true
+    if qHead <= qTail then
+        state.openTimerLive = true
         C_Timer.After(OPEN_TICK_INTERVAL, OpenTick)
     end
 end
 
-local function StopOpenTimer()
-    openTimerLive = false
-end
-local function StartOpenTimer()
-    if openTimerLive or not QHasItems() then
-        return
-    end
-    openTimerLive = true
-    After(OPEN_TICK_INTERVAL, OpenTick)
-end
-
 local function ScheduleScan(force)
     local run = function()
-        scanPending, scanTimerAt = false, 0
-
-        lastFreeSlots = GetFreeSlots()
-        if OpenSesame.isEnabled then
-            local shouldPause = ShouldPause(lastFreeSlots)
-            if shouldPause ~= OpenSesame.isPaused then
-                OpenSesame.isPaused = shouldPause
+        state.scanPending = false
+        state.lastFreeSlots = GetFreeSlots()
+        if OS.isEnabled then
+            local shouldPause = ShouldPause(state.lastFreeSlots)
+            if shouldPause ~= OS.isPaused then
+                OS.isPaused = shouldPause
                 if shouldPause then
-                    StopOpenTimer()
+                    state.openTimerLive = false
                     StatusPrint("Paused until you have at least %d empty bag slots.", MIN_FREE_SLOTS)
                 else
                     StatusPrint("Resumed.")
-                    fullScanNeeded = true
+                    state.fullScanNeeded = true
                 end
                 if OpenSesame_UpdateMinimapIcon then
                     OpenSesame_UpdateMinimapIcon()
@@ -315,10 +352,11 @@ local function ScheduleScan(force)
             end
         end
 
-        BuildQueueDirty()
+        BuildQueue(force and "ALL")
 
-        if IsSafeToOpen() then
-            StartOpenTimer()
+        if IsSafeToOpen() and not state.openTimerLive and qHead <= qTail then
+            state.openTimerLive = true
+            C_Timer.After(OPEN_TICK_INTERVAL, OpenTick)
         end
     end
 
@@ -328,14 +366,15 @@ local function ScheduleScan(force)
     end
 
     local wantAt = GetTime() + SCAN_DEBOUNCE
-    if scanPending and wantAt >= scanTimerAt then
+    if state.scanPending and wantAt >= state.scanTimerAt then
         return
     end
-    scanPending, scanTimerAt = true, wantAt
+    state.scanPending, state.scanTimerAt = true, wantAt
+
     C_Timer.After(
         SCAN_DEBOUNCE,
         function()
-            if GetTime() < scanTimerAt then
+            if GetTime() < state.scanTimerAt then
                 return
             end
             run()
@@ -343,43 +382,53 @@ local function ScheduleScan(force)
     )
 end
 
+----------------------------------------------------------------------
+-- MINIMAP ICON & LDB
+----------------------------------------------------------------------
 local LDB = LibStub and LibStub:GetLibrary("LibDataBroker-1.1", true)
 local LDBIcon = LibStub and LibStub("LibDBIcon-1.0", true)
 OpenSesame_MinimapOptions = OpenSesame_MinimapOptions or {hide = false}
+
 local ICONS = {
     on = "Interface\\Icons\\inv_misc_bag_09_green",
     paused = "Interface\\Icons\\inv_misc_bag_09_black",
     off = "Interface\\Icons\\inv_misc_bag_09_red"
 }
+
 local function StatusText()
-    return OpenSesame.isPaused and "Paused" or "On"
+    return OS.isPaused and "Paused" or "On"
 end
+
 local ldbObject
 function OpenSesame_UpdateMinimapIcon()
     if not LDB or not LDBIcon or not ldbObject then
         return
     end
-    local key = (not OpenSesame.isEnabled) and "off" or (OpenSesame.isPaused and "paused" or "on")
+    local key = (not OS.isEnabled) and "off" or (OS.isPaused and "paused" or "on")
     ldbObject.icon = ICONS[key] or ICONS.off
-    ldbObject.text = ADDON_NAME .. " : " .. StatusText()
+    ldbObject.text = CHAT_NAME .. " : " .. StatusText()
     LDBIcon:Refresh(ADDON_NAME, OpenSesame_MinimapOptions)
 end
 
 local function ToggleEnabled(newState)
-    if OpenSesame.isEnabled == newState then
+    if OS.isEnabled == newState then
         return
     end
-    OpenSesame.isEnabled = newState
+    OS.isEnabled = newState
     if not newState then
-        StopOpenTimer()
-        OpenSesame.isPaused = false
+        state.openTimerLive = false
+        OS.isPaused = false
         Print("Disabled.")
     else
-        lastFreeSlots = GetFreeSlots()
-        OpenSesame.isPaused = ShouldPause(lastFreeSlots)
-        fullScanNeeded = true
+        state.lastFreeSlots = GetFreeSlots()
+        OS.isPaused = ShouldPause(state.lastFreeSlots)
+        state.fullScanNeeded = true
         ScheduleScan(true)
-        PrintEnabledStatus()
+        if IsAutoLootOn() then
+            Print("Enabled.")
+        else
+            Print("Enabled, but Open Sesame also requires Auto Loot be turned on in order to function properly.")
+        end
     end
     OpenSesame_UpdateMinimapIcon()
 end
@@ -390,15 +439,15 @@ if LDB then
         ADDON_NAME,
         {
             type = "launcher",
-            label = ADDON_NAME,
-            icon = ICONS[(not OpenSesame.isEnabled) and "off" or (OpenSesame.isPaused and "paused" or "on")],
-            text = ADDON_NAME .. " : " .. StatusText(),
+            label = CHAT_NAME,
+            icon = ICONS[(not OS.isEnabled) and "off" or (OS.isPaused and "paused" or "on")],
+            text = CHAT_NAME .. " : " .. StatusText(),
             OnClick = function(frame, button)
                 if button ~= "LeftButton" then
                     return
                 end
 
-                ToggleEnabled(not OpenSesame.isEnabled)
+                ToggleEnabled(not OS.isEnabled)
 
                 if not (frame and frame:IsMouseOver()) then
                     return
@@ -423,16 +472,12 @@ if LDB then
                 end
             end,
             OnTooltipShow = function(tt)
-                local version = "@project-version@"
-                if version:find("project-version", 1, true) then
-                    version = "Dev"
-                end
-                tt:AddDoubleLine(ADDON_NAME, "|cFFAAAAAA" .. version .. "|r", 1, 0.82, 0, 1, 1, 1)
+                tt:AddDoubleLine(CHAT_NAME, "|cFFAAAAAA" .. OS.Version .. "|r", 1, 0.82, 0, 1, 1, 1)
                 tt:AddLine(" ")
                 local statusText
-                if not OpenSesame.isEnabled then
+                if not OS.isEnabled then
                     statusText = "|cFFFF0000Disabled|r"
-                elseif OpenSesame.isPaused then
+                elseif OS.isPaused then
                     statusText = "|cFFFFD100Paused|r"
                 else
                     statusText = "|cFF00FF00Enabled|r"
@@ -441,7 +486,13 @@ if LDB then
                 tt:AddLine(" ")
                 tt:AddDoubleLine("|cFF66BBFFLeft-Click|r", "|cFFFFFFFFToggle Auto-Opening|r")
                 tt:AddLine(" ")
-                tt:AddLine("|cFFaaaaaaAuto-pauses when you have less than 5 empty bag slots.|r", nil, nil, nil, true)
+                tt:AddLine(
+                    "|cFFaaaaaaWill automatically pause when you have 4 or fewer empty bag slots.|r",
+                    nil,
+                    nil,
+                    nil,
+                    true
+                )
             end
         }
     )
@@ -451,109 +502,124 @@ if LDB then
     end
 end
 
-local f = CreateFrame("Frame")
-f:RegisterEvent("BAG_NEW_ITEMS_UPDATED")
-f:RegisterEvent("BAG_UPDATE")
-f:RegisterEvent("BANKFRAME_CLOSED")
-f:RegisterEvent("CHAT_MSG_LOOT")
-f:RegisterEvent("GOSSIP_CLOSED")
-f:RegisterEvent("LOADING_SCREEN_DISABLED")
-f:RegisterEvent("LOADING_SCREEN_ENABLED")
-f:RegisterEvent("MAIL_CLOSED")
-f:RegisterEvent("MERCHANT_CLOSED")
-f:RegisterEvent("PLAYER_ENTERING_WORLD")
-f:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_HIDE")
-f:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_SHOW")
-f:RegisterEvent("PLAYER_REGEN_ENABLED")
-f:RegisterEvent("QUEST_FINISHED")
-f:RegisterEvent("TRADE_CLOSED")
-f:RegisterEvent("UI_ERROR_MESSAGE")
-f:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
-f:RegisterEvent("UNIT_SPELLCAST_CHANNEL_STOP")
-f:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED")
-f:RegisterEvent("UNIT_SPELLCAST_START")
-f:RegisterEvent("UNIT_SPELLCAST_STOP")
-f:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
+----------------------------------------------------------------------
+-- EVENTS
+----------------------------------------------------------------------
+local EventHandlers = {}
 
+function EventHandlers:PLAYER_ENTERING_WORLD(isInitialLogin, isReloadingUi)
+    if isInitialLogin or isReloadingUi then
+        C_Timer.After(
+            WORLD_LOAD_DELAY,
+            function()
+                state.lastFreeSlots = GetFreeSlots()
+                if OS.isEnabled then
+                    OS.isPaused = ShouldPause(state.lastFreeSlots)
+                    state.fullScanNeeded = true
+                    ScheduleScan(true)
+                    if IsAutoLootOn() then
+                        Print("Enabled.")
+                    else
+                        Print("Enabled, but requires Auto Loot.")
+                    end
+                end
+                OpenSesame_UpdateMinimapIcon()
+            end
+        )
+    else
+        SetQuiet(2)
+    end
+end
+
+function EventHandlers:BAG_UPDATE(bagId)
+    state.dirtyBags[bagId or -1] = true
+    ScheduleScan()
+end
+
+function EventHandlers:BAG_NEW_ITEMS_UPDATED()
+    state.fullScanNeeded = true
+    ScheduleScan()
+end
+function EventHandlers:CHAT_MSG_LOOT()
+    state.fullScanNeeded = true
+    ScheduleScan()
+end
+function EventHandlers:PLAYER_REGEN_ENABLED()
+    if OS.isEnabled then
+        state.fullScanNeeded = true
+        ScheduleScan(true)
+    end
+end
+
+function EventHandlers:UPDATE_STEALTH()
+    if not IsPlayerStealthed() and OS.isEnabled then
+        state.fullScanNeeded = true
+        ScheduleScan(true)
+    end
+end
+
+local function OnFrameClosed()
+    state.fullScanNeeded = true
+    ScheduleScan(true)
+end
+EventHandlers.BANKFRAME_CLOSED = OnFrameClosed
+EventHandlers.GOSSIP_CLOSED = OnFrameClosed
+EventHandlers.MAIL_CLOSED = OnFrameClosed
+EventHandlers.MERCHANT_CLOSED = OnFrameClosed
+EventHandlers.QUEST_FINISHED = OnFrameClosed
+EventHandlers.TRADE_CLOSED = OnFrameClosed
+EventHandlers.PLAYER_INTERACTION_MANAGER_FRAME_HIDE = OnFrameClosed
+
+function EventHandlers:LOADING_SCREEN_ENABLED()
+    SetQuiet(10)
+end
+function EventHandlers:LOADING_SCREEN_DISABLED()
+    SetQuiet(3)
+end
+
+function EventHandlers:UNIT_SPELLCAST_SUCCEEDED(unit, castGUID, spellID)
+    if unit == "player" and spellID == PICK_LOCK_SPELL_ID then
+        C_Timer.After(
+            0.5,
+            function()
+                state.fullScanNeeded = true
+                ScheduleScan(true)
+            end
+        )
+    end
+end
+
+function EventHandlers:UI_ERROR_MESSAGE(errTypeOrID, msg)
+    local isBagFull = (msg and msg:find(ERR_INV_FULL or "Inventory is full"))
+
+    if not isBagFull and type(errTypeOrID) == "number" then
+        isBagFull =
+            (errTypeOrID == (LE_GAME_ERR_INV_FULL or 0)) or
+            (Enum and Enum.UIERRORS and errTypeOrID == Enum.UIERRORS.ERR_INV_FULL)
+    end
+
+    if isBagFull then
+        local now = GetTime()
+        if (now - state.lastBagFullAt) > BAG_FULL_COOLDOWN then
+            state.lastBagFullAt = now
+            OS.isPaused = true
+            state.openTimerLive = false
+            OpenSesame_UpdateMinimapIcon()
+            StatusPrint("Inventory is full!")
+        end
+    end
+end
+
+local f = CreateFrame("Frame")
 f:SetScript(
     "OnEvent",
-    function(_, event, ...)
-        if event == "PLAYER_ENTERING_WORLD" then
-            local isInitialLogin, isReloadingUi = ...
-            if isInitialLogin or isReloadingUi then
-                After(
-                    WORLD_LOAD_DELAY,
-                    function()
-                        lastFreeSlots = GetFreeSlots()
-                        if OpenSesame.isEnabled then
-                            OpenSesame.isPaused = ShouldPause(lastFreeSlots)
-                            fullScanNeeded = true
-                            ScheduleScan(true)
-                            PrintEnabledStatus()
-                        end
-                        OpenSesame_UpdateMinimapIcon()
-                    end
-                )
-            else
-                SetQuiet(2)
-            end
-        elseif event == "BAG_UPDATE" then
-            local bagId = ...
-            dirtyBags[bagId or -1] = true
-            ScheduleScan()
-        elseif event == "BAG_NEW_ITEMS_UPDATED" or event == "CHAT_MSG_LOOT" then
-            fullScanNeeded = true
-            ScheduleScan()
-        elseif event == "PLAYER_REGEN_ENABLED" then
-            if OpenSesame.isEnabled then
-                fullScanNeeded = true
-                ScheduleScan(true)
-            end
-        elseif event == "PLAYER_INTERACTION_MANAGER_FRAME_SHOW" then
-        elseif
-            event == "PLAYER_INTERACTION_MANAGER_FRAME_HIDE" or 
-                event == "BANKFRAME_CLOSED" or 
-                event == "GOSSIP_CLOSED" or
-                event == "MAIL_CLOSED" or
-                event == "MERCHANT_CLOSED" or
-                event == "QUEST_FINISHED" or
-                event == "TRADE_CLOSED"
-         then
-            fullScanNeeded = true
-            ScheduleScan(true)
-        elseif event == "LOADING_SCREEN_ENABLED" then
-            SetQuiet(10)
-        elseif event == "LOADING_SCREEN_DISABLED" then
-            SetQuiet(3)
-        elseif
-            event == "UNIT_SPELLCAST_STOP" or event == "UNIT_SPELLCAST_CHANNEL_STOP" or
-                event == "UNIT_SPELLCAST_INTERRUPTED" or
-                event == "UNIT_SPELLCAST_SUCCEEDED"
-         then
-            local unit = ...
-            if unit == "player" then
-                fullScanNeeded = true
-                ScheduleScan(true)
-            end
-        elseif event == "UI_ERROR_MESSAGE" then
-            local errTypeOrID, msg = ...
-            local isBagFull =
-                (type(errTypeOrID) == "number" and
-                ((type(LE_GAME_ERR_INV_FULL) == "number" and errTypeOrID == LE_GAME_ERR_INV_FULL) or
-                    (Enum and Enum.UIERRORS and Enum.UIERRORS.ERR_INV_FULL and errTypeOrID == Enum.UIERRORS.ERR_INV_FULL))) or
-                (type(msg) == "string" and msg:find((ERR_INV_FULL or "Inventory is full"), 1, true))
-            if isBagFull then
-                local now, cooldown = GetTime(), tonumber(BAG_FULL_COOLDOWN) or 10
-                if (now - lastBagFullAt) > cooldown or (now - lastBagFullAt) < 0 then
-                    lastBagFullAt = now
-                    OpenSesame.isPaused = true
-                    StopOpenTimer()
-                    if OpenSesame_UpdateMinimapIcon then
-                        OpenSesame_UpdateMinimapIcon()
-                    end
-                    StatusPrint("Inventory is full!")
-                end
-            end
+    function(self, event, ...)
+        if EventHandlers[event] then
+            EventHandlers[event](self, ...)
         end
     end
 )
+
+for event in pairs(EventHandlers) do
+    f:RegisterEvent(event)
+end
