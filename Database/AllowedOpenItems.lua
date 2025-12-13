@@ -1,8 +1,11 @@
-OpenSesame_AllowedOpenItems = {
+local ADDON_NAME, OS = ...
 
+local version = select(4, GetBuildInfo())
+local isTBCorHigher = (version >= 20000) 
+
+local vanillaItems = {
     -- Classic Era | Openable
     -- https://www.wowhead.com/classic/items?filter=11:10:161:82;1:2:1:4;0:0:0:11400
-
     [10456] = true, -- A Bulging Coin Purse
     [15902] = true, -- A Crazy Grab Bag
     [11883] = true, -- A Dingy Fanny Pack
@@ -17,7 +20,7 @@ OpenSesame_AllowedOpenItems = {
     [22152] = true, -- Anthion's Pouch
     [20231] = true, -- Arathor Advanced Care Package
     [20233] = true, -- Arathor Basic Care Package
-    [20236] = true, -- Arathor Standard Care Package
+    [20236] = true, -- Arathor Standard Care Package 
     [11955] = true, -- Bag of Empty Ooze Containers
     [20603] = true, -- Bag of Spoils
     [6356] = true, -- Battered Chest
@@ -191,168 +194,33 @@ OpenSesame_AllowedOpenItems = {
     [17965] = true, -- Yellow Sack of Gems
     [22137] = true, -- Ysida's Satchel
     [22233] = true, -- Zigris' Footlocker
-
     -- Classic Era | Openable but Locked
     -- https://www.wowhead.com/classic/items?filter=11:10:161:82;1:1:1:4;0:0:0:11400
+    [16882] = false, -- Battered Junkbox
+    [5760] = false, -- Eternium Lockbox
+    [4633] = false, -- Heavy Bronze Lockbox
+    [16885] = false, -- Heavy Junkbox
+    [4634] = false, -- Iron Lockbox
+    [13875] = false, -- Ironbound Locked Chest
+    [5758] = false, -- Mithril Lockbox
+    [4632] = false, -- Ornate Bronze Lockbox
+    [13918] = false, -- Reinforced Locked Chest
+    [4638] = false, -- Reinforced Steel Lockbox
+    [6354] = false, -- Small Locked Chest
+    [4637] = false, -- Steel Lockbox
+    [4636] = false, -- Strong Iron Lockbox
+    [16884] = false, -- Sturdy Junkbox
+    [6355] = false, -- Sturdy Locked Chest
+    [7209] = false, -- Tazan's Satchel
+    [12033] = false, -- Thaurissan Family Jewels
+    [7868] = false, -- Thieven' Kit
+    [5759] = false, -- Thorium Lockbox
+    [16883] = false, -- Worn Junkbox
+}
 
-    -- [16882] = true, -- Battered Junkbox
-    -- [5760] = true, -- Eternium Lockbox
-    -- [4633] = true, -- Heavy Bronze Lockbox
-    -- [16885] = true, -- Heavy Junkbox
-    -- [4634] = true, -- Iron Lockbox
-    -- [13875] = true, -- Ironbound Locked Chest
-    -- [5758] = true, -- Mithril Lockbox
-    -- [4632] = true, -- Ornate Bronze Lockbox
-    -- [13918] = true, -- Reinforced Locked Chest
-    -- [4638] = true, -- Reinforced Steel Lockbox
-    -- [6354] = true, -- Small Locked Chest
-    -- [4637] = true, -- Steel Lockbox
-    -- [4636] = true, -- Strong Iron Lockbox
-    -- [16884] = true, -- Sturdy Junkbox
-    -- [6355] = true, -- Sturdy Locked Chest
-    -- [7209] = true, -- Tazan's Satchel
-    -- [12033] = true, -- Thaurissan Family Jewels
-    -- [7868] = true, -- Thieven' Kit
-    -- [5759] = true, -- Thorium Lockbox
-    -- [16883] = true, -- Worn Junkbox
-    
-    -- Season of Mastery & Discovery | Openable
-    -- https://www.wowhead.com/classic/items?filter=11:10:161:82;1:2:1:1;0:0:0:11400
-
-    [208223] = true, -- Acolyte's Knapsack
-    [205364] = true, -- Acolyte's Knapsack
-    [227360] = true, -- Astral Boots, Legs, and Shoulders Set
-    [227338] = true, -- Astral Gloves and Belt Set
-    [227384] = true, -- Astral Helm and Chestpiece Set
-    [227374] = true, -- Battle's Boots, Legs, and Shoulders Set
-    [227349] = true, -- Battle's Gloves and Belt Set
-    [227396] = true, -- Battle's Helm and Chestpiece Set
-    [213641] = true, -- Box of Gnomeregan Salvage
-    [220914] = true, -- Broken Geode Hammer
-    [216618] = true, -- Captain Aransas' Reward
-    [227379] = true, -- Corrupted Boots, Legs, and Shoulders Set
-    [227354] = true, -- Corrupted Gloves and Belt Set
-    [227401] = true, -- Corrupted Helm and Chestpiece Set
-    [208848] = true, -- Cracked Skull-Shaped Geode
-    [236414] = true, -- Damaged Undermine Supply Crate
-    [226405] = true, -- Damaged Undermine Supply Crate
-    [227371] = true, -- Dawn Boots, Legs, and Shoulders Set
-    [227346] = true, -- Dawn Gloves and Belt Set
-    [227393] = true, -- Dawn Helm and Chestpiece Set
-    [191656] = true, -- Death's Essence
-    [209031] = true, -- Discreet Envelope
-    [227370] = true, -- Divine Will Boots, Legs, and Shoulders Set
-    [227345] = true, -- Divine Will Gloves and Belt Set
-    [227392] = true, -- Divine Will Helm and Chestpiece Set
-    [238681] = true, -- Dusty Bag
-    [221471] = true, -- Emerald Wardens Chest
-    [213565] = true, -- Entomology Starter Kit
-    [227376] = true, -- Eruption's Boots, Legs, and Shoulders Set
-    [227351] = true, -- Eruption's Gloves and Belt Set
-    [227398] = true, -- Eruption's Helm and Chestpiece Set
-    [215465] = true, -- Exploded Strongbox
-    [227359] = true, -- Feline Boots, Legs, and Shoulders Set
-    [227337] = true, -- Feline Gloves and Belt Set
-    [227383] = true, -- Feline Helm and Chestpiece Set
-    [189421] = true, -- Fire Resist Leather Gear
-    [189420] = true, -- Fire Resist Plate Gear
-    [189419] = true, -- Fire Resist Plate Gear
-    [227361] = true, -- Guardian's Boots, Legs, and Shoulders Set
-    [227339] = true, -- Guardian's Gloves and Belt Set
-    [227385] = true, -- Guardian's Helm and Chestpiece Set
-    [208766] = true, -- Helping Hand
-    [227931] = true, -- Hidden Bundle
-    [210330] = true, -- Hot Tip
-    [227381] = true, -- Immoveable Boots, Legs, and Shoulders Set
-    [227356] = true, -- Immoveable Gloves and Belt Set
-    [227403] = true, -- Immoveable Helm and Chestpiece Set
-    [227377] = true, -- Impact's Boots, Legs, and Shoulders Set
-    [227352] = true, -- Impact's Gloves and Belt Set
-    [227399] = true, -- Impact's Helm and Chestpiece Set
-    [212553] = true, -- Jewel-Encrusted Box
-    [221371] = true, -- Kidnapper's Coin Purse
-    [227365] = true, -- Mender's Boots, Legs, and Shoulders Set
-    [227340] = true, -- Mender's Gloves and Belt Set
-    [227387] = true, -- Mender's Helm and Chestpiece Set
-    [227368] = true, -- Merciful Boots, Legs, and Shoulders Set
-    [227343] = true, -- Merciful Gloves and Belt Set
-    [227390] = true, -- Merciful Helm and Chestpiece Set
-    [219773] = true, -- Mission Brief: Ashenvale
-    [219526] = true, -- Mission Brief: Duskwood
-    [219775] = true, -- Mission Brief: Feralas
-    [219774] = true, -- Mission Brief: Hinterlands
-    [189427] = true, -- More Raid Consumables
-    [224851] = true, -- Otherworldly Treasure
-    [224850] = true, -- Otherworldly Treasure
-    [223148] = true, -- Otherworldly Treasure
-    [223150] = true, -- Otherworldly Treasure
-    [224849] = true, -- Otherworldly Treasure
-    [224848] = true, -- Otherworldly Treasure
-    [220446] = true, -- Otherworldly Treasure
-    [223151] = true, -- Otherworldly Treasure
-    [228615] = true, -- Otherworldly Treasure
-    [224836] = true, -- Otherworldly Treasure
-    [223149] = true, -- Otherworldly Treasure
-    [227367] = true, -- Prowler's Boots, Legs, and Shoulders Set
-    [227342] = true, -- Prowler's Gloves and Belt Set
-    [227389] = true, -- Prowler's Helm and Chestpiece Set
-    [227366] = true, -- Pursuer's Boots, Legs, and Shoulders Set
-    [227341] = true, -- Pursuer's Gloves and Belt Set
-    [227388] = true, -- Pursuer's Helm and Chestpiece Set
-    [227369] = true, -- Radiant Boots, Legs, and Shoulders Set
-    [227344] = true, -- Radiant Gloves and Belt Set
-    [227391] = true, -- Radiant Helm and Chestpiece Set
-    [189426] = true, -- Raid Consumables
-    [227375] = true, -- Relief's Boots, Legs, and Shoulders Set
-    [227350] = true, -- Relief's Gloves and Belt Set
-    [227397] = true, -- Relief's Helm and Chestpiece Set
-    [227378] = true, -- Resolve's Boots, Legs, and Shoulders Set
-    [227353] = true, -- Resolve's Gloves and Belt Set
-    [227400] = true, -- Resolve's Helm and Chestpiece Set
-    [211799] = true, -- Sack of Stolen Goods
-    [235144] = true, -- Satchel of Blood-Caked Copper Coins
-    [235145] = true, -- Satchel of Blood-Caked Silver Coins
-    [216971] = true, -- Satchel of Copper Blood Coins
-    [221367] = true, -- Satchel of Copper Massacre Coins
-    [228326] = true, -- Satchel of Copper Slaughter Coins
-    [216972] = true, -- Satchel of Silver Blood Coins
-    [221368] = true, -- Satchel of Silver Massacre Coins
-    [228327] = true, -- Satchel of Silver Slaughter Coins
-    [239248] = true, -- Scarlet Junkbox
-    [221491] = true, -- Shadowtooth Bag
-    [237263] = true, -- Supply Bag
-    [217014] = true, -- Supply Bag
-    [227373] = true, -- Thrill's Boots, Legs, and Shoulders Set
-    [227348] = true, -- Thrill's Gloves and Belt Set
-    [227395] = true, -- Thrill's Helm and Chestpiece Set
-    [213443] = true, -- Ticking Present
-    [227372] = true, -- Twilight Boots, Legs, and Shoulders Set
-    [227347] = true, -- Twilight Gloves and Belt Set
-    [227394] = true, -- Twilight Helm and Chestpiece Set
-    [227382] = true, -- Unstoppable Boots, Legs, and Shoulders Set
-    [227357] = true, -- Unstoppable Gloves and Belt Set
-    [227404] = true, -- Unstoppable Helm and Chestpiece Set
-    [231644] = true, -- Warden's Enchanting Bag
-    [231642] = true, -- Warden's Herb Bag
-    [237386] = true, -- Wartorn Undermine Supply Crate
-    [227380] = true, -- Wicked Boots, Legs, and Shoulders Set
-    [227355] = true, -- Wicked Gloves and Belt Set
-    [227402] = true, -- Wicked Helm and Chestpiece Set
-    [216646] = true, -- Ziri's Mystery Crate
-
-    -- Season of Mastery & Discovery | Openable but Locked
-    -- https://www.wowhead.com/classic/items?filter=11:10:161:82;1:2:1:1;0:0:0:11400
-
-    -- [208838] = true, -- Dark Iron Lockbox
-    -- [215451] = true, -- Large Strongbox
-    -- [215452] = true, -- Medium Strongbox
-    -- [227937] = true, -- Puzzle Box
-    -- [215453] = true, -- Small Strongbox
-    -- [215454] = true, -- Tiny Strongbox
-
+local tbcItems = {
     -- The Burning Crusade | Openable
     -- https://www.wowhead.com/tbc/items?filter=11:10:161:166;1:2:1:2;0:0:0:0
-
     [34592] = true, -- Aldor Supplies Package
     [34595] = true, -- Aldor Supplies Package
     [34583] = true, -- Aldor Supplies Package
@@ -421,11 +289,18 @@ OpenSesame_AllowedOpenItems = {
     [25419] = true, -- Unmarked Bag of Gems
     [30260] = true, -- Voren'thal's Package
     [34426] = true, -- Winter Veil Gift
-
     -- The Burning Crusade | Openable but Locked
     -- https://www.wowhead.com/tbc/items?filter=11:10:161:166;1:1:1:2;0:0:0:0
-
-    -- [31952] = true, -- Khorium Lockbox
-    -- [29569] = true, -- Strong Junkbox
-
+    [31952] = false, -- Khorium Lockbox
+    [29569] = false, -- Strong Junkbox
 }
+
+OS.AllowedItems = vanillaItems
+
+if isTBCorHigher then
+    for id, value in pairs(tbcItems) do
+        OS.AllowedItems[id] = value
+    end
+end
+
+OpenSesame_AllowedOpenItems = OS.AllowedItems
