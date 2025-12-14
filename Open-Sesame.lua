@@ -28,8 +28,8 @@ local BAG_FULL_COOLDOWN = 10
 local PICK_LOCK_SPELL_ID = 1804
 local SHADOWMELD_SPELL_ID = 20580
 
-local HEX_NAME = "82B1FF"
-local HEX_SEPARATOR = "2962FF"
+local HEX_NAME = "00BBFF"
+local HEX_SEPARATOR = "AAAAAA"
 local HEX_TEXT = "FFFFFF"
 local COLOR_PREFIX = "|cff"
 
@@ -478,13 +478,13 @@ if LDB then
                 if not OS.isEnabled then
                     statusText = "|cFFFF0000Disabled|r"
                 elseif OS.isPaused then
-                    statusText = "|cFFFFD100Paused|r"
+                    statusText = "|cFFAAAAAAPaused|r"
                 else
                     statusText = "|cFF00FF00Enabled|r"
                 end
                 tt:AddDoubleLine("Auto-Opening", statusText)
                 tt:AddLine(" ")
-                tt:AddDoubleLine("|cFF66BBFFLeft-Click|r", "|cFFFFFFFFToggle Auto-Opening|r")
+                tt:AddDoubleLine("|cFF00BBFFLeft-Click|r", "|cFFFFFFFFToggle Auto-Opening|r")
                 tt:AddLine(" ")
                 tt:AddLine(
                     "|cFFaaaaaaWill automatically pause when you have 4 or fewer empty bag slots.|r",
@@ -520,7 +520,7 @@ function EventHandlers:PLAYER_ENTERING_WORLD(isInitialLogin, isReloadingUi)
                     if IsAutoLootOn() then
                         Print("Enabled.")
                     else
-                        Print("Enabled, but requires Auto Loot.")
+                        Print("Enabled, but requires Auto Loot to function correctly.")
                     end
                 end
                 OpenSesame_UpdateMinimapIcon()
