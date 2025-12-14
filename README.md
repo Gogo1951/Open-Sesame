@@ -4,9 +4,7 @@ A simple add-on that automatically opens clams, treat bags, and other containers
 
 ## How it Works
 
-⚠️ **Important**
-
-Auto Loot must be enabled in your game settings for Open Sesame to function correctly.
+⚠️ **Important**: Auto Loot must be enabled in your game settings for Open Sesame to function correctly.
 
 **Toggle Control**: Left-click the minimap icon to toggle the addon Enable or Disable. (It is enabled by default upon installation).
 
