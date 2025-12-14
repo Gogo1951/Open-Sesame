@@ -4,16 +4,16 @@ enable-nolib-creation: no
 
 externals:
   Includes/LibStub:
-    url: https://repos.curseforge.com/wow/libstub/trunk
+    url: svn://svn.wowace.com/wow/libstub/mainline/trunk
 
   Includes/CallbackHandler-1.0:
-    url: https://repos.curseforge.com/wow/callbackhandler/trunk/CallbackHandler-1.0
+    url: https://repos.curseforge.com/wow/callbackhandler/trunk/CallbackHandler-1.0/
 
   Includes/LibDataBroker-1.1:
-    url: https://repos.curseforge.com/wow/libdatabroker-1-1/trunk
+    url: https://github.com/tekkub/libdatabroker-1-1/
 
   Includes/LibDBIcon-1.0:
-    url: https://repos.curseforge.com/wow/libdbicon-1-0/trunk/LibDBIcon-1.0
+    url: https://repos.curseforge.com/wow/libdbicon-1-0/trunk/LibDBIcon-1.0/
 
 ignore:
   - .git
