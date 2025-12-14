@@ -4,10 +4,11 @@
 local ADDON_NAME, OS = ...
 local CHAT_NAME = "Open Sesame"
 
-OS.Version = "2025.12.13.B"
-if OS.Version:find("project-version", 1, true) then
-    OS.Version = "Dev"
+local version = (C_AddOns and C_AddOns.GetAddOnMetadata(ADDON_NAME, "Version")) or "Dev"
+if version:find("@") then
+    version = "Dev"
 end
+OS.Version = version
 
 ----------------------------------------------------------------------
 -- 2. CONSTANTS & BRANDING
@@ -75,7 +76,6 @@ local state = {
 ----------------------------------------------------------------------
 local function Print(msg, ...)
     local text = (...) and string.format(msg, ...) or msg
-    -- Uses the color table defined at the top
     local output = OS.BRAND_PREFIX .. OS.COLORS.TEXT .. text .. "|r"
 
     if DEFAULT_CHAT_FRAME then
@@ -358,12 +358,9 @@ local function ScheduleScan(force)
                 OS.isPaused = shouldPause
                 if shouldPause then
                     state.openTimerLive = false
-                    StatusPrint(
-                        OS.COLORS.WARNING .. "Paused until you have at least %d empty bag slots.|r",
-                        MIN_FREE_SLOTS
-                    )
+                    StatusPrint("Paused until you have at least %d empty bag slots.", MIN_FREE_SLOTS)
                 else
-                    StatusPrint(OS.COLORS.SUCCESS .. "Resumed.|r")
+                    StatusPrint("Resumed.")
                     state.fullScanNeeded = true
                 end
                 if OpenSesame_UpdateMinimapIcon then
@@ -430,6 +427,14 @@ function OpenSesame_UpdateMinimapIcon()
     if OS.DB and OS.DB.minimap then
         LDBIcon:Refresh(ADDON_NAME, OS.DB.minimap)
     end
+
+    if LDBIcon then
+        local button = LDBIcon:GetMinimapButton(ADDON_NAME)
+        if button and button:IsMouseOver() then
+            local onEnter = button:GetScript("OnEnter")
+            if onEnter then onEnter(button) end
+        end
+    end
 end
 
 local function ToggleEnabled(newState)
@@ -440,19 +445,16 @@ local function ToggleEnabled(newState)
     if not newState then
         state.openTimerLive = false
         OS.isPaused = false
-        Print(OS.COLORS.WARNING .. "Disabled.|r")
+        Print("Disabled.")
     else
         state.lastFreeSlots = GetFreeSlots()
         OS.isPaused = ShouldPause(state.lastFreeSlots)
         state.fullScanNeeded = true
         ScheduleScan(true)
         if IsAutoLootOn() then
-            Print(OS.COLORS.SUCCESS .. "Enabled.|r")
+            Print("Enabled.")
         else
-            Print(
-                OS.COLORS.SUCCESS ..
-                    "Enabled,|r but Open Sesame also requires " .. OS.COLORS.WARNING .. "Auto Loot|r be turned on."
-            )
+            Print("Enabled, but Open Sesame also requires " .. OS.COLORS.WARNING .. "Auto Loot|r be turned on.")
         end
     end
     OpenSesame_UpdateMinimapIcon()
@@ -504,7 +506,8 @@ if LDB then
                 tt:AddDoubleLine(OS.COLORS.NAME .. "Left-Click|r", OS.COLORS.TEXT .. "Toggle Auto-Opening|r")
                 tt:AddLine(" ")
                 tt:AddLine(
-                    OS.COLORS.SEPARATOR .. "Will automatically pause when you have 4 or fewer empty bag slots.|r"
+                    OS.COLORS.SEPARATOR .. "Will automatically pause when you have 4 or fewer empty bag slots.|r",
+                    1, 1, 1, true 
                 )
             end
         }
@@ -517,7 +520,6 @@ end
 local EventHandlers = {}
 
 function EventHandlers:PLAYER_LOGIN()
-    -- Initialize SavedVariables
     OpenSesameDB = OpenSesameDB or {}
     OpenSesameDB.minimap = OpenSesameDB.minimap or {}
     OS.DB = OpenSesameDB
@@ -539,11 +541,10 @@ function EventHandlers:PLAYER_ENTERING_WORLD(isInitialLogin, isReloadingUi)
                     state.fullScanNeeded = true
                     ScheduleScan(true)
                     if IsAutoLootOn() then
-                        Print(OS.COLORS.SUCCESS .. "Enabled.|r")
+                        Print("Enabled.")
                     else
                         Print(
-                            OS.COLORS.SUCCESS ..
-                                "Enabled,|r but requires " .. OS.COLORS.WARNING .. "Auto Loot|r to function."
+                            "Enabled, but Open Sesame also requires for Auto Loot to be turned on."
                         )
                     end
                 end
@@ -631,7 +632,7 @@ function EventHandlers:UI_ERROR_MESSAGE(errTypeOrID, msg)
             OS.isPaused = true
             state.openTimerLive = false
             OpenSesame_UpdateMinimapIcon()
-            StatusPrint(OS.COLORS.WARNING .. "Inventory is full!|r")
+            StatusPrint("Inventory is full!")
         end
     end
 end
