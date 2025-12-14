@@ -2,20 +2,23 @@
 
 A simple add-on that automatically opens clams, treat bags, and other containers in your inventory — no clicks required.
 
-⚠️ **Auto Loot must be enabled for Open Sesame to work correctly!**
+⚠️ **Important Requirement**
 
-<img width="250" alt="image" src="https://github.com/user-attachments/assets/2f649bae-80ae-4ded-8d3e-976422010d4d" />
+Auto Loot must be enabled in your game settings for Open Sesame to function correctly.
 
-<img width="250" alt="image" src="https://github.com/user-attachments/assets/ebb4fc5a-2a96-474b-b3b3-f10d238bb1be" />
+## How it Works
 
-## Usage
+**Toggle Control**: Left-click the minimap icon to toggle the addon Enable or Disable. (It is enabled by default upon installation).
 
-* Left-click the minimap icon to toggle enable/disable. (Open Sesame is on by default when installed.)
-* The addon automatically pauses when you have **fewer than 4 free bag slots**, and resumes once you have **5 or more**.
-* Containers won’t open during combat or while interaction windows are up (vendors, mail, quests, gossip, etc.), or when the container is known to contain a BoP or Unique item.
-* That’s it — everything else is automatic.
+**Smart Pausing**: The addon automatically protects your inventory management. It pauses when you have fewer than 4 free bag slots and resumes once you have 5 or more.
 
-🚫 **The "UseContainerItem" API call no longer works on clams. This likely has something to do with the "[Clam Weaving](https://www.youtube.com/watch?v=h3YO7jeoOWs)" hack.**
+**Safety First**: Containers will not open during combat, while you are interacting with NPCs (vendors, mail, quest givers), or if the container is known to hold BoP or Unique items that require confirmation.
+
+**Locked Items**: If you loot a locked item (like a lockbox), Open Sesame will attempt to open it automatically as soon as you unlock it.
+
+**Boss Loot Exclusions**: To prevent accidental master-looting issues or inventory clutter during raids, gem bags dropped by bosses are excluded from auto-opening.
+
+<img width="300" alt="image" src="https://github.com/user-attachments/assets/5c136dd5-9b2e-47cf-b2ef-83dea3b43c64" />
 
 ## Download
 
@@ -25,19 +28,15 @@ https://www.curseforge.com/wow/addons/open-sesame
 
 ## Testing Status
 
-🟢 World of Warcraft Classic : Classic Era
+🟢 World of Warcraft Classic : Vanilla (Era, Anniversary, Hardcore, Anniversary Hardcore)
 
-🟢 World of Warcraft Classic : Hardcore
+🔴 World of Warcraft Classic : Season of Discovery
 
-🟡 World of Warcraft Classic : Season of Discovery
+🟢 World of Warcraft Classic : The Burning Crusade (Anniversary)
 
-🟢 World of Warcraft Classic : Anniversary Realms
+🔴 Mists of Pandaria Classic
 
-🟢 World of Warcraft Classic : Hardcore Anniversary Realms
-
-🟡 Mists of Pandaria Classic
-
-🟡 World of Warcraft
+🔴 World of Warcraft
 
 Please reach out if you would like to be involved with testing!
 
