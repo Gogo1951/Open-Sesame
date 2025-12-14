@@ -1,24 +1,35 @@
 ----------------------------------------------------------------------
--- NAMESPACE & CONSTANTS
+-- 1. HEADER & NAMESPACE
 ----------------------------------------------------------------------
 local ADDON_NAME, OS = ...
 local CHAT_NAME = "Open Sesame"
 
-OS.Version = "@project-version@"
+OS.Version = "2025.12.13.B"
 if OS.Version:find("project-version", 1, true) then
     OS.Version = "Dev"
 end
 
-local CreateFrame, C_Timer, C_Container = CreateFrame, C_Timer, C_Container
-local UnitAffectingCombat, GetTime = UnitAffectingCombat, GetTime
-local tonumber, type, wipe = tonumber, type, wipe
+----------------------------------------------------------------------
+-- 2. CONSTANTS & BRANDING
+----------------------------------------------------------------------
+local HEX_BLUE = "00BBFF"
+local HEX_GOLD = "FFD100"
+local HEX_SEPARATOR = "AAAAAA"
+local HEX_TEXT = "FFFFFF"
+local HEX_SUCCESS = "00FF00"
+local HEX_WARNING = "FF0000"
+local COLOR_PREFIX = "|cff"
 
-local GetContainerNumSlots = (C_Container and C_Container.GetContainerNumSlots) or GetContainerNumSlots
-local GetContainerNumFreeSlots = (C_Container and C_Container.GetContainerNumFreeSlots) or GetContainerNumFreeSlots
-local UseContainerItem = (C_Container and C_Container.UseContainerItem) or UseContainerItem
-local GetContainerItemLink = (C_Container and C_Container.GetContainerItemLink) or GetContainerItemLink
-local GetContainerItemID = (C_Container and C_Container.GetContainerItemID) or GetContainerItemID
-local UnitBuff = (C_UnitAuras and C_UnitAuras.GetBuffDataByIndex) or UnitBuff
+OS.COLORS = {
+    NAME = COLOR_PREFIX .. HEX_BLUE,
+    TITLE = COLOR_PREFIX .. HEX_GOLD,
+    SEPARATOR = COLOR_PREFIX .. HEX_SEPARATOR,
+    TEXT = COLOR_PREFIX .. HEX_TEXT,
+    SUCCESS = COLOR_PREFIX .. HEX_SUCCESS,
+    WARNING = COLOR_PREFIX .. HEX_WARNING
+}
+
+OS.BRAND_PREFIX = string.format("%s%s|r %s//|r ", OS.COLORS.NAME, CHAT_NAME, OS.COLORS.SEPARATOR)
 
 local MIN_FREE_SLOTS = 4
 local WORLD_LOAD_DELAY = 6
@@ -28,14 +39,20 @@ local BAG_FULL_COOLDOWN = 10
 local PICK_LOCK_SPELL_ID = 1804
 local SHADOWMELD_SPELL_ID = 20580
 
-local HEX_NAME = "00BBFF"
-local HEX_SEPARATOR = "AAAAAA"
-local HEX_TEXT = "FFFFFF"
-local COLOR_PREFIX = "|cff"
+----------------------------------------------------------------------
+-- 3. INITIALIZATION & VARIABLES
+----------------------------------------------------------------------
+local CreateFrame, C_Timer, C_Container = CreateFrame, C_Timer, C_Container
+local UnitAffectingCombat, GetTime = UnitAffectingCombat, GetTime
+local tonumber, type, wipe = tonumber, type, wipe
+local UnitCastingInfo, UnitChannelInfo = UnitCastingInfo, UnitChannelInfo
 
-local BRAND_PREFIX =
-    COLOR_PREFIX ..
-    HEX_NAME .. CHAT_NAME .. "|r " .. COLOR_PREFIX .. HEX_SEPARATOR .. "//|r " .. COLOR_PREFIX .. HEX_TEXT
+local GetContainerNumSlots = (C_Container and C_Container.GetContainerNumSlots) or GetContainerNumSlots
+local GetContainerNumFreeSlots = (C_Container and C_Container.GetContainerNumFreeSlots) or GetContainerNumFreeSlots
+local UseContainerItem = (C_Container and C_Container.UseContainerItem) or UseContainerItem
+local GetContainerItemLink = (C_Container and C_Container.GetContainerItemLink) or GetContainerItemLink
+local GetContainerItemID = (C_Container and C_Container.GetContainerItemID) or GetContainerItemID
+local UnitBuff = (C_UnitAuras and C_UnitAuras.GetBuffDataByIndex) or UnitBuff
 
 OS.isEnabled = (OS.isEnabled ~= false)
 OS.isPaused = OS.isPaused or false
@@ -54,11 +71,12 @@ local state = {
 }
 
 ----------------------------------------------------------------------
--- UTILITY FUNCTIONS
+-- 4. UTILITY FUNCTIONS
 ----------------------------------------------------------------------
 local function Print(msg, ...)
     local text = (...) and string.format(msg, ...) or msg
-    local output = BRAND_PREFIX .. text .. "|r"
+    -- Uses the color table defined at the top
+    local output = OS.BRAND_PREFIX .. OS.COLORS.TEXT .. text .. "|r"
 
     if DEFAULT_CHAT_FRAME then
         DEFAULT_CHAT_FRAME:AddMessage(output)
@@ -117,6 +135,7 @@ local function SafeFastItemID(bag, slot)
     if id then
         return id
     end
+
     local link = GetContainerItemLink(bag, slot)
     if not link then
         return nil
@@ -125,7 +144,7 @@ local function SafeFastItemID(bag, slot)
 end
 
 ----------------------------------------------------------------------
--- TOOLTIP SCANNING
+-- 5. TOOLTIP SCANNING
 ----------------------------------------------------------------------
 local scanTooltip = CreateFrame("GameTooltip", "OS_ScanTooltip", nil, "GameTooltipTemplate")
 scanTooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
@@ -144,7 +163,7 @@ local function IsItemLocked(bag, slot)
 end
 
 ----------------------------------------------------------------------
--- SAFETY CHECKS
+-- 6. SAFETY CHECKS
 ----------------------------------------------------------------------
 local function IsPlayerStealthed()
     if _G.IsStealthed and _G.IsStealthed() then
@@ -160,7 +179,6 @@ local function IsPlayerStealthed()
             return true
         end
     end
-
     return false
 end
 
@@ -215,7 +233,7 @@ local function ShouldPause(free)
 end
 
 ----------------------------------------------------------------------
--- QUEUE SYSTEM
+-- 7. QUEUE SYSTEM
 ----------------------------------------------------------------------
 local q, qHead, qTail = {}, 1, 0
 
@@ -267,7 +285,6 @@ local function BuildQueue(targetBag)
 
     if useDirty then
         for bag in pairs(state.dirtyBags) do
-            -- Only scan inventory bags, ignore bank
             if bag >= 0 and bag <= 4 then
                 ScanBag(bag)
             end
@@ -281,7 +298,7 @@ local function BuildQueue(targetBag)
 end
 
 ----------------------------------------------------------------------
--- EXECUTION LOOP
+-- 8. EXECUTION LOOP
 ----------------------------------------------------------------------
 local function OpenTick()
     state.openTimerLive = false
@@ -341,9 +358,12 @@ local function ScheduleScan(force)
                 OS.isPaused = shouldPause
                 if shouldPause then
                     state.openTimerLive = false
-                    StatusPrint("Paused until you have at least %d empty bag slots.", MIN_FREE_SLOTS)
+                    StatusPrint(
+                        OS.COLORS.WARNING .. "Paused until you have at least %d empty bag slots.|r",
+                        MIN_FREE_SLOTS
+                    )
                 else
-                    StatusPrint("Resumed.")
+                    StatusPrint(OS.COLORS.SUCCESS .. "Resumed.|r")
                     state.fullScanNeeded = true
                 end
                 if OpenSesame_UpdateMinimapIcon then
@@ -383,11 +403,10 @@ local function ScheduleScan(force)
 end
 
 ----------------------------------------------------------------------
--- MINIMAP ICON & LDB
+-- 9. MINIMAP ICON & LDB
 ----------------------------------------------------------------------
 local LDB = LibStub and LibStub:GetLibrary("LibDataBroker-1.1", true)
 local LDBIcon = LibStub and LibStub("LibDBIcon-1.0", true)
-OpenSesame_MinimapOptions = OpenSesame_MinimapOptions or {hide = false}
 
 local ICONS = {
     on = "Interface\\Icons\\inv_misc_bag_09_green",
@@ -407,7 +426,10 @@ function OpenSesame_UpdateMinimapIcon()
     local key = (not OS.isEnabled) and "off" or (OS.isPaused and "paused" or "on")
     ldbObject.icon = ICONS[key] or ICONS.off
     ldbObject.text = CHAT_NAME .. " : " .. StatusText()
-    LDBIcon:Refresh(ADDON_NAME, OpenSesame_MinimapOptions)
+
+    if OS.DB and OS.DB.minimap then
+        LDBIcon:Refresh(ADDON_NAME, OS.DB.minimap)
+    end
 end
 
 local function ToggleEnabled(newState)
@@ -418,16 +440,19 @@ local function ToggleEnabled(newState)
     if not newState then
         state.openTimerLive = false
         OS.isPaused = false
-        Print("Disabled.")
+        Print(OS.COLORS.WARNING .. "Disabled.|r")
     else
         state.lastFreeSlots = GetFreeSlots()
         OS.isPaused = ShouldPause(state.lastFreeSlots)
         state.fullScanNeeded = true
         ScheduleScan(true)
         if IsAutoLootOn() then
-            Print("Enabled.")
+            Print(OS.COLORS.SUCCESS .. "Enabled.|r")
         else
-            Print("Enabled, but Open Sesame also requires Auto Loot be turned on in order to function properly.")
+            Print(
+                OS.COLORS.SUCCESS ..
+                    "Enabled,|r but Open Sesame also requires " .. OS.COLORS.WARNING .. "Auto Loot|r be turned on."
+            )
         end
     end
     OpenSesame_UpdateMinimapIcon()
@@ -460,52 +485,48 @@ if LDB then
                     tt:Show()
                     return
                 end
-
-                local onEnter = frame:GetScript("OnEnter")
-                if onEnter then
-                    C_Timer.After(
-                        0,
-                        function()
-                            onEnter(frame)
-                        end
-                    )
-                end
             end,
             OnTooltipShow = function(tt)
-                tt:AddDoubleLine(CHAT_NAME, "|cFFAAAAAA" .. OS.Version .. "|r", 1, 0.82, 0, 1, 1, 1)
+                tt:AddDoubleLine(OS.COLORS.TITLE .. CHAT_NAME .. "|r", OS.COLORS.SEPARATOR .. OS.Version .. "|r")
                 tt:AddLine(" ")
+
                 local statusText
                 if not OS.isEnabled then
-                    statusText = "|cFFFF0000Disabled|r"
+                    statusText = OS.COLORS.WARNING .. "Disabled|r"
                 elseif OS.isPaused then
-                    statusText = "|cFFAAAAAAPaused|r"
+                    statusText = OS.COLORS.SEPARATOR .. "Paused|r"
                 else
-                    statusText = "|cFF00FF00Enabled|r"
+                    statusText = OS.COLORS.SUCCESS .. "Enabled|r"
                 end
+
                 tt:AddDoubleLine("Auto-Opening", statusText)
                 tt:AddLine(" ")
-                tt:AddDoubleLine("|cFF00BBFFLeft-Click|r", "|cFFFFFFFFToggle Auto-Opening|r")
+                tt:AddDoubleLine(OS.COLORS.NAME .. "Left-Click|r", OS.COLORS.TEXT .. "Toggle Auto-Opening|r")
                 tt:AddLine(" ")
                 tt:AddLine(
-                    "|cFFaaaaaaWill automatically pause when you have 4 or fewer empty bag slots.|r",
-                    nil,
-                    nil,
-                    nil,
-                    true
+                    OS.COLORS.SEPARATOR .. "Will automatically pause when you have 4 or fewer empty bag slots.|r"
                 )
             end
         }
     )
-
-    if LDBIcon then
-        LDBIcon:Register(ADDON_NAME, ldbObject, OpenSesame_MinimapOptions)
-    end
 end
 
 ----------------------------------------------------------------------
--- EVENTS
+-- 10. EVENTS
 ----------------------------------------------------------------------
 local EventHandlers = {}
+
+function EventHandlers:PLAYER_LOGIN()
+    -- Initialize SavedVariables
+    OpenSesameDB = OpenSesameDB or {}
+    OpenSesameDB.minimap = OpenSesameDB.minimap or {}
+    OS.DB = OpenSesameDB
+
+    if LDBIcon and ldbObject then
+        LDBIcon:Register(ADDON_NAME, ldbObject, OS.DB.minimap)
+    end
+    OpenSesame_UpdateMinimapIcon()
+end
 
 function EventHandlers:PLAYER_ENTERING_WORLD(isInitialLogin, isReloadingUi)
     if isInitialLogin or isReloadingUi then
@@ -518,9 +539,12 @@ function EventHandlers:PLAYER_ENTERING_WORLD(isInitialLogin, isReloadingUi)
                     state.fullScanNeeded = true
                     ScheduleScan(true)
                     if IsAutoLootOn() then
-                        Print("Enabled.")
+                        Print(OS.COLORS.SUCCESS .. "Enabled.|r")
                     else
-                        Print("Enabled, but requires Auto Loot to function correctly.")
+                        Print(
+                            OS.COLORS.SUCCESS ..
+                                "Enabled,|r but requires " .. OS.COLORS.WARNING .. "Auto Loot|r to function."
+                        )
                     end
                 end
                 OpenSesame_UpdateMinimapIcon()
@@ -540,10 +564,12 @@ function EventHandlers:BAG_NEW_ITEMS_UPDATED()
     state.fullScanNeeded = true
     ScheduleScan()
 end
+
 function EventHandlers:CHAT_MSG_LOOT()
     state.fullScanNeeded = true
     ScheduleScan()
 end
+
 function EventHandlers:PLAYER_REGEN_ENABLED()
     if OS.isEnabled then
         state.fullScanNeeded = true
@@ -605,7 +631,7 @@ function EventHandlers:UI_ERROR_MESSAGE(errTypeOrID, msg)
             OS.isPaused = true
             state.openTimerLive = false
             OpenSesame_UpdateMinimapIcon()
-            StatusPrint("Inventory is full!")
+            StatusPrint(OS.COLORS.WARNING .. "Inventory is full!|r")
         end
     end
 end
