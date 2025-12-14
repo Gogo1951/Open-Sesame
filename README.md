@@ -2,21 +2,21 @@
 
 A simple add-on that automatically opens clams, treat bags, and other containers in your inventory — no clicks required.
 
+<img width="300" alt="image" src="https://github.com/user-attachments/assets/5c136dd5-9b2e-47cf-b2ef-83dea3b43c64" />
+
 ## How it Works
 
 ⚠️ **Important**: Auto Loot must be enabled in your game settings for Open Sesame to function correctly.
 
-**Toggle Control**: Left-click the minimap icon to toggle the addon Enable or Disable. (It is enabled by default upon installation).
+* **Toggle Control**: Left-click the minimap icon to toggle the addon Enable or Disable. (It is enabled by default upon installation).
 
-**Smart Pausing**: The addon automatically protects your inventory management. It pauses when you have fewer than 4 free bag slots and resumes once you have 5 or more.
+* **Smart Pausing**: The addon automatically protects your inventory management. It pauses when you have fewer than 4 free bag slots and resumes once you have 5 or more.
 
-**Safety First**: Containers will not open during combat, while you are interacting with NPCs (vendors, mail, quest givers), or if the container is known to hold BoP or Unique items that require confirmation.
+* **Safety First**: Containers will not open during combat, while you are interacting with NPCs (vendors, mail, quest givers), or if the container is known to hold BoP or Unique items that require confirmation.
 
-**Locked Items**: If you loot a locked item (like a lockbox), Open Sesame will attempt to open it automatically as soon as you unlock it.
+* **Locked Items**: If you loot a locked item (like a lockbox), Open Sesame will attempt to open it automatically as soon as you unlock it.
 
-**Boss Loot Exclusions**: To prevent accidental master-looting issues or inventory clutter during raids, gem bags dropped by bosses are excluded from auto-opening.
-
-<img width="300" alt="image" src="https://github.com/user-attachments/assets/5c136dd5-9b2e-47cf-b2ef-83dea3b43c64" />
+* **Boss Loot Exclusions**: To prevent accidental master-looting issues or inventory clutter during raids, gem bags dropped by bosses are excluded from auto-opening.
 
 ## Download
 
