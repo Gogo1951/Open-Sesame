@@ -302,5 +302,3 @@ if isTBCorHigher then
         OS.AllowedItems[id] = value
     end
 end
-
-OpenSesame_AllowedOpenItems = OS.AllowedItems
