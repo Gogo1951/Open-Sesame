@@ -454,7 +454,7 @@ local function ToggleEnabled(newState)
         if IsAutoLootOn() then
             Print("Enabled.")
         else
-            Print("Enabled, but Open Sesame also requires " .. OS.COLORS.WARNING .. "Auto Loot|r be turned on.")
+            Print("Enabled, but Open Sesame won't work unless Auto Loot is also turned on.")
         end
     end
     OpenSesame_UpdateMinimapIcon()
@@ -544,7 +544,7 @@ function EventHandlers:PLAYER_ENTERING_WORLD(isInitialLogin, isReloadingUi)
                         Print("Enabled.")
                     else
                         Print(
-                            "Enabled, but Open Sesame also requires for Auto Loot to be turned on."
+                            "Enabled, but Open Sesame won't work unless Auto Loot is also turned on."
                         )
                     end
                 end
@@ -650,3 +650,4 @@ f:SetScript(
 for event in pairs(EventHandlers) do
     f:RegisterEvent(event)
 end
+
