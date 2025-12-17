@@ -2,7 +2,7 @@
 
 A simple add-on that automatically opens clams, treat bags, and other containers in your inventory — no clicks required.
 
-<img width="300" alt="image" src="https://github.com/user-attachments/assets/5c136dd5-9b2e-47cf-b2ef-83dea3b43c64" />
+<img width="300" alt="image" src="https://github.com/user-attachments/assets/3594e928-aafd-4f3f-b951-dc3a1565b3f1" />
 
 ## How it Works
 
