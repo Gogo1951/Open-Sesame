@@ -3,7 +3,7 @@
 ## Author: Gogo1951
 ## X-License: MIT
 
-## Interface: 11508
+## Interface: 11508, 20505
 ## Version: @project-version@
 ## X-Curse-Project-ID: 830638
 ## SavedVariables: OpenSesameDB
