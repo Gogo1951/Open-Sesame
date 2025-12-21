@@ -1,7 +1,10 @@
 ## Title: Open Sesame
-## Notes: A simple add-on that automatically opens clams & containers in your inventory.
+## Notes: Automatically opens clams and unlocked containers in your inventory. Features Speedy Loot for faster looting.
 ## Author: Gogo1951
 ## X-License: MIT
+
+## IconTexture: Interface\AddOns\Open-Sesame\Open-Sesame.tga
+## Category-enUS: Bags & Inventory
 
 ## Interface: 11508, 20505
 ## Version: @project-version@
