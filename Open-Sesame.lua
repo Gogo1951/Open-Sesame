@@ -17,8 +17,9 @@ local HEX_BLUE = "00BBFF"
 local HEX_GOLD = "FFD100"
 local HEX_SEPARATOR = "AAAAAA"
 local HEX_TEXT = "FFFFFF"
-local HEX_SUCCESS = "00FF00"
-local HEX_WARNING = "FF0000"
+local HEX_DESC = "CCCCCC"
+local HEX_SUCCESS = "33CC33"
+local HEX_DISABLED = "CC3333"
 local COLOR_PREFIX = "|cff"
 
 OS.COLORS = {
@@ -26,8 +27,9 @@ OS.COLORS = {
     TITLE = COLOR_PREFIX .. HEX_GOLD,
     SEPARATOR = COLOR_PREFIX .. HEX_SEPARATOR,
     TEXT = COLOR_PREFIX .. HEX_TEXT,
+    DESC = COLOR_PREFIX .. HEX_DESC,
     SUCCESS = COLOR_PREFIX .. HEX_SUCCESS,
-    WARNING = COLOR_PREFIX .. HEX_WARNING
+    DISABLED = COLOR_PREFIX .. HEX_DISABLED
 }
 
 OS.BRAND_PREFIX = string.format("%s%s|r %s//|r ", OS.COLORS.NAME, CHAT_NAME, OS.COLORS.SEPARATOR)
@@ -39,6 +41,7 @@ local OPEN_TICK_INTERVAL = 0.5
 local BAG_FULL_COOLDOWN = 10
 local PICK_LOCK_SPELL_ID = 1804
 local SHADOWMELD_SPELL_ID = 20580
+local LOOT_DELAY = 0.3
 
 ----------------------------------------------------------------------
 -- 3. INITIALIZATION & VARIABLES
@@ -54,9 +57,13 @@ local UseContainerItem = (C_Container and C_Container.UseContainerItem) or UseCo
 local GetContainerItemLink = (C_Container and C_Container.GetContainerItemLink) or GetContainerItemLink
 local GetContainerItemID = (C_Container and C_Container.GetContainerItemID) or GetContainerItemID
 local UnitBuff = (C_UnitAuras and C_UnitAuras.GetBuffDataByIndex) or UnitBuff
+local GetCVarBool = (C_CVar and C_CVar.GetCVarBool) or function(cvar)
+    return GetCVar(cvar) == "1"
+end
 
-OS.isEnabled = (OS.isEnabled ~= false)
-OS.isPaused = OS.isPaused or false
+OS.isEnabled = true 
+OS.isPaused = false
+OS.isSpeedyLoot = true
 
 local state = {
     scanTimerAt = 0,
@@ -68,7 +75,8 @@ local state = {
     lastStatusMsg = nil,
     lastStatusAt = 0,
     fullScanNeeded = false,
-    dirtyBags = {}
+    dirtyBags = {},
+    lootEpoch = 0
 }
 
 ----------------------------------------------------------------------
@@ -77,7 +85,6 @@ local state = {
 local function Print(msg, ...)
     local text = (...) and string.format(msg, ...) or msg
     local output = OS.BRAND_PREFIX .. OS.COLORS.TEXT .. text .. "|r"
-
     if DEFAULT_CHAT_FRAME then
         DEFAULT_CHAT_FRAME:AddMessage(output)
     else
@@ -110,10 +117,7 @@ local function StatusPrint(msg, ...)
 end
 
 local function IsAutoLootOn()
-    if GetCVarBool then
-        return GetCVarBool("autoLootDefault")
-    end
-    return GetCVar and (GetCVar("autoLootDefault") == "1") or false
+    return GetCVarBool("autoLootDefault")
 end
 
 local function GetFreeSlots()
@@ -125,22 +129,6 @@ local function GetFreeSlots()
         end
     end
     return free
-end
-
-local function SafeFastItemID(bag, slot)
-    if not bag or not slot or bag < 0 or bag > 4 then
-        return nil
-    end
-    local id = GetContainerItemID(bag, slot)
-    if id then
-        return id
-    end
-
-    local link = GetContainerItemLink(bag, slot)
-    if not link then
-        return nil
-    end
-    return tonumber(link:match("item:(%d+)"))
 end
 
 ----------------------------------------------------------------------
@@ -169,7 +157,6 @@ local function IsPlayerStealthed()
     if _G.IsStealthed and _G.IsStealthed() then
         return true
     end
-
     for i = 1, 40 do
         local _, _, _, _, _, _, _, _, _, spellID = UnitBuff("player", i)
         if not spellID then
@@ -189,14 +176,13 @@ local function IsInteractionActive()
             return true
         end
     end
-    if
-        (MerchantFrame and MerchantFrame:IsShown()) or (MailFrame and MailFrame:IsShown()) or
-            (TradeFrame and TradeFrame:IsShown()) or
-            (BankFrame and BankFrame:IsShown()) or
-            (GossipFrame and GossipFrame:IsShown()) or
-            (QuestFrame and QuestFrame:IsShown()) or
-            (StaticPopup1 and StaticPopup1:IsShown())
-     then
+    if (MerchantFrame and MerchantFrame:IsShown()) or 
+        (MailFrame and MailFrame:IsShown()) or 
+        (TradeFrame and TradeFrame:IsShown()) or 
+        (BankFrame and BankFrame:IsShown()) or 
+        (GossipFrame and GossipFrame:IsShown()) or 
+        (QuestFrame and QuestFrame:IsShown()) or 
+        (StaticPopup1 and StaticPopup1:IsShown()) then
         return true
     end
     return false
@@ -215,11 +201,9 @@ local function IsSafeToOpen()
     if IsPlayerStealthed() then
         return false
     end
-
     if (UnitCastingInfo and UnitCastingInfo("player")) or (UnitChannelInfo and UnitChannelInfo("player")) then
         return false
     end
-
     state.lastFreeSlots = GetFreeSlots()
     return state.lastFreeSlots >= MIN_FREE_SLOTS
 end
@@ -249,26 +233,38 @@ local function QPop()
     local b, s, i = q[qHead], q[qHead + 1], q[qHead + 2]
     qHead = qHead + 3
     if qHead > qTail then
-        wipe(q)
+        wipe(q);
         qHead, qTail = 1, 0
     end
     return b, s, i
 end
 
+local function SafeFastItemID(bag, slot)
+    if not bag or not slot then
+        return nil
+    end
+    local id = GetContainerItemID(bag, slot)
+    if id then
+        return id
+    end
+    local link = GetContainerItemLink(bag, slot)
+    if not link then
+        return nil
+    end
+    return tonumber(link:match("item:(%d+)"))
+end
+
 local function BuildQueue(targetBag)
     local useDirty = (not state.fullScanNeeded) and (next(state.dirtyBags) ~= nil) and (targetBag ~= "ALL")
-
-    wipe(q)
+    wipe(q);
     qHead, qTail = 1, 0
-
     if not useDirty then
-        state.fullScanNeeded = false
+        state.fullScanNeeded = false;
         wipe(state.dirtyBags)
     end
-
     local function ScanBag(bag)
         local slots = GetContainerNumSlots(bag)
-        for slot = 1, (slots or 0) do
+        for slot = 1, slots or 0 do
             local id = SafeFastItemID(bag, slot)
             if id then
                 local allowed = OS.AllowedItems[id]
@@ -282,7 +278,6 @@ local function BuildQueue(targetBag)
             end
         end
     end
-
     if useDirty then
         for bag in pairs(state.dirtyBags) do
             if bag >= 0 and bag <= 4 then
@@ -302,46 +297,35 @@ end
 ----------------------------------------------------------------------
 local function OpenTick()
     state.openTimerLive = false
-
     if (UnitCastingInfo and UnitCastingInfo("player")) or (UnitChannelInfo and UnitChannelInfo("player")) then
         state.openTimerLive = true
         C_Timer.After(OPEN_TICK_INTERVAL, OpenTick)
         return
     end
-
     if not IsSafeToOpen() then
         return
     end
-
     local bag, slot, cachedId = QPop()
     if not bag then
         return
     end
-
     local currentId = SafeFastItemID(bag, slot)
-
     if currentId and currentId == cachedId then
         UseContainerItem(bag, slot)
-
-        C_Timer.After(
-            0.25,
-            function()
-                local still = SafeFastItemID(bag, slot)
-                if still == cachedId then
-                    local allowed = OS.AllowedItems[still]
-                    if allowed == true or (allowed == false and not IsItemLocked(bag, slot)) then
-                        QPush(bag, slot, still)
-                    end
-                end
-
-                if IsSafeToOpen() and not state.openTimerLive and qHead <= qTail then
-                    state.openTimerLive = true
-                    C_Timer.After(OPEN_TICK_INTERVAL, OpenTick)
+        C_Timer.After(0.25, function()
+            local still = SafeFastItemID(bag, slot)
+            if still == cachedId then
+                local allowed = OS.AllowedItems[still]
+                if allowed == true or (allowed == false and not IsItemLocked(bag, slot)) then
+                    QPush(bag, slot, still)
                 end
             end
-        )
+            if IsSafeToOpen() and not state.openTimerLive and qHead <= qTail then
+                state.openTimerLive = true
+                C_Timer.After(OPEN_TICK_INTERVAL, OpenTick)
+            end
+        end)
     end
-
     if qHead <= qTail then
         state.openTimerLive = true
         C_Timer.After(OPEN_TICK_INTERVAL, OpenTick)
@@ -368,35 +352,27 @@ local function ScheduleScan(force)
                 end
             end
         end
-
         BuildQueue(force and "ALL")
-
         if IsSafeToOpen() and not state.openTimerLive and qHead <= qTail then
             state.openTimerLive = true
             C_Timer.After(OPEN_TICK_INTERVAL, OpenTick)
         end
     end
-
     if force then
-        run()
+        run();
         return
     end
-
     local wantAt = GetTime() + SCAN_DEBOUNCE
     if state.scanPending and wantAt >= state.scanTimerAt then
         return
     end
     state.scanPending, state.scanTimerAt = true, wantAt
-
-    C_Timer.After(
-        SCAN_DEBOUNCE,
-        function()
-            if GetTime() < state.scanTimerAt then
-                return
-            end
-            run()
+    C_Timer.After(SCAN_DEBOUNCE, function()
+        if GetTime() < state.scanTimerAt then
+            return
         end
-    )
+        run()
+    end)
 end
 
 ----------------------------------------------------------------------
@@ -411,8 +387,14 @@ local ICONS = {
     off = "Interface\\Icons\\inv_misc_bag_09_red"
 }
 
-local function StatusText()
-    return OS.isPaused and "Paused" or "On"
+local function GetStatusColor(bool, isPaused)
+    if not bool then
+        return OS.COLORS.DISABLED .. "Disabled|r"
+    end
+    if isPaused then
+        return OS.COLORS.SEPARATOR .. "Paused|r"
+    end
+    return OS.COLORS.SUCCESS .. "Enabled|r"
 end
 
 local ldbObject
@@ -422,96 +404,81 @@ function OpenSesame_UpdateMinimapIcon()
     end
     local key = (not OS.isEnabled) and "off" or (OS.isPaused and "paused" or "on")
     ldbObject.icon = ICONS[key] or ICONS.off
-    ldbObject.text = CHAT_NAME .. " : " .. StatusText()
-
+    ldbObject.text = string.format("%s : %s", CHAT_NAME, OS.isEnabled and (OS.isPaused and "Paused" or "On") or "Off")
     if OS.DB and OS.DB.minimap then
         LDBIcon:Refresh(ADDON_NAME, OS.DB.minimap)
     end
-
-    if LDBIcon then
-        local button = LDBIcon:GetMinimapButton(ADDON_NAME)
-        if button and button:IsMouseOver() then
-            local onEnter = button:GetScript("OnEnter")
-            if onEnter then onEnter(button) end
-        end
-    end
 end
 
-local function ToggleEnabled(newState)
-    if OS.isEnabled == newState then
-        return
+local function ToggleAutoOpen()
+    OS.isEnabled = not OS.isEnabled
+    if OS.DB then
+        OS.DB.autoOpen = OS.isEnabled
     end
-    OS.isEnabled = newState
-    if not newState then
-        state.openTimerLive = false
+    if not OS.isEnabled then
+        state.openTimerLive = false;
         OS.isPaused = false
-        Print("Disabled.")
+        Print("Auto-Opening Disabled.")
     else
         state.lastFreeSlots = GetFreeSlots()
         OS.isPaused = ShouldPause(state.lastFreeSlots)
         state.fullScanNeeded = true
         ScheduleScan(true)
-        if IsAutoLootOn() then
-            Print("Enabled.")
-        else
-            Print("Enabled, but Open Sesame won't work unless Auto Loot is also turned on.")
-        end
+        Print("Auto-Opening Enabled.")
     end
     OpenSesame_UpdateMinimapIcon()
 end
 
+local function ToggleSpeedyLoot()
+    OS.isSpeedyLoot = not OS.isSpeedyLoot
+    if OS.DB then
+        OS.DB.speedyLoot = OS.isSpeedyLoot
+    end
+    Print("Speedy Looting %s.", OS.isSpeedyLoot and "Enabled" or "Disabled")
+    OpenSesame_UpdateMinimapIcon()
+end
+
+local OnEnter
+OnEnter = function(anchor)
+    local tooltip = GameTooltip
+    tooltip:SetOwner(anchor, "ANCHOR_BOTTOMLEFT")
+    tooltip:ClearLines()
+    tooltip:AddDoubleLine(OS.COLORS.TITLE .. CHAT_NAME .. "|r", OS.COLORS.SEPARATOR .. OS.Version .. "|r")
+    tooltip:AddLine(" ")
+    tooltip:AddDoubleLine(OS.COLORS.TITLE .. "Auto-Opening|r", GetStatusColor(OS.isEnabled, OS.isPaused))
+    tooltip:AddLine(OS.COLORS.DESC .. "Automatically opens clams and unlocked containers.|r", nil, nil, nil, true)
+    tooltip:AddDoubleLine(OS.COLORS.NAME .. "Left-Click|r", OS.COLORS.DESC .. "Toggle|r")
+    tooltip:AddLine(" ")
+    tooltip:AddDoubleLine(OS.COLORS.TITLE .. "Speedy Loot|r", GetStatusColor(OS.isSpeedyLoot, false))
+    tooltip:AddLine(OS.COLORS.DESC .. "Hide the loot window altogether for faster auto-looting.|r", nil, nil, nil, true)
+    tooltip:AddDoubleLine(OS.COLORS.NAME .. "Right-Click|r", OS.COLORS.DESC .. "Toggle|r")
+    tooltip:AddLine(" ")
+    tooltip:AddLine(OS.COLORS.DESC .. "Will automatically pause when you have 4 or fewer empty bag slots.|r", 1, 1, 1, true)
+    tooltip:Show()
+end
+
 if LDB then
-    ldbObject =
-        LDB:NewDataObject(
-        ADDON_NAME,
-        {
-            type = "launcher",
-            label = CHAT_NAME,
-            icon = ICONS[(not OS.isEnabled) and "off" or (OS.isPaused and "paused" or "on")],
-            text = CHAT_NAME .. " : " .. StatusText(),
-            OnClick = function(frame, button)
-                if button ~= "LeftButton" then
-                    return
-                end
-
-                ToggleEnabled(not OS.isEnabled)
-
-                if not (frame and frame:IsMouseOver()) then
-                    return
-                end
-
-                local tt = GameTooltip
-                if tt and tt:IsShown() and tt:IsOwned(frame) then
-                    tt:ClearLines()
-                    ldbObject.OnTooltipShow(tt)
-                    tt:Show()
-                    return
-                end
-            end,
-            OnTooltipShow = function(tt)
-                tt:AddDoubleLine(OS.COLORS.TITLE .. CHAT_NAME .. "|r", OS.COLORS.SEPARATOR .. OS.Version .. "|r")
-                tt:AddLine(" ")
-
-                local statusText
-                if not OS.isEnabled then
-                    statusText = OS.COLORS.WARNING .. "Disabled|r"
-                elseif OS.isPaused then
-                    statusText = OS.COLORS.SEPARATOR .. "Paused|r"
-                else
-                    statusText = OS.COLORS.SUCCESS .. "Enabled|r"
-                end
-
-                tt:AddDoubleLine("Auto-Opening", statusText)
-                tt:AddLine(" ")
-                tt:AddDoubleLine(OS.COLORS.NAME .. "Left-Click|r", OS.COLORS.TEXT .. "Toggle Auto-Opening|r")
-                tt:AddLine(" ")
-                tt:AddLine(
-                    OS.COLORS.SEPARATOR .. "Will automatically pause when you have 4 or fewer empty bag slots.|r",
-                    1, 1, 1, true 
-                )
+    ldbObject = LDB:NewDataObject(ADDON_NAME, {
+        type = "launcher",
+        label = CHAT_NAME,
+        icon = ICONS["on"],
+        OnClick = function(frame, button)
+            if button == "LeftButton" then
+                ToggleAutoOpen()
+            elseif button == "RightButton" then
+                ToggleSpeedyLoot()
             end
-        }
-    )
+            if frame and GameTooltip:GetOwner() == frame then
+                OnEnter(frame)
+            end
+        end,
+        OnEnter = function(self)
+            OnEnter(self)
+        end,
+        OnLeave = function(frame)
+            GameTooltip:Hide()
+        end
+    })
 end
 
 ----------------------------------------------------------------------
@@ -523,7 +490,14 @@ function EventHandlers:PLAYER_LOGIN()
     OpenSesameDB = OpenSesameDB or {}
     OpenSesameDB.minimap = OpenSesameDB.minimap or {}
     OS.DB = OpenSesameDB
-
+    if OS.DB.autoOpen == nil then
+        OS.DB.autoOpen = true
+    end
+    if OS.DB.speedyLoot == nil then
+        OS.DB.speedyLoot = true
+    end
+    OS.isEnabled = OS.DB.autoOpen
+    OS.isSpeedyLoot = OS.DB.speedyLoot
     if LDBIcon and ldbObject then
         LDBIcon:Register(ADDON_NAME, ldbObject, OS.DB.minimap)
     end
@@ -532,27 +506,51 @@ end
 
 function EventHandlers:PLAYER_ENTERING_WORLD(isInitialLogin, isReloadingUi)
     if isInitialLogin or isReloadingUi then
-        C_Timer.After(
-            WORLD_LOAD_DELAY,
-            function()
-                state.lastFreeSlots = GetFreeSlots()
-                if OS.isEnabled then
-                    OS.isPaused = ShouldPause(state.lastFreeSlots)
-                    state.fullScanNeeded = true
-                    ScheduleScan(true)
-                    if IsAutoLootOn() then
-                        Print("Enabled.")
-                    else
-                        Print(
-                            "Enabled, but Open Sesame won't work unless Auto Loot is also turned on."
-                        )
-                    end
+        C_Timer.After(WORLD_LOAD_DELAY, function()
+            state.lastFreeSlots = GetFreeSlots()
+            if OS.isEnabled then
+                OS.isPaused = ShouldPause(state.lastFreeSlots)
+                state.fullScanNeeded = true
+                ScheduleScan(true)
+                if not IsAutoLootOn() then
+                    Print("Enabled, but Open Sesame won't work properly unless Auto Loot is also turned on.")
                 end
-                OpenSesame_UpdateMinimapIcon()
             end
-        )
+            OpenSesame_UpdateMinimapIcon()
+        end)
     else
         SetQuiet(2)
+    end
+end
+
+----------------------------------------------------------------------
+-- 11. SPEEDY LOOT LOGIC
+----------------------------------------------------------------------
+function EventHandlers:LOOT_READY()
+    if not OS.isSpeedyLoot then
+        return
+    end
+    local autoLoot = GetCVarBool("autoLootDefault")
+    local modifier = IsModifiedClick("AUTOLOOTTOGGLE")
+    local isAutoLooting = (autoLoot ~= modifier)
+    if isAutoLooting then
+        local now = GetTime()
+        if (now - state.lootEpoch) >= LOOT_DELAY then
+            if TSMDestroyBtn and TSMDestroyBtn:IsShown() and TSMDestroyBtn:GetButtonState() == "DISABLED" then
+                state.lootEpoch = now
+                return
+            end
+            local numLoot = GetNumLootItems()
+            if numLoot > 0 then
+                if LootFrame then
+                    LootFrame:Hide()
+                end
+                for i = numLoot, 1, -1 do
+                    LootSlot(i)
+                end
+                state.lootEpoch = now
+            end
+        end
     end
 end
 
@@ -562,31 +560,30 @@ function EventHandlers:BAG_UPDATE(bagId)
 end
 
 function EventHandlers:BAG_NEW_ITEMS_UPDATED()
-    state.fullScanNeeded = true
+    state.fullScanNeeded = true;
     ScheduleScan()
 end
-
 function EventHandlers:CHAT_MSG_LOOT()
-    state.fullScanNeeded = true
+    state.fullScanNeeded = true;
     ScheduleScan()
 end
 
 function EventHandlers:PLAYER_REGEN_ENABLED()
     if OS.isEnabled then
-        state.fullScanNeeded = true
+        state.fullScanNeeded = true;
         ScheduleScan(true)
     end
 end
 
 function EventHandlers:UPDATE_STEALTH()
     if not IsPlayerStealthed() and OS.isEnabled then
-        state.fullScanNeeded = true
+        state.fullScanNeeded = true;
         ScheduleScan(true)
     end
 end
 
 local function OnFrameClosed()
-    state.fullScanNeeded = true
+    state.fullScanNeeded = true;
     ScheduleScan(true)
 end
 EventHandlers.BANKFRAME_CLOSED = OnFrameClosed
@@ -606,25 +603,18 @@ end
 
 function EventHandlers:UNIT_SPELLCAST_SUCCEEDED(unit, castGUID, spellID)
     if unit == "player" and spellID == PICK_LOCK_SPELL_ID then
-        C_Timer.After(
-            0.5,
-            function()
-                state.fullScanNeeded = true
-                ScheduleScan(true)
-            end
-        )
+        C_Timer.After(0.5, function()
+            state.fullScanNeeded = true;
+            ScheduleScan(true)
+        end)
     end
 end
 
 function EventHandlers:UI_ERROR_MESSAGE(errTypeOrID, msg)
     local isBagFull = (msg and msg:find(ERR_INV_FULL or "Inventory is full"))
-
     if not isBagFull and type(errTypeOrID) == "number" then
-        isBagFull =
-            (errTypeOrID == (LE_GAME_ERR_INV_FULL or 0)) or
-            (Enum and Enum.UIERRORS and errTypeOrID == Enum.UIERRORS.ERR_INV_FULL)
+        isBagFull = (errTypeOrID == (LE_GAME_ERR_INV_FULL or 0)) or (Enum and Enum.UIERRORS and errTypeOrID == Enum.UIERRORS.ERR_INV_FULL)
     end
-
     if isBagFull then
         local now = GetTime()
         if (now - state.lastBagFullAt) > BAG_FULL_COOLDOWN then
@@ -638,16 +628,12 @@ function EventHandlers:UI_ERROR_MESSAGE(errTypeOrID, msg)
 end
 
 local f = CreateFrame("Frame")
-f:SetScript(
-    "OnEvent",
-    function(self, event, ...)
-        if EventHandlers[event] then
-            EventHandlers[event](self, ...)
-        end
+f:SetScript("OnEvent", function(self, event, ...)
+    if EventHandlers[event] then
+        EventHandlers[event](self, ...)
     end
-)
+end)
 
 for event in pairs(EventHandlers) do
     f:RegisterEvent(event)
 end
-
