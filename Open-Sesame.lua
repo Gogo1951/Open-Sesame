@@ -13,23 +13,27 @@ OS.Version = version
 ----------------------------------------------------------------------
 -- 2. CONSTANTS & BRANDING
 ----------------------------------------------------------------------
-local HEX_BLUE = "00BBFF"
-local HEX_GOLD = "FFD100"
-local HEX_SEPARATOR = "AAAAAA"
-local HEX_TEXT = "FFFFFF"
-local HEX_DESC = "CCCCCC"
-local HEX_SUCCESS = "33CC33"
-local HEX_DISABLED = "CC3333"
+-- Style Guide Color Definitions
+local C_TITLE  = "FFD100" -- Gold
+local C_INFO   = "00BBFF" -- Blue
+local C_BODY   = "CCCCCC" -- Silver
+local C_TEXT   = "FFFFFF" -- White
+local C_ON     = "33CC33" -- Green
+local C_OFF    = "CC3333" -- Red
+local C_SEP    = "AAAAAA" -- Gray
+local C_MUTED  = "808080" -- Dark Gray
+
 local COLOR_PREFIX = "|cff"
 
 OS.COLORS = {
-    NAME = COLOR_PREFIX .. HEX_BLUE,
-    TITLE = COLOR_PREFIX .. HEX_GOLD,
-    SEPARATOR = COLOR_PREFIX .. HEX_SEPARATOR,
-    TEXT = COLOR_PREFIX .. HEX_TEXT,
-    DESC = COLOR_PREFIX .. HEX_DESC,
-    SUCCESS = COLOR_PREFIX .. HEX_SUCCESS,
-    DISABLED = COLOR_PREFIX .. HEX_DISABLED
+    TITLE     = COLOR_PREFIX .. C_TITLE,
+    NAME      = COLOR_PREFIX .. C_INFO,
+    DESC      = COLOR_PREFIX .. C_BODY,
+    TEXT      = COLOR_PREFIX .. C_TEXT,
+    SUCCESS   = COLOR_PREFIX .. C_ON,
+    DISABLED  = COLOR_PREFIX .. C_OFF,
+    SEPARATOR = COLOR_PREFIX .. C_SEP,
+    MUTED     = COLOR_PREFIX .. C_MUTED
 }
 
 OS.BRAND_PREFIX = string.format("%s%s|r %s//|r ", OS.COLORS.NAME, CHAT_NAME, OS.COLORS.SEPARATOR)
@@ -60,6 +64,7 @@ local UnitBuff = (C_UnitAuras and C_UnitAuras.GetBuffDataByIndex) or UnitBuff
 local GetCVarBool = (C_CVar and C_CVar.GetCVarBool) or function(cvar)
     return GetCVar(cvar) == "1"
 end
+local SetCVar = (C_CVar and C_CVar.SetCVar) or SetCVar
 
 OS.isEnabled = true 
 OS.isPaused = false
@@ -118,6 +123,13 @@ end
 
 local function IsAutoLootOn()
     return GetCVarBool("autoLootDefault")
+end
+
+local function EnsureAutoLoot()
+    if not IsAutoLootOn() then
+        SetCVar("autoLootDefault", "1")
+        Print("Auto Loot is required for Open Sesame to function properly. Auto Loot has been enabled.")
+    end
 end
 
 local function GetFreeSlots()
@@ -418,13 +430,12 @@ local function ToggleAutoOpen()
     if not OS.isEnabled then
         state.openTimerLive = false;
         OS.isPaused = false
-        Print("Auto-Opening Disabled.")
     else
         state.lastFreeSlots = GetFreeSlots()
         OS.isPaused = ShouldPause(state.lastFreeSlots)
         state.fullScanNeeded = true
         ScheduleScan(true)
-        Print("Auto-Opening Enabled.")
+        EnsureAutoLoot()
     end
     OpenSesame_UpdateMinimapIcon()
 end
@@ -434,7 +445,9 @@ local function ToggleSpeedyLoot()
     if OS.DB then
         OS.DB.speedyLoot = OS.isSpeedyLoot
     end
-    Print("Speedy Looting %s.", OS.isSpeedyLoot and "Enabled" or "Disabled")
+    if OS.isSpeedyLoot then
+        EnsureAutoLoot()
+    end
     OpenSesame_UpdateMinimapIcon()
 end
 
@@ -443,15 +456,21 @@ OnEnter = function(anchor)
     local tooltip = GameTooltip
     tooltip:SetOwner(anchor, "ANCHOR_BOTTOMLEFT")
     tooltip:ClearLines()
-    tooltip:AddDoubleLine(OS.COLORS.TITLE .. CHAT_NAME .. "|r", OS.COLORS.SEPARATOR .. OS.Version .. "|r")
+    -- Header
+    tooltip:AddDoubleLine(OS.COLORS.TITLE .. CHAT_NAME .. "|r", OS.COLORS.MUTED .. OS.Version .. "|r")
     tooltip:AddLine(" ")
+    tooltip:AddLine(" ")
+    -- Auto-Opening
     tooltip:AddDoubleLine(OS.COLORS.TITLE .. "Auto-Opening|r", GetStatusColor(OS.isEnabled, OS.isPaused))
     tooltip:AddLine(OS.COLORS.DESC .. "Automatically opens clams and unlocked containers.|r", nil, nil, nil, true)
-    tooltip:AddDoubleLine(OS.COLORS.NAME .. "Left-Click|r", OS.COLORS.DESC .. "Toggle|r")
+    tooltip:AddDoubleLine(OS.COLORS.NAME .. "Left-Click|r", OS.COLORS.NAME .. "Toggle|r")
+    -- Feature Spacer
     tooltip:AddLine(" ")
+    -- Speedy Loot
     tooltip:AddDoubleLine(OS.COLORS.TITLE .. "Speedy Loot|r", GetStatusColor(OS.isSpeedyLoot, false))
     tooltip:AddLine(OS.COLORS.DESC .. "Hide the loot window altogether for faster auto-looting.|r", nil, nil, nil, true)
-    tooltip:AddDoubleLine(OS.COLORS.NAME .. "Right-Click|r", OS.COLORS.DESC .. "Toggle|r")
+    tooltip:AddDoubleLine(OS.COLORS.NAME .. "Right-Click|r", OS.COLORS.NAME .. "Toggle|r")
+    -- Footer
     tooltip:AddLine(" ")
     tooltip:AddLine(OS.COLORS.DESC .. "Will automatically pause when you have 4 or fewer empty bag slots.|r", 1, 1, 1, true)
     tooltip:Show()
@@ -512,9 +531,7 @@ function EventHandlers:PLAYER_ENTERING_WORLD(isInitialLogin, isReloadingUi)
                 OS.isPaused = ShouldPause(state.lastFreeSlots)
                 state.fullScanNeeded = true
                 ScheduleScan(true)
-                if not IsAutoLootOn() then
-                    Print("Enabled, but Open Sesame won't work properly unless Auto Loot is also turned on.")
-                end
+                EnsureAutoLoot()
             end
             OpenSesame_UpdateMinimapIcon()
         end)
