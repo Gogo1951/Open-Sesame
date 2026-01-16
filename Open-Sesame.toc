@@ -18,8 +18,10 @@ Includes\LibDataBroker-1.1\LibDataBroker-1.1.lua
 Includes\LibDBIcon-1.0\LibDBIcon-1.0.lua
 
 ## Open Sesame
-Database\AllowedOpenItems.lua
-Open-Sesame.lua
+Data.lua
+Core.lua
+SpeedyLoot.lua
+Minimap.lua
 
 # Feedback Welcome! (=
 # Open Sesame on CurseForge // https://www.curseforge.com/wow/addons/open-sesame
