@@ -1,5 +1,88 @@
 local ADDON_NAME, OS = ...
 
+-------------------------------------------------------------------------------
+-- METADATA & VERSION
+-------------------------------------------------------------------------------
+local version = (C_AddOns and C_AddOns.GetAddOnMetadata(ADDON_NAME, "Version")) or "Dev"
+if version:find("@") then
+    version = "Dev"
+end
+OS.Version = version
+
+-------------------------------------------------------------------------------
+-- CONSTANTS & COLORS
+-------------------------------------------------------------------------------
+local CHAT_NAME = "Open Sesame"
+local C_TITLE = "FFD100" -- Gold
+local C_INFO = "00BBFF" -- Blue
+local C_BODY = "CCCCCC" -- Silver
+local C_TEXT = "FFFFFF" -- White
+local C_ON = "33CC33" -- Green
+local C_OFF = "CC3333" -- Red
+local C_SEP = "AAAAAA" -- Gray
+local C_MUTED = "808080" -- Dark Gray
+local COLOR_PREFIX = "|cff"
+
+OS.COLORS = {
+    TITLE = COLOR_PREFIX .. C_TITLE,
+    NAME = COLOR_PREFIX .. C_INFO,
+    DESC = COLOR_PREFIX .. C_BODY,
+    TEXT = COLOR_PREFIX .. C_TEXT,
+    SUCCESS = COLOR_PREFIX .. C_ON,
+    DISABLED = COLOR_PREFIX .. C_OFF,
+    SEPARATOR = COLOR_PREFIX .. C_SEP,
+    MUTED = COLOR_PREFIX .. C_MUTED
+}
+
+OS.BRAND_PREFIX = string.format("%s%s|r %s//|r ", OS.COLORS.NAME, CHAT_NAME, OS.COLORS.SEPARATOR)
+
+-------------------------------------------------------------------------------
+-- SHARED STATE
+-------------------------------------------------------------------------------
+OS.state = {
+    scanTimerAt = 0,
+    scanPending = false,
+    openTimerLive = false,
+    lastBagFullAt = 0,
+    lastFreeSlots = 0,
+    quietUntil = 0,
+    lastStatusMsg = nil,
+    lastStatusAt = 0
+}
+
+-------------------------------------------------------------------------------
+-- SHARED UTILITIES
+-------------------------------------------------------------------------------
+function OS.Print(msg, ...)
+    if not OS.BRAND_PREFIX or not OS.COLORS then
+        return
+    end
+    local text = (...) and string.format(msg, ...) or msg
+    local output = OS.BRAND_PREFIX .. OS.COLORS.TEXT .. text .. "|r"
+
+    if DEFAULT_CHAT_FRAME then
+        DEFAULT_CHAT_FRAME:AddMessage(output)
+    else
+        print(output)
+    end
+end
+
+function OS.GetFreeSlots()
+    local free = 0
+    local GetContainerNumFreeSlots = (C_Container and C_Container.GetContainerNumFreeSlots) or GetContainerNumFreeSlots
+    for bag = 0, 4 do
+        local f, family = GetContainerNumFreeSlots(bag)
+        if (family == nil or family == 0) and f then
+            free = free + f
+        end
+    end
+    return free
+end
+
+-------------------------------------------------------------------------------
+-- ITEM DATABASE
+-------------------------------------------------------------------------------
+
 OS.AllowedItems = {
     -- Classic Era | Openable
     -- https://www.wowhead.com/classic/items?filter=11:10:161:82;1:2:1:4;0:0:0:11400
@@ -17,7 +100,7 @@ OS.AllowedItems = {
     [22152] = true, -- Anthion's Pouch
     [20231] = true, -- Arathor Advanced Care Package
     [20233] = true, -- Arathor Basic Care Package
-    [20236] = true, -- Arathor Standard Care Package 
+    [20236] = true, -- Arathor Standard Care Package
     [11955] = true, -- Bag of Empty Ooze Containers
     [20603] = true, -- Bag of Spoils
     [6356] = true, -- Battered Chest
@@ -189,7 +272,6 @@ OS.AllowedItems = {
     [17965] = true, -- Yellow Sack of Gems
     [22137] = true, -- Ysida's Satchel
     [22233] = true, -- Zigris' Footlocker
-
     -- Classic Era | Openable but Locked
     -- https://www.wowhead.com/classic/items?filter=11:10:161:82;1:1:1:4;0:0:0:11400
     [16882] = false, -- Battered Junkbox
@@ -212,7 +294,6 @@ OS.AllowedItems = {
     [7868] = false, -- Thieven' Kit
     [5759] = false, -- Thorium Lockbox
     [16883] = false, -- Worn Junkbox
-
     -- The Burning Crusade | Openable
     -- https://www.wowhead.com/tbc/items?filter=11:10:161:166;1:2:1:2;0:0:0:0
     [34592] = true, -- Aldor Supplies Package
@@ -281,16 +362,15 @@ OS.AllowedItems = {
     [25419] = true, -- Unmarked Bag of Gems
     [30260] = true, -- Voren'thal's Package
     [34426] = true, -- Winter Veil Gift
-    
     -- The Burning Crusade | Openable but Locked
     -- https://www.wowhead.com/tbc/items?filter=11:10:161:166;1:1:1:2;0:0:0:0
     [31952] = false, -- Khorium Lockbox
-    [29569] = false, -- Strong Junkbox
+    [29569] = false -- Strong Junkbox
 }
 
 OS.IgnoreItems = {
     [34846] = true, -- Black Sack of Gems
     [191060] = true, -- Black Sack of Gems
     [8049] = true, -- Gnarlpine Necklace
-    [9276] = true, -- Pirate's Footlocker
+    [9276] = true -- Pirate's Footlocker
 }
