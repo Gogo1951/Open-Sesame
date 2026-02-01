@@ -3,12 +3,6 @@ local ADDON_NAME, OS = ...
 local LDB = LibStub and LibStub:GetLibrary("LibDataBroker-1.1", true)
 local LDBIcon = LibStub and LibStub("LibDBIcon-1.0", true)
 
-local ICONS = {
-    on = "Interface\\Icons\\inv_misc_bag_09_green",
-    paused = "Interface\\Icons\\inv_misc_bag_09_black",
-    off = "Interface\\Icons\\inv_misc_bag_09_red"
-}
-
 local brokerObj
 
 function OS.UpdateMinimapIcon()
@@ -17,7 +11,7 @@ function OS.UpdateMinimapIcon()
     end
 
     local state = not OS.isEnabled and "off" or (OS.isPaused and "paused" or "on")
-    brokerObj.icon = ICONS[state] or ICONS.off
+    brokerObj.icon = OS.ICONS[state] or OS.ICONS.off
     brokerObj.text = string.format("Open Sesame : %s", OS.isEnabled and (OS.isPaused and "Paused" or "On") or "Off")
 
     if OS.DB and OS.DB.minimap then
@@ -32,7 +26,7 @@ local function GetStatusText(isEnabled, isPaused)
     if isPaused then
         return OS.COLORS.SEPARATOR .. "Paused|r"
     end
-    return OS.COLORS.SUCCESS .. "On|r"
+    return OS.COLORS.SUCCESS .. "Enabled|r"
 end
 
 local function ToggleAutoOpen()
@@ -40,71 +34,73 @@ local function ToggleAutoOpen()
     OS.isEnabled = OS.DB.autoOpen
     OS.ScheduleScan(true)
     OS.UpdateMinimapIcon()
-    OS.StatusPrint(OS.isEnabled and "Auto Open Enabled" or "Auto Open Disabled")
 end
 
 local function ToggleSpeedyLoot()
     OS.DB.speedyLoot = not OS.DB.speedyLoot
     OS.isSpeedyLoot = OS.DB.speedyLoot
     OS.UpdateMinimapIcon()
-    OS.StatusPrint(OS.isSpeedyLoot and "Speedy Loot Enabled" or "Speedy Loot Disabled")
 end
 
-local function ShowTooltip(self)
+local function ToggleLootSounds()
+    OS.DB.lootSounds = not OS.DB.lootSounds
+end
+
+local function ShowTooltip(anchor)
     local tooltip = GameTooltip
-    tooltip:SetOwner(self, "ANCHOR_NONE")
-    tooltip:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
+    tooltip:SetOwner(anchor, "ANCHOR_NONE")
+    tooltip:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT")
     tooltip:ClearLines()
     tooltip:AddLine(OS.COLORS.TITLE .. "Open Sesame|r " .. OS.COLORS.MUTED .. OS.Version .. "|r")
     tooltip:AddLine(" ")
-    tooltip:AddDoubleLine(OS.COLORS.TITLE .. "Auto Open|r", GetStatusText(OS.isEnabled, OS.isPaused))
-    tooltip:AddLine(OS.COLORS.DESC .. "Automatically open clams and unlocked containers.|r", nil, nil, nil, true)
+
+    -- Auto-Opening
+    tooltip:AddDoubleLine(OS.COLORS.TITLE .. "Auto-Opening|r", GetStatusText(OS.isEnabled, OS.isPaused))
+    tooltip:AddLine(OS.COLORS.DESC .. "Automatically opens clams and unlocked containers when you have more than 4 empty bag slots.|r", nil, nil, nil, true)
     tooltip:AddDoubleLine(OS.COLORS.NAME .. "Left-Click|r", OS.COLORS.NAME .. "Toggle|r")
     tooltip:AddLine(" ")
+
+    -- Speedy Loot
     tooltip:AddDoubleLine(OS.COLORS.TITLE .. "Speedy Loot|r", GetStatusText(OS.isSpeedyLoot, false))
-    tooltip:AddLine(OS.COLORS.DESC .. "Hide the loot window altogether for faster auto-looting.|r", nil, nil, nil, true)
+    tooltip:AddLine(OS.COLORS.DESC .. "Hides the loot window for near-instant looting.|r", nil, nil, nil, true)
     tooltip:AddDoubleLine(OS.COLORS.NAME .. "Right-Click|r", OS.COLORS.NAME .. "Toggle|r")
     tooltip:AddLine(" ")
-    tooltip:AddLine(
-        OS.COLORS.DESC .. "Will automatically pause when you have 4 or fewer empty bag slots.|r",
-        1,
-        1,
-        1,
-        true
-    )
+
+    -- Loot Sounds
+    tooltip:AddDoubleLine(OS.COLORS.TITLE .. "Loot Sounds|r", GetStatusText(OS.DB.lootSounds, false))
+    tooltip:AddLine(OS.COLORS.DESC .. "Plays a distinct sound when you loot an Uncommon or higher quality item.|r", nil, nil, nil, true)
+    tooltip:AddDoubleLine(OS.COLORS.NAME .. "Middle-Click|r", OS.COLORS.NAME .. "Toggle|r")
+
     tooltip:Show()
 end
 
 function OS.InitMinimap()
-    if not LDB then
-        return
-    end
+    if not LDB then return end
 
-    brokerObj =
-        LDB:NewDataObject(
-        ADDON_NAME,
-        {
-            type = "launcher",
-            label = "Open Sesame",
-            icon = ICONS["on"],
-            OnClick = function(self, button)
-                if button == "LeftButton" then
-                    ToggleAutoOpen()
-                elseif button == "RightButton" then
-                    ToggleSpeedyLoot()
-                end
-                if self and GameTooltip:GetOwner() == self then
-                    ShowTooltip(self)
-                end
-            end,
-            OnEnter = function(self)
-                ShowTooltip(self)
-            end,
-            OnLeave = function(self)
-                GameTooltip:Hide()
+    brokerObj = LDB:NewDataObject(ADDON_NAME, {
+        type = "launcher",
+        label = "Open Sesame",
+        icon = OS.ICONS["on"],
+        OnClick = function(self, button)
+            if button == "LeftButton" then
+                ToggleAutoOpen()
+            elseif button == "RightButton" then
+                ToggleSpeedyLoot()
+            elseif button == "MiddleButton" then
+                ToggleLootSounds()
             end
-        }
-    )
+            
+            if GameTooltip:GetOwner() == self then
+                ShowTooltip(self)
+            end
+        end,
+        OnEnter = function(self)
+            ShowTooltip(self)
+        end,
+        OnLeave = function(self)
+            GameTooltip:Hide()
+        end
+    })
 
     if LDBIcon then
         LDBIcon:Register(ADDON_NAME, brokerObj, OS.DB.minimap)

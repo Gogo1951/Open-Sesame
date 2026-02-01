@@ -10,8 +10,35 @@ end
 OS.Version = version
 
 -------------------------------------------------------------------------------
--- CONSTANTS & COLORS
+-- CONSTANTS & SETTINGS
 -------------------------------------------------------------------------------
+OS.MIN_FREE_SLOTS = 4
+OS.WORLD_LOAD_DELAY = 8
+OS.SCAN_DEBOUNCE = 0.5
+OS.OPEN_TICK_INTERVAL = 0.25
+OS.BAG_FULL_COOLDOWN = 10
+OS.LOOT_SOUND_ID = 2847
+OS.LOOT_DELAY = 0.25
+
+OS.SPELLS = {
+    PICK_LOCK = 1804,
+    SHADOWMELD = 20580
+}
+
+-- Race/Gender Specific "Inventory Full" Sound IDs
+OS.RACE_SOUNDS = {
+    ["Human"] = {[2] = 1897, [3] = 2021},
+    ["Orc"] = {[2] = 2308, [3] = 2363},
+    ["Dwarf"] = {[2] = 1609, [3] = 1673},
+    ["NightElf"] = {[2] = 2140, [3] = 2251},
+    ["Scourge"] = {[2] = 2076, [3] = 2196},
+    ["Tauren"] = {[2] = 2440, [3] = 2441},
+    ["Gnome"] = {[2] = 1730, [3] = 1787},
+    ["Troll"] = {[2] = 1842, [3] = 1952},
+    ["BloodElf"] = {[2] = 9589, [3] = 9590},
+    ["Draenei"] = {[2] = 9504, [3] = 9505}
+}
+
 local CHAT_NAME = "Open Sesame"
 local C_TITLE = "FFD100" -- Gold
 local C_INFO = "00BBFF" -- Blue
@@ -34,10 +61,25 @@ OS.COLORS = {
     MUTED = COLOR_PREFIX .. C_MUTED
 }
 
+OS.ICONS = {
+    on = "Interface\\Icons\\inv_misc_bag_09_green",
+    paused = "Interface\\Icons\\inv_misc_bag_09_black",
+    off = "Interface\\Icons\\inv_misc_bag_09_red"
+}
+
 OS.BRAND_PREFIX = string.format("%s%s|r %s//|r ", OS.COLORS.NAME, CHAT_NAME, OS.COLORS.SEPARATOR)
 
 -------------------------------------------------------------------------------
--- SHARED STATE
+-- API ABSTRACTION (C_Container / Legacy)
+-------------------------------------------------------------------------------
+OS.GetContainerNumSlots = (C_Container and C_Container.GetContainerNumSlots) or _G.GetContainerNumSlots
+OS.UseContainerItem = (C_Container and C_Container.UseContainerItem) or _G.UseContainerItem
+OS.GetContainerItemLink = (C_Container and C_Container.GetContainerItemLink) or _G.GetContainerItemLink
+OS.GetContainerItemID = (C_Container and C_Container.GetContainerItemID) or _G.GetContainerItemID
+OS.GetContainerNumFreeSlots = (C_Container and C_Container.GetContainerNumFreeSlots) or _G.GetContainerNumFreeSlots
+
+-------------------------------------------------------------------------------
+-- SHARED STATE & UTILS
 -------------------------------------------------------------------------------
 OS.state = {
     scanTimerAt = 0,
@@ -50,16 +92,9 @@ OS.state = {
     lastStatusAt = 0
 }
 
--------------------------------------------------------------------------------
--- SHARED UTILITIES
--------------------------------------------------------------------------------
 function OS.Print(msg, ...)
-    if not OS.BRAND_PREFIX or not OS.COLORS then
-        return
-    end
     local text = (...) and string.format(msg, ...) or msg
     local output = OS.BRAND_PREFIX .. OS.COLORS.TEXT .. text .. "|r"
-
     if DEFAULT_CHAT_FRAME then
         DEFAULT_CHAT_FRAME:AddMessage(output)
     else
@@ -69,9 +104,8 @@ end
 
 function OS.GetFreeSlots()
     local free = 0
-    local GetContainerNumFreeSlots = (C_Container and C_Container.GetContainerNumFreeSlots) or GetContainerNumFreeSlots
     for bag = 0, 4 do
-        local f, family = GetContainerNumFreeSlots(bag)
+        local f, family = OS.GetContainerNumFreeSlots(bag)
         if (family == nil or family == 0) and f then
             free = free + f
         end
