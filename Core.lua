@@ -230,7 +230,7 @@ function EventHandlers:PLAYER_LOGIN()
         OS.DB.speedyLoot = true
     end
     if OS.DB.lootSounds == nil then
-        OS.DB.lootSounds = true
+        OS.DB.lootSounds = false  -- Changed default to false
     end
 
     OS.isEnabled = OS.DB.autoOpen
@@ -310,6 +310,14 @@ local function OnLoadEnd()
     SetQuiet(3)
 end
 
+function EventHandlers:LOOT_READY()
+    OS.state.lastLootWindowAt = GetTime()
+end
+
+function EventHandlers:LOOT_OPENED()
+    OS.state.lastLootWindowAt = GetTime()
+end
+
 EventHandlers.BAG_UPDATE_DELAYED = OnScanReq
 EventHandlers.BAG_NEW_ITEMS_UPDATED = OnScanReq
 
@@ -330,10 +338,10 @@ function EventHandlers:CHAT_MSG_LOOT(msg)
 
                 -- Loot Sounds Logic
                 if OS.DB.lootSounds then
-                    local isMail = MailFrame and MailFrame:IsShown()
-                    local isTrade = TradeFrame and TradeFrame:IsShown()
+                    local lootWindowOpen = (LootFrame and LootFrame:IsShown())
+                    local lootWindowRecentlyOpen = (GetTime() - (OS.state.lastLootWindowAt or 0)) < 2
 
-                    if not isMail and not isTrade then
+                    if lootWindowOpen or lootWindowRecentlyOpen then
                         local colorSeq = link:match("|c(%x+)|H")
                         if colorSeq and #colorSeq == 8 then
                             local hex = string.lower(string.sub(colorSeq, 3, 8)) -- Get RGB

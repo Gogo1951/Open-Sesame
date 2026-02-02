@@ -51,7 +51,8 @@ local function ShowTooltip(anchor)
     tooltip:SetOwner(anchor, "ANCHOR_NONE")
     tooltip:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT")
     tooltip:ClearLines()
-    tooltip:AddLine(OS.COLORS.TITLE .. "Open Sesame|r " .. OS.COLORS.MUTED .. OS.Version .. "|r")
+    
+    tooltip:AddDoubleLine(OS.COLORS.TITLE .. "Open Sesame|r", OS.COLORS.MUTED .. OS.Version .. "|r")
     tooltip:AddLine(" ")
 
     -- Auto-Opening
