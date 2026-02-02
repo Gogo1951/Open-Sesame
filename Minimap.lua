@@ -54,6 +54,7 @@ local function ShowTooltip(anchor)
     
     tooltip:AddDoubleLine(OS.COLORS.TITLE .. "Open Sesame|r", OS.COLORS.MUTED .. OS.Version .. "|r")
     tooltip:AddLine(" ")
+    tooltip:AddLine(" ")
 
     -- Auto-Opening
     tooltip:AddDoubleLine(OS.COLORS.TITLE .. "Auto-Opening|r", GetStatusText(OS.isEnabled, OS.isPaused))
