@@ -49,7 +49,7 @@ end
 local function ShowTooltip(anchor)
     local tooltip = GameTooltip
     tooltip:SetOwner(anchor, "ANCHOR_NONE")
-    tooltip:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT")
+    tooltip:SetPoint("TOPRIGHT", anchor, "BOTTOMLEFT")
     tooltip:ClearLines()
     
     tooltip:AddDoubleLine(OS.COLORS.TITLE .. "Open Sesame|r", OS.COLORS.MUTED .. OS.Version .. "|r")
