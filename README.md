@@ -2,7 +2,7 @@
 
 Automatically opens clams and unlocked containers in your inventory. Features Speedy Loot for faster looting.
 
-<img width="300" alt="image" src="https://github.com/user-attachments/assets/b7b09e33-6bc6-4727-8bf3-a70c54b95447" />
+<img width="270" alt="Pasted_Image_2_9_26__12_58 PM" src="https://github.com/user-attachments/assets/d1829c33-0ed8-4867-b7cd-a4c1fa98923a" />
 
 ## How it Works
 
@@ -10,6 +10,7 @@ Automatically opens clams and unlocked containers in your inventory. Features Sp
 
 * **Toggle Control** : Left-click the minimap icon to quickly toggle the addon ON or OFF. (It is enabled by default).
 * **Speedy Loot** : This option hides the loot window entirely to achieve significantly faster looting.
+* **Loot Sounds** : Play a sound when you loot a green (or better) item. This is off by default.
 * **Smart Pausing** : Automatically protects your inventory space. The addon pauses when you drop below 4 free bag slots and resumes once you have 5 or more.
 * **Safety First** : Containers will never open during combat, while interacting with NPCs (vendors, mail, quest givers), or if the container holds BoP/Unique items requiring confirmation.
 * **Locked Items** : If you loot a locked item (like a lockbox), Open Sesame attempts to open it automatically the moment you unlock it.
