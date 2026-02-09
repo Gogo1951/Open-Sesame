@@ -50,5 +50,5 @@ Looking around CurseForge, it looks like the bulk of the original code came from
 * [AutoClam](https://www.curseforge.com/wow/addons/autoclam)
 * [AutoOpen](https://www.curseforge.com/wow/addons/autoopen)
 * [kAutoOpen Dragonflight](https://www.curseforge.com/wow/addons/kautoopen-dragonflight)
-- [kAutoOpen](https://www.curseforge.com/wow/addons/kautoopen)
-- [Openables (Weak Aura)](https://wago.io/gtRVJZetK)
+* [kAutoOpen](https://www.curseforge.com/wow/addons/kautoopen)
+* [Openables (Weak Aura)](https://wago.io/gtRVJZetK)
