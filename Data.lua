@@ -1,17 +1,19 @@
 local ADDON_NAME, OS = ...
 
--------------------------------------------------------------------------------
+---------------------------------------------------------------------
 -- METADATA & VERSION
--------------------------------------------------------------------------------
+---------------------------------------------------------------------
+
 local version = (C_AddOns and C_AddOns.GetAddOnMetadata(ADDON_NAME, "Version")) or "Dev"
 if version:find("@") then
     version = "Dev"
 end
 OS.Version = version
 
--------------------------------------------------------------------------------
+---------------------------------------------------------------------
 -- CONSTANTS & SETTINGS
--------------------------------------------------------------------------------
+---------------------------------------------------------------------
+
 OS.MIN_FREE_SLOTS = 4
 OS.WORLD_LOAD_DELAY = 8
 OS.SCAN_DEBOUNCE = 0.5
@@ -69,18 +71,20 @@ OS.ICONS = {
 
 OS.BRAND_PREFIX = string.format("%s%s|r %s//|r ", OS.COLORS.NAME, CHAT_NAME, OS.COLORS.SEPARATOR)
 
--------------------------------------------------------------------------------
+---------------------------------------------------------------------
 -- API ABSTRACTION (C_Container / Legacy)
--------------------------------------------------------------------------------
+---------------------------------------------------------------------
+
 OS.GetContainerNumSlots = (C_Container and C_Container.GetContainerNumSlots) or _G.GetContainerNumSlots
 OS.UseContainerItem = (C_Container and C_Container.UseContainerItem) or _G.UseContainerItem
 OS.GetContainerItemLink = (C_Container and C_Container.GetContainerItemLink) or _G.GetContainerItemLink
 OS.GetContainerItemID = (C_Container and C_Container.GetContainerItemID) or _G.GetContainerItemID
 OS.GetContainerNumFreeSlots = (C_Container and C_Container.GetContainerNumFreeSlots) or _G.GetContainerNumFreeSlots
 
--------------------------------------------------------------------------------
+---------------------------------------------------------------------
 -- SHARED STATE & UTILS
--------------------------------------------------------------------------------
+---------------------------------------------------------------------
+
 OS.state = {
     scanTimerAt = 0,
     scanPending = false,
@@ -113,13 +117,16 @@ function OS.GetFreeSlots()
     return free
 end
 
--------------------------------------------------------------------------------
--- ITEM DATABASE
--------------------------------------------------------------------------------
+-----------------------------------------------------------------
+-- Item Database
+-----------------------------------------------------------------
 
 OS.AllowedItems = {
-    -- Classic Era | Openable
-    -- https://www.wowhead.com/classic/items?filter=11:10:161:82;1:2:1:4;0:0:0:11400
+
+-----------------------------------------------------------------
+-- 01. World of Warcraft
+-----------------------------------------------------------------
+
     [10456] = true, -- A Bulging Coin Purse
     [15902] = true, -- A Crazy Grab Bag
     [11883] = true, -- A Dingy Fanny Pack
@@ -127,10 +134,10 @@ OS.AllowedItems = {
     [6755] = true, -- A Small Container of Gems
     [11107] = true, -- A Small Pack
     [21509] = true, -- Ahn'Qiraj War Effort Supplies
+    [21510] = true, -- Ahn'Qiraj War Effort Supplies
     [21511] = true, -- Ahn'Qiraj War Effort Supplies
     [21512] = true, -- Ahn'Qiraj War Effort Supplies
     [21513] = true, -- Ahn'Qiraj War Effort Supplies
-    [21510] = true, -- Ahn'Qiraj War Effort Supplies
     [22152] = true, -- Anthion's Pouch
     [20231] = true, -- Arathor Advanced Care Package
     [20233] = true, -- Arathor Basic Care Package
@@ -138,6 +145,7 @@ OS.AllowedItems = {
     [11955] = true, -- Bag of Empty Ooze Containers
     [20603] = true, -- Bag of Spoils
     [6356] = true, -- Battered Chest
+    [16882] = false, -- Battered Junkbox
     [7973] = true, -- Big-mouth Clam
     [6646] = true, -- Bloated Albacore
     [6647] = true, -- Bloated Catfish
@@ -151,7 +159,6 @@ OS.AllowedItems = {
     [13891] = true, -- Bloated Salmon
     [6643] = true, -- Bloated Smallfish
     [8366] = true, -- Bloated Trout
-    [17962] = true, -- Blue Sack of Gems
     [21812] = true, -- Box of Chocolates
     [10695] = true, -- Box of Empty Vials
     [9541] = true, -- Box of Goodies
@@ -180,6 +187,7 @@ OS.AllowedItems = {
     [8647] = true, -- Egg Crate
     [10752] = true, -- Emerald Encrusted Chest
     [11617] = true, -- Eridan's Supplies
+    [5760] = false, -- Eternium Lockbox
     [11024] = true, -- Evergreen Herb Casing
     [11937] = true, -- Fat Sack of Coins
     [10834] = true, -- Felhound Tracker Kit
@@ -208,13 +216,13 @@ OS.AllowedItems = {
     [5857] = true, -- Gnome Prize Box
     [11422] = true, -- Goblin Engineer's Renewal Gift
     [5858] = true, -- Goblin Prize Box
-    [17964] = true, -- Gray Sack of Gems
     [19296] = true, -- Greater Darkmoon Prize
-    [17963] = true, -- Green Sack of Gems
     [10773] = true, -- Hakkari Urn
+    [4633] = false, -- Heavy Bronze Lockbox
     [8503] = true, -- Heavy Bronze Lotterybox
     [13874] = true, -- Heavy Crate
     [8505] = true, -- Heavy Iron Lotterybox
+    [16885] = false, -- Heavy Junkbox
     [8507] = true, -- Heavy Mithril Lotterybox
     [22648] = true, -- Hive'Ashi Dossier
     [22649] = true, -- Hive'Regal Dossier
@@ -224,10 +232,12 @@ OS.AllowedItems = {
     [9529] = true, -- Internal Warrior Equipment Kit L25
     [9532] = true, -- Internal Warrior Equipment Kit L30
     [21150] = true, -- Iron Bound Trunk
+    [4634] = false, -- Iron Lockbox
     [8504] = true, -- Iron Lotterybox
+    [13875] = false, -- Ironbound Locked Chest
     [10479] = true, -- Kovic's Trading Satchel
-    [12122] = true, -- Kum'isha's Junk
     [10595] = true, -- Kum'isha's Junk
+    [12122] = true, -- Kum'isha's Junk
     [19035] = true, -- Lard's Special Picnic Basket
     [21743] = true, -- Large Cluster Rocket Recipes
     [21742] = true, -- Large Rocket Recipes
@@ -240,6 +250,7 @@ OS.AllowedItems = {
     [6307] = true, -- Message in a Bottle
     [19298] = true, -- Minor Darkmoon Prize
     [21228] = true, -- Mithril Bound Trunk
+    [5758] = false, -- Mithril Lockbox
     [8506] = true, -- Mithril Lotterybox
     [22320] = true, -- Mux's Quality Goods
     [19425] = true, -- Mysterious Lockbox
@@ -247,6 +258,7 @@ OS.AllowedItems = {
     [15876] = true, -- Nathanos' Chest
     [9537] = true, -- Neatly Wrapped Box
     [20768] = true, -- Oozing Bag
+    [4632] = false, -- Ornate Bronze Lockbox
     [19153] = true, -- Outrider Advanced Care Package
     [19154] = true, -- Outrider Basic Care Package
     [19155] = true, -- Outrider Standard Care Package
@@ -263,9 +275,9 @@ OS.AllowedItems = {
     [22178] = true, -- Pledge of Friendship: Stormwind
     [22162] = true, -- Pledge of Friendship: Thunder Bluff
     [22163] = true, -- Pledge of Friendship: Undercity
-    [23271] = true, -- QATest Darkmoon Faire Tickets
     [13247] = true, -- Quartermaster Zigris' Footlocker
-    [17969] = true, -- Red Sack of Gems
+    [13918] = false, -- Reinforced Locked Chest
+    [4638] = false, -- Reinforced Steel Lockbox
     [6715] = true, -- Ruined Jumper Cables
     [18636] = true, -- Ruined Jumper Cables XL
     [11938] = true, -- Sack of Gems
@@ -282,6 +294,7 @@ OS.AllowedItems = {
     [5523] = true, -- Small Barnacled Clam
     [15699] = true, -- Small Brown-wrapped Package
     [6353] = true, -- Small Chest
+    [6354] = false, -- Small Locked Chest
     [21740] = true, -- Small Rocket Recipes
     [11966] = true, -- Small Sack of Coins
     [21216] = true, -- Smokywood Pastures Extra-Special Gift
@@ -291,11 +304,19 @@ OS.AllowedItems = {
     [21315] = true, -- Smokywood Satchel
     [15874] = true, -- Soft-shelled Clam
     [9363] = true, -- Sparklematic-Wrapped Box
+    [4637] = false, -- Steel Lockbox
     [11442] = true, -- Stormwind Deputy Kit
+    [4636] = false, -- Strong Iron Lockbox
+    [16884] = false, -- Sturdy Junkbox
+    [6355] = false, -- Sturdy Locked Chest
     [23224] = true, -- Summer Gift Package
     [20809] = true, -- Tactical Assignment
+    [7209] = false, -- Tazan's Satchel
     [7870] = true, -- Thaumaturgy Vessel Lockbox
+    [12033] = false, -- Thaurissan Family Jewels
     [5524] = true, -- Thick-shelled Clam
+    [7868] = false, -- Thieven' Kit
+    [5759] = false, -- Thorium Lockbox
     [21327] = true, -- Ticking Present
     [20708] = true, -- Tightly Sealed Trunk
     [11568] = true, -- Torwa's Pouch
@@ -303,37 +324,18 @@ OS.AllowedItems = {
     [12339] = true, -- Vaelan's Gift
     [6352] = true, -- Waterlogged Crate
     [21113] = true, -- Watertight Trunk
-    [17965] = true, -- Yellow Sack of Gems
+    [16883] = false, -- Worn Junkbox
     [22137] = true, -- Ysida's Satchel
     [22233] = true, -- Zigris' Footlocker
-    -- Classic Era | Openable but Locked
-    -- https://www.wowhead.com/classic/items?filter=11:10:161:82;1:1:1:4;0:0:0:11400
-    [16882] = false, -- Battered Junkbox
-    [5760] = false, -- Eternium Lockbox
-    [4633] = false, -- Heavy Bronze Lockbox
-    [16885] = false, -- Heavy Junkbox
-    [4634] = false, -- Iron Lockbox
-    [13875] = false, -- Ironbound Locked Chest
-    [5758] = false, -- Mithril Lockbox
-    [4632] = false, -- Ornate Bronze Lockbox
-    [13918] = false, -- Reinforced Locked Chest
-    [4638] = false, -- Reinforced Steel Lockbox
-    [6354] = false, -- Small Locked Chest
-    [4637] = false, -- Steel Lockbox
-    [4636] = false, -- Strong Iron Lockbox
-    [16884] = false, -- Sturdy Junkbox
-    [6355] = false, -- Sturdy Locked Chest
-    [7209] = false, -- Tazan's Satchel
-    [12033] = false, -- Thaurissan Family Jewels
-    [7868] = false, -- Thieven' Kit
-    [5759] = false, -- Thorium Lockbox
-    [16883] = false, -- Worn Junkbox
-    -- The Burning Crusade | Openable
-    -- https://www.wowhead.com/tbc/items?filter=11:10:161:166;1:2:1:2;0:0:0:0
-    [34592] = true, -- Aldor Supplies Package
-    [34595] = true, -- Aldor Supplies Package
+
+-----------------------------------------------------------------
+-- 02. World of Warcraft : The Burning Crusade
+-----------------------------------------------------------------
+
     [34583] = true, -- Aldor Supplies Package
     [34587] = true, -- Aldor Supplies Package
+    [34592] = true, -- Aldor Supplies Package
+    [34595] = true, -- Aldor Supplies Package
     [28499] = true, -- Arakkoa Hunter's Supplies
     [31955] = true, -- Arelion's Knapsack
     [34863] = true, -- Bag of Fishing Treasures
@@ -344,8 +346,8 @@ OS.AllowedItems = {
     [35286] = true, -- Bloated Giant Sunfish
     [28135] = true, -- Bomb Crate
     [34503] = true, -- Box of Adamantite Shells
-    [35945] = true, -- Brilliant Glass
     [191061] = true, -- Brilliant Glass
+    [35945] = true, -- Brilliant Glass
     [25422] = true, -- Bulging Sack of Gems
     [23921] = true, -- Bulging Sack of Silver
     [30320] = true, -- Bundle of Nether Spikes
@@ -358,11 +360,13 @@ OS.AllowedItems = {
     [187799] = true, -- Enlistment Bonus
     [24336] = true, -- Fireproof Satchel
     [25424] = true, -- Gem-Stuffed Envelope
+    [262788] = true, -- Grand Gift
     [37586] = true, -- Handful of Candy
     [27481] = true, -- Heavy Supply Crate
     [33928] = true, -- Hollowed Bone Decanter
     [27511] = true, -- Inscribed Scrollcase
     [24476] = true, -- Jaggal Clam
+    [31952] = false, -- Khorium Lockbox
     [32777] = true, -- Kronk's Grab Bag
     [32626] = true, -- Large Copper Metamorphosis Geode
     [32629] = true, -- Large Gold Metamorphosis Geode
@@ -381,10 +385,10 @@ OS.AllowedItems = {
     [31522] = true, -- Primal Mooncloth Supplies
     [32064] = true, -- Protectorate Treasure Cache
     [33045] = true, -- Renn's Supplies
-    [34594] = true, -- Scryer Supplies Package
-    [34585] = true, -- Scryer Supplies Package
     [34584] = true, -- Scryer Supplies Package
+    [34585] = true, -- Scryer Supplies Package
     [34593] = true, -- Scryer Supplies Package
+    [34594] = true, -- Scryer Supplies Package
     [33926] = true, -- Sealed Scroll Case
     [35232] = true, -- Shattered Sun Supplies
     [32724] = true, -- Sludge-covered Object
@@ -392,19 +396,116 @@ OS.AllowedItems = {
     [32630] = true, -- Small Gold Metamorphosis Geode
     [32625] = true, -- Small Iron Metamorphosis Geode
     [32631] = true, -- Small Silver Metamorphosis Geode
+    [29569] = false, -- Strong Junkbox
     [32561] = true, -- Tier 5 Arrow Box
     [25419] = true, -- Unmarked Bag of Gems
     [30260] = true, -- Voren'thal's Package
     [34426] = true, -- Winter Veil Gift
-    -- The Burning Crusade | Openable but Locked
-    -- https://www.wowhead.com/tbc/items?filter=11:10:161:166;1:1:1:2;0:0:0:0
-    [31952] = false, -- Khorium Lockbox
-    [29569] = false -- Strong Junkbox
+
+-----------------------------------------------------------------
+-- 03. World of Warcraft : Wrath of the Lich King
+-----------------------------------------------------------------
+
+    [44663] = true, -- Abandoned Adventurer's Satchel
+    [44161] = true, -- Arcane Tarot
+    [39903] = true, -- Argent Crusade Gratuity
+    [39904] = true, -- Argent Crusade Gratuity
+    [46007] = true, -- Bag of Fishing Treasures
+    [52274] = true, -- Bag of Shaman Stuff
+    [52344] = true, -- Bag of Shaman Stuff
+    [34119] = true, -- Black Conrad's Treasure
+    [45328] = true, -- Bloated Slippery Eel
+    [40308] = true, -- Bonework Soul Jar
+    [46809] = true, -- Bountiful Cookbook
+    [46810] = true, -- Bountiful Cookbook
+    [202269] = true, -- Bounty Satchel
+    [208157] = true, -- Bounty Satchel
+    [44951] = true, -- Box of Bombs
+    [49909] = true, -- Box of Chocolates
+    [35745] = true, -- Box of Treasure
+    [49926] = true, -- Brazie's Black Book of Secrets
+    [45072] = true, -- Brightly Colored Egg
+    [44700] = true, -- Brooding Darkwater Clam
+    [52676] = true, -- Cache of the Ley-Guardian
+    [45724] = true, -- Champion's Purse
+    [39883] = true, -- Cracked Egg
+    [34871] = true, -- Crafty's Sack
+    [50161] = true, -- Dinner Suit Box
+    [39014] = false, -- Floral Foundations
+    [43622] = false, -- Froststeel Lockbox
+    [54537] = true, -- Heart-Shaped Box
+    [44751] = true, -- Hyldnir Spoils
+    [44943] = true, -- Icy Prism
+    [54535] = true, -- Keg-Shaped Treasure Chest
+    [50301] = true, -- Landro's Pet Box
+    [45878] = true, -- Large Sack of Ulduar Spoils
+    [54516] = true, -- Loot-Filled Pumpkin
+    [50160] = true, -- Lovely Dress Box
+    [35792] = true, -- Mage Hunter Personal Effects
+    [41426] = true, -- Magically Wrapped Gift
+    [37168] = true, -- Mysterious Tarot
+    [199210] = true, -- Northrend Adventuring Supplies
+    [200238] = true, -- Northrend Adventuring Supplies
+    [200239] = true, -- Northrend Adventuring Supplies
+    [200240] = true, -- Northrend Adventuring Supplies
+    [46812] = true, -- Northrend Mystery Gem Pouch
+    [39418] = true, -- Ornately Jeweled Box
+    [43556] = true, -- Patroller's Pack
+    [44475] = true, -- Reinforced Crate
+    [43575] = false, -- Reinforced Junkbox
+    [44718] = true, -- Ripe Disgusting Jar
+    [52006] = true, -- Sack of Frosty Treasures
+    [38539] = true, -- Sack of Gold
+    [45875] = true, -- Sack of Ulduar Spoils
+    [54536] = true, -- Satchel of Chilled Goods
+    [51999] = true, -- Satchel of Helpful Goods
+    [52000] = true, -- Satchel of Helpful Goods
+    [52001] = true, -- Satchel of Helpful Goods
+    [52002] = true, -- Satchel of Helpful Goods
+    [52003] = true, -- Satchel of Helpful Goods
+    [52004] = true, -- Satchel of Helpful Goods
+    [52005] = true, -- Satchel of Helpful Goods
+    [44163] = true, -- Shadowy Tarot
+    [44113] = true, -- Small Spice Bag
+    [41888] = true, -- Small Velvet Bag
+    [49631] = true, -- Standard Apothecary Serving Kit
+    [42953] = false, -- Strange Envelope
+    [44142] = true, -- Strange Tarot
+    [54467] = true, -- Tabard Lost & Found
+    [45986] = false, -- Tiny Titanium Lockbox
+    [43624] = false, -- Titanium Lockbox
+    [51316] = true, -- Unsealed Chest
+    [43504] = true, -- Winter Veil Gift
+    [46740] = true, -- Winter Veil Gift
+
 }
 
 OS.IgnoreItems = {
-    [34846] = true, -- Black Sack of Gems
-    [191060] = true, -- Black Sack of Gems
+
+-----------------------------------------------------------------
+-- Ignore List
+-----------------------------------------------------------------
+    
+    -- 01. World of Warcraft
+
+    [17962] = true, -- Blue Sack of Gems
     [8049] = true, -- Gnarlpine Necklace
-    [9276] = true -- Pirate's Footlocker
+    [17964] = true, -- Gray Sack of Gems
+    [17963] = true, -- Green Sack of Gems
+    [9276] = true, -- Pirate's Footlocker
+    [17969] = true, -- Red Sack of Gems
+    [17965] = true, -- Yellow Sack of Gems
+
+    -- 02. World of Warcraft : The Burning Crusade
+
+    [191060] = true, -- Black Sack of Gems
+    [34846] = true, -- Black Sack of Gems
+
+    -- 03. World of Warcraft : Wrath of the Lich King
+
+   [46110] = true, -- Alchemist's Cache
+   [49294] = true, -- Ashen Sack of Gems
+   [43346] = true, -- Large Satchel of Spoils
+   [43347] = true, -- Satchel of Spoils
+
 }
