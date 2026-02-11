@@ -159,7 +159,6 @@ OS.AllowedItems = {
     [13891] = true, -- Bloated Salmon
     [6643] = true, -- Bloated Smallfish
     [8366] = true, -- Bloated Trout
-    [21812] = true, -- Box of Chocolates
     [10695] = true, -- Box of Empty Vials
     [9541] = true, -- Box of Goodies
     [9539] = true, -- Box of Rations
@@ -489,6 +488,7 @@ OS.IgnoreItems = {
     -- 01. World of Warcraft
 
     [17962] = true, -- Blue Sack of Gems
+    [21812] = true, -- Box of Chocolates
     [8049] = true, -- Gnarlpine Necklace
     [17964] = true, -- Gray Sack of Gems
     [17963] = true, -- Green Sack of Gems
@@ -509,3 +509,4 @@ OS.IgnoreItems = {
    [43347] = true, -- Satchel of Spoils
 
 }
+
