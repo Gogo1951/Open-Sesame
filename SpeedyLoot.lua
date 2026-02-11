@@ -50,7 +50,7 @@ frame:SetScript(
                                 if (now - lastAnnounced) > 5 then
                                     Print(
                                         link ..
-                                            " needs to be opened manually. It may contain a Unique or Bind on Pickup item, or was dropped by a raid boss."
+                                            " needs to be opened manually. It may contain a Unique, Bind on Pickup, or Temporary item; or it was dropped by a raid boss."
                                     )
                                     OS.state.recentAnnouncements[id] = now
                                 end
@@ -71,3 +71,4 @@ frame:SetScript(
         end
     end
 )
+
