@@ -2,7 +2,7 @@
 
 Automatically opens clams and unlocked containers in your inventory. Features Speedy Loot for faster looting.
 
-<img width="270" alt="Pasted_Image_2_9_26__12_58 PM" src="https://github.com/user-attachments/assets/d1829c33-0ed8-4867-b7cd-a4c1fa98923a" />
+<img width="270" src="https://github.com/user-attachments/assets/d1829c33-0ed8-4867-b7cd-a4c1fa98923a" />
 
 ## How it Works
 
