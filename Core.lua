@@ -10,7 +10,9 @@ local tonumber, wipe, UnitRace, UnitSex = tonumber, wipe, UnitRace, UnitSex
 local UnitCastingInfo, UnitChannelInfo = UnitCastingInfo, UnitChannelInfo
 
 local UnitBuff = (C_UnitAuras and C_UnitAuras.GetBuffDataByIndex) or _G.UnitBuff
-local GetCVarBool = (C_CVar and C_CVar.GetCVarBool) or function(cvar) return GetCVar(cvar) == "1" end
+local GetCVarBool = (C_CVar and C_CVar.GetCVarBool) or function(cvar)
+        return GetCVar(cvar) == "1"
+    end
 local SetCVar = (C_CVar and C_CVar.SetCVar) or _G.SetCVar
 
 -- Default Flags
@@ -22,18 +24,26 @@ OS.isSpeedyLoot = true
 -- HELPER FUNCTIONS
 -------------------------------------------------------------------------------
 
-local function IsQuiet() return GetTime() < OS.state.quietUntil end
+local function IsQuiet()
+    return GetTime() < OS.state.quietUntil
+end
 
 local function SetQuiet(seconds)
     local untilTS = GetTime() + (seconds or 0)
-    if untilTS > OS.state.quietUntil then OS.state.quietUntil = untilTS end
+    if untilTS > OS.state.quietUntil then
+        OS.state.quietUntil = untilTS
+    end
 end
 
 local function StatusPrint(msg, ...)
-    if IsQuiet() then return end
+    if IsQuiet() then
+        return
+    end
     local text = (...) and string.format(msg, ...) or msg
     local now = GetTime()
-    if text == OS.state.lastStatusMsg and (now - OS.state.lastStatusAt) < 5 then return end
+    if text == OS.state.lastStatusMsg and (now - OS.state.lastStatusAt) < 5 then
+        return
+    end
     OS.state.lastStatusMsg, OS.state.lastStatusAt = text, now
     OS.Print(text)
 end
@@ -48,7 +58,7 @@ end
 
 local function PlayBagFullSound()
     local _, raceEn = UnitRace("player")
-    local gender = UnitSex("player") 
+    local gender = UnitSex("player")
     if raceEn and OS.RACE_SOUNDS[raceEn] and OS.RACE_SOUNDS[raceEn][gender] then
         PlaySound(OS.RACE_SOUNDS[raceEn][gender], "Master")
     else
@@ -65,17 +75,25 @@ local function IsItemLocked(bag, slot)
     for i = 1, scanTooltip:NumLines() do
         local line = _G["OS_ScanTooltipTextLeft" .. i]
         local text = line and line:GetText()
-        if text and text == LOCKED then return true end
+        if text and text == LOCKED then
+            return true
+        end
     end
     return false
 end
 
 local function IsPlayerStealthed()
-    if _G.IsStealthed and _G.IsStealthed() then return true end
+    if _G.IsStealthed and _G.IsStealthed() then
+        return true
+    end
     for i = 1, 40 do
         local _, _, _, _, _, _, _, _, _, spellID = UnitBuff("player", i)
-        if not spellID then break end
-        if spellID == OS.SPELLS.SHADOWMELD then return true end -- Corrected
+        if not spellID then
+            break
+        end
+        if spellID == OS.SPELLS.SHADOWMELD then
+            return true
+        end -- Corrected
     end
     return false
 end
@@ -83,18 +101,36 @@ end
 local function IsInteractionActive()
     if C_PlayerInteractionManager and C_PlayerInteractionManager.GetInteractionType then
         local t = C_PlayerInteractionManager.GetInteractionType()
-        if t and (t ~= 0) then return true end
+        if t and (t ~= 0) then
+            return true
+        end
     end
     return (MerchantFrame and MerchantFrame:IsShown()) or (MailFrame and MailFrame:IsShown()) or
-        (TradeFrame and TradeFrame:IsShown()) or (BankFrame and BankFrame:IsShown()) or
-        (GossipFrame and GossipFrame:IsShown()) or (QuestFrame and QuestFrame:IsShown()) or
+        (TradeFrame and TradeFrame:IsShown()) or
+        (BankFrame and BankFrame:IsShown()) or
+        (GossipFrame and GossipFrame:IsShown()) or
+        (QuestFrame and QuestFrame:IsShown()) or
         (StaticPopup1 and StaticPopup1:IsShown())
 end
 
 local function IsSafeToOpen()
-    if not OS.isEnabled or OS.isPaused then return false end
-    if UnitAffectingCombat("player") or IsInteractionActive() or IsPlayerStealthed() then return false end
-    if (UnitCastingInfo and UnitCastingInfo("player")) or (UnitChannelInfo and UnitChannelInfo("player")) then return false end
+    if not OS.isEnabled or OS.isPaused then
+        return false
+    end
+    if UnitAffectingCombat("player") or IsInteractionActive() or IsPlayerStealthed() then
+        return false
+    end
+    if (UnitCastingInfo and UnitCastingInfo("player")) or (UnitChannelInfo and UnitChannelInfo("player")) then
+        return false
+    end
+
+    if GameTooltip:IsShown() then
+        local hasItem, itemLink = GameTooltip:GetItem()
+        if hasItem or itemLink then
+            return false
+        end
+    end
+
     OS.state.lastFreeSlots = OS.GetFreeSlots()
     return OS.state.lastFreeSlots >= OS.MIN_FREE_SLOTS
 end
@@ -114,16 +150,23 @@ local function QPush(bag, slot, id)
 end
 
 local function QPop()
-    if qHead > qTail then return nil end
+    if qHead > qTail then
+        return nil
+    end
     local b, s, i = q[qHead], q[qHead + 1], q[qHead + 2]
     qHead = qHead + 3
-    if qHead > qTail then wipe(q) qHead, qTail = 1, 0 end
+    if qHead > qTail then
+        wipe(q)
+        qHead, qTail = 1, 0
+    end
     return b, s, i
 end
 
 local function SafeFastItemID(bag, slot)
     local id = OS.GetContainerItemID(bag, slot)
-    if id then return id end
+    if id then
+        return id
+    end
     local link = OS.GetContainerItemLink(bag, slot)
     return link and tonumber(link:match("item:(%d+)"))
 end
@@ -152,27 +195,34 @@ local function OpenTick()
         C_Timer.After(OS.OPEN_TICK_INTERVAL, OpenTick)
         return
     end
-    if not IsSafeToOpen() then return end
+    if not IsSafeToOpen() then
+        return
+    end
 
     local bag, slot, cachedId = QPop()
-    if not bag then return end
+    if not bag then
+        return
+    end
 
     if SafeFastItemID(bag, slot) == cachedId then
         PlaySound(565975, "Master")
         OS.UseContainerItem(bag, slot)
-        C_Timer.After(0.25, function()
-            local still = SafeFastItemID(bag, slot)
-            if still == cachedId then
-                local allowed = OS.AllowedItems[still]
-                if allowed == true or (allowed == false and not IsItemLocked(bag, slot)) then
-                    QPush(bag, slot, still)
+        C_Timer.After(
+            0.25,
+            function()
+                local still = SafeFastItemID(bag, slot)
+                if still == cachedId then
+                    local allowed = OS.AllowedItems[still]
+                    if allowed == true or (allowed == false and not IsItemLocked(bag, slot)) then
+                        QPush(bag, slot, still)
+                    end
+                end
+                if IsSafeToOpen() and not OS.state.openTimerLive and qHead <= qTail then
+                    OS.state.openTimerLive = true
+                    C_Timer.After(OS.OPEN_TICK_INTERVAL, OpenTick)
                 end
             end
-            if IsSafeToOpen() and not OS.state.openTimerLive and qHead <= qTail then
-                OS.state.openTimerLive = true
-                C_Timer.After(OS.OPEN_TICK_INTERVAL, OpenTick)
-            end
-        end)
+        )
     end
     if qHead <= qTail then
         OS.state.openTimerLive = true
@@ -194,7 +244,9 @@ local function ScheduleScan(force)
                 else
                     StatusPrint("Resumed.")
                 end
-                if OS.UpdateMinimapIcon then OS.UpdateMinimapIcon() end
+                if OS.UpdateMinimapIcon then
+                    OS.UpdateMinimapIcon()
+                end
             end
         end
         BuildQueue()
@@ -204,13 +256,23 @@ local function ScheduleScan(force)
         end
     end
 
-    if force then run() return end
+    if force then
+        run()
+        return
+    end
     local wantAt = GetTime() + OS.SCAN_DEBOUNCE
-    if OS.state.scanPending and wantAt >= OS.state.scanTimerAt then return end
+    if OS.state.scanPending and wantAt >= OS.state.scanTimerAt then
+        return
+    end
     OS.state.scanPending, OS.state.scanTimerAt = true, wantAt
-    C_Timer.After(OS.SCAN_DEBOUNCE, function()
-        if GetTime() >= OS.state.scanTimerAt then run() end
-    end)
+    C_Timer.After(
+        OS.SCAN_DEBOUNCE,
+        function()
+            if GetTime() >= OS.state.scanTimerAt then
+                run()
+            end
+        end
+    )
 end
 OS.ScheduleScan = ScheduleScan
 
@@ -230,7 +292,7 @@ function EventHandlers:PLAYER_LOGIN()
         OS.DB.speedyLoot = true
     end
     if OS.DB.lootSounds == nil then
-        OS.DB.lootSounds = false  -- Changed default to false
+        OS.DB.lootSounds = false -- Changed default to false
     end
 
     OS.isEnabled = OS.DB.autoOpen
@@ -249,7 +311,9 @@ function EventHandlers:PLAYER_ENTERING_WORLD(isInitialLogin, isReloadingUi)
             function()
                 OS.state.lastFreeSlots = OS.GetFreeSlots()
                 if OS.isEnabled then
-                    OS.isPaused = (OS.isPaused and OS.state.lastFreeSlots < (OS.MIN_FREE_SLOTS + 1)) or (OS.state.lastFreeSlots < OS.MIN_FREE_SLOTS)
+                    OS.isPaused =
+                        (OS.isPaused and OS.state.lastFreeSlots < (OS.MIN_FREE_SLOTS + 1)) or
+                        (OS.state.lastFreeSlots < OS.MIN_FREE_SLOTS)
                     OS.ScheduleScan(true)
                     EnsureAutoLoot()
                 end
@@ -275,14 +339,21 @@ end
 
 function EventHandlers:UNIT_SPELLCAST_SUCCEEDED(unit, castGUID, spellID)
     if unit == "player" and spellID == OS.SPELLS.PICK_LOCK then
-        C_Timer.After(0.5, function() OS.ScheduleScan(true) end)
+        C_Timer.After(
+            0.5,
+            function()
+                OS.ScheduleScan(true)
+            end
+        )
     end
 end
 
 function EventHandlers:UI_ERROR_MESSAGE(errTypeOrID, msg)
     local isBagFull = (msg and msg:find(ERR_INV_FULL or "Inventory is full"))
     if not isBagFull and type(errTypeOrID) == "number" then
-        isBagFull = (errTypeOrID == (LE_GAME_ERR_INV_FULL or 0)) or (Enum and Enum.UIERRORS and errTypeOrID == Enum.UIERRORS.ERR_INV_FULL)
+        isBagFull =
+            (errTypeOrID == (LE_GAME_ERR_INV_FULL or 0)) or
+            (Enum and Enum.UIERRORS and errTypeOrID == Enum.UIERRORS.ERR_INV_FULL)
     end
     if isBagFull then
         local now = GetTime()
