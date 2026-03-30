@@ -13,15 +13,20 @@
 
 # Includes
 Includes\LibStub\LibStub.lua
-Includes\CallbackHandler-1.0\CallbackHandler-1.0.xml
+Includes\CallbackHandler-1.0\CallbackHandler-1.0.lua
+Includes\AceLocale-3.0\AceLocale-3.0.xml
 Includes\LibDataBroker-1.1\LibDataBroker-1.1.lua
 Includes\LibDBIcon-1.0\LibDBIcon-1.0.lua
+Includes\AceGUI-3.0\AceGUI-3.0.xml
+Includes\AceConfig-3.0\AceConfig-3.0.xml
 
 ## Open Sesame
 Data.lua
+Locales\enUS.lua
 Core.lua
-SpeedyLoot.lua
-Minimap.lua
+Speedy-Loot.lua
+Minimap-Button.lua
+Options.lua
 
 # Feedback Welcome! (=
 # Open Sesame on CurseForge // https://www.curseforge.com/wow/addons/open-sesame

@@ -1,100 +1,126 @@
 local ADDON_NAME, OS = ...
 
----------------------------------------------------------------------
--- METADATA & VERSION
----------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Metadata
+--------------------------------------------------------------------------------
 
-local version = (C_AddOns and C_AddOns.GetAddOnMetadata(ADDON_NAME, "Version")) or "Dev"
+local GetMetadata = (C_AddOns and C_AddOns.GetAddOnMetadata) or GetAddOnMetadata
+local version = GetMetadata and GetMetadata(ADDON_NAME, "Version") or "Dev"
 if version:find("@") then
     version = "Dev"
 end
 OS.Version = version
 
----------------------------------------------------------------------
--- CONSTANTS & SETTINGS
----------------------------------------------------------------------
+OS.CURSEFORGE_URL = "https://www.curseforge.com/wow/addons/open-sesame"
+OS.GITHUB_URL     = "https://github.com/Gogo1951/Open-Sesame"
+OS.DISCORD_URL    = "https://discord.gg/eh8hKq992Q"
 
-OS.MIN_FREE_SLOTS = 4
-OS.WORLD_LOAD_DELAY = 8
-OS.SCAN_DEBOUNCE = 0.5
+--------------------------------------------------------------------------------
+-- Constants
+--------------------------------------------------------------------------------
+
+OS.MIN_FREE_SLOTS     = 4
+OS.WORLD_LOAD_DELAY   = 8
+OS.SCAN_DEBOUNCE      = 0.5
 OS.OPEN_TICK_INTERVAL = 0.25
-OS.BAG_FULL_COOLDOWN = 10
-OS.LOOT_SOUND_ID = 2847
-OS.LOOT_DELAY = 0.25
+OS.BAG_FULL_COOLDOWN  = 10
+OS.LOOT_SOUND_ID      = 2847
+OS.LOOT_DELAY         = 0.25
 
 OS.SPELLS = {
-    PICK_LOCK = 1804,
-    SHADOWMELD = 20580
+    PICK_LOCK  = 1804,
+    SHADOWMELD = 20580,
 }
 
--- Race/Gender Specific "Inventory Full" Sound IDs
+-- { [raceKey] = { [genderId] = soundId } }
 OS.RACE_SOUNDS = {
-    ["Human"] = {[2] = 1897, [3] = 2021},
-    ["Orc"] = {[2] = 2308, [3] = 2363},
-    ["Dwarf"] = {[2] = 1609, [3] = 1673},
-    ["NightElf"] = {[2] = 2140, [3] = 2251},
-    ["Scourge"] = {[2] = 2076, [3] = 2196},
-    ["Tauren"] = {[2] = 2440, [3] = 2441},
-    ["Gnome"] = {[2] = 1730, [3] = 1787},
-    ["Troll"] = {[2] = 1842, [3] = 1952},
-    ["BloodElf"] = {[2] = 9589, [3] = 9590},
-    ["Draenei"] = {[2] = 9504, [3] = 9505}
+    ["Human"]    = { [2] = 1897, [3] = 2021 },
+    ["Orc"]      = { [2] = 2308, [3] = 2363 },
+    ["Dwarf"]    = { [2] = 1609, [3] = 1673 },
+    ["NightElf"] = { [2] = 2140, [3] = 2251 },
+    ["Scourge"]  = { [2] = 2076, [3] = 2196 },
+    ["Tauren"]   = { [2] = 2440, [3] = 2441 },
+    ["Gnome"]    = { [2] = 1730, [3] = 1787 },
+    ["Troll"]    = { [2] = 1842, [3] = 1952 },
+    ["BloodElf"] = { [2] = 9589, [3] = 9590 },
+    ["Draenei"]  = { [2] = 9504, [3] = 9505 },
 }
+
+--------------------------------------------------------------------------------
+-- Colors
+--------------------------------------------------------------------------------
 
 local CHAT_NAME = "Open Sesame"
-local C_TITLE = "FFD100" -- Gold
-local C_INFO = "00BBFF" -- Blue
-local C_BODY = "CCCCCC" -- Silver
-local C_TEXT = "FFFFFF" -- White
-local C_ON = "33CC33" -- Green
-local C_OFF = "CC3333" -- Red
-local C_SEP = "AAAAAA" -- Gray
-local C_MUTED = "808080" -- Dark Gray
+
+local C_TITLE    = "FFD100" -- Gold
+local C_INFO     = "00BBFF" -- Blue
+local C_BODY     = "CCCCCC" -- Silver
+local C_TEXT     = "FFFFFF" -- White
+local C_SUCCESS  = "33CC33" -- Green
+local C_DISABLED = "CC3333" -- Red
+local C_SEP      = "AAAAAA" -- Gray
+local C_MUTED    = "808080" -- Dark Gray
+
 local COLOR_PREFIX = "|cff"
 
 OS.COLORS = {
-    TITLE = COLOR_PREFIX .. C_TITLE,
-    NAME = COLOR_PREFIX .. C_INFO,
-    DESC = COLOR_PREFIX .. C_BODY,
-    TEXT = COLOR_PREFIX .. C_TEXT,
-    SUCCESS = COLOR_PREFIX .. C_ON,
-    DISABLED = COLOR_PREFIX .. C_OFF,
-    SEPARATOR = COLOR_PREFIX .. C_SEP,
-    MUTED = COLOR_PREFIX .. C_MUTED
+    TITLE    = COLOR_PREFIX .. C_TITLE,
+    INFO     = COLOR_PREFIX .. C_INFO,
+    DESC     = COLOR_PREFIX .. C_BODY,
+    TEXT     = COLOR_PREFIX .. C_TEXT,
+    SUCCESS  = COLOR_PREFIX .. C_SUCCESS,
+    DISABLED = COLOR_PREFIX .. C_DISABLED,
+    SEP      = COLOR_PREFIX .. C_SEP,
+    MUTED    = COLOR_PREFIX .. C_MUTED,
 }
+
+--------------------------------------------------------------------------------
+-- Icons
+--------------------------------------------------------------------------------
 
 OS.ICONS = {
-    on = "Interface\\Icons\\inv_misc_bag_09_green",
+    on     = "Interface\\Icons\\inv_misc_bag_09_green",
     paused = "Interface\\Icons\\inv_misc_bag_09_black",
-    off = "Interface\\Icons\\inv_misc_bag_09_red"
+    off    = "Interface\\Icons\\inv_misc_bag_09_red",
 }
 
-OS.BRAND_PREFIX = string.format("%s%s|r %s//|r ", OS.COLORS.NAME, CHAT_NAME, OS.COLORS.SEPARATOR)
+--------------------------------------------------------------------------------
+-- Chat
+--------------------------------------------------------------------------------
 
----------------------------------------------------------------------
--- API ABSTRACTION (C_Container / Legacy)
----------------------------------------------------------------------
+OS.BRAND_PREFIX = string.format("%s%s|r %s//|r ", OS.COLORS.INFO, CHAT_NAME, OS.COLORS.SEP)
 
-OS.GetContainerNumSlots = (C_Container and C_Container.GetContainerNumSlots) or _G.GetContainerNumSlots
-OS.UseContainerItem = (C_Container and C_Container.UseContainerItem) or _G.UseContainerItem
-OS.GetContainerItemLink = (C_Container and C_Container.GetContainerItemLink) or _G.GetContainerItemLink
-OS.GetContainerItemID = (C_Container and C_Container.GetContainerItemID) or _G.GetContainerItemID
+--------------------------------------------------------------------------------
+-- API Abstraction (C_Container / Legacy)
+--------------------------------------------------------------------------------
+
+OS.GetContainerNumSlots    = (C_Container and C_Container.GetContainerNumSlots) or _G.GetContainerNumSlots
+OS.UseContainerItem        = (C_Container and C_Container.UseContainerItem) or _G.UseContainerItem
+OS.GetContainerItemLink    = (C_Container and C_Container.GetContainerItemLink) or _G.GetContainerItemLink
+OS.GetContainerItemID      = (C_Container and C_Container.GetContainerItemID) or _G.GetContainerItemID
 OS.GetContainerNumFreeSlots = (C_Container and C_Container.GetContainerNumFreeSlots) or _G.GetContainerNumFreeSlots
 
----------------------------------------------------------------------
--- SHARED STATE & UTILS
----------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- State
+--------------------------------------------------------------------------------
 
 OS.state = {
-    scanTimerAt = 0,
-    scanPending = false,
-    openTimerLive = false,
-    lastBagFullAt = 0,
-    lastFreeSlots = 0,
-    quietUntil = 0,
-    lastStatusMsg = nil,
-    lastStatusAt = 0
+    lastBagFullAt       = 0,
+    lastFreeSlots       = 0,
+    lastLootAt          = 0,
+    lastLootWindowAt    = 0,
+    lastStatusAt        = 0,
+    lastStatusMsg       = nil,
+    openTimerLive       = false,
+    quietUntil          = 0,
+    recentAnnouncements = {},
+    scanPending         = false,
+    scanTimerAt         = 0,
 }
+
+--------------------------------------------------------------------------------
+-- Utility Functions
+--------------------------------------------------------------------------------
 
 function OS.Print(msg, ...)
     local text = (...) and string.format(msg, ...) or msg
@@ -109,23 +135,23 @@ end
 function OS.GetFreeSlots()
     local free = 0
     for bag = 0, 4 do
-        local f, family = OS.GetContainerNumFreeSlots(bag)
-        if (family == nil or family == 0) and f then
-            free = free + f
+        local slotCount, family = OS.GetContainerNumFreeSlots(bag)
+        if (family == nil or family == 0) and slotCount then
+            free = free + slotCount
         end
     end
     return free
 end
 
------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Item Database
------------------------------------------------------------------
-
+--------------------------------------------------------------------------------
+-- { [itemId] = canOpenImmediately (true) or requiresUnlock (false) }
 OS.AllowedItems = {
 
------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- 01. World of Warcraft
------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
     [10456] = true, -- A Bulging Coin Purse
     [15902] = true, -- A Crazy Grab Bag
@@ -327,9 +353,9 @@ OS.AllowedItems = {
     [22137] = true, -- Ysida's Satchel
     [22233] = true, -- Zigris' Footlocker
 
------------------------------------------------------------------
--- 02. World of Warcraft : The Burning Crusade
------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- 02. World of Warcraft: The Burning Crusade
+--------------------------------------------------------------------------------
 
     [34583] = true, -- Aldor Supplies Package
     [34587] = true, -- Aldor Supplies Package
@@ -401,9 +427,9 @@ OS.AllowedItems = {
     [30260] = true, -- Voren'thal's Package
     [34426] = true, -- Winter Veil Gift
 
------------------------------------------------------------------
--- 03. World of Warcraft : Wrath of the Lich King
------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- 03. World of Warcraft: Wrath of the Lich King
+--------------------------------------------------------------------------------
 
     [44663] = true, -- Abandoned Adventurer's Satchel
     [44161] = true, -- Arcane Tarot
@@ -479,12 +505,13 @@ OS.AllowedItems = {
 
 }
 
+--------------------------------------------------------------------------------
+-- Ignore List
+--------------------------------------------------------------------------------
+
+-- { [itemId] = ignored }
 OS.IgnoreItems = {
 
------------------------------------------------------------------
--- Ignore List
------------------------------------------------------------------
-    
     -- 01. World of Warcraft
 
     [17962] = true, -- Blue Sack of Gems
@@ -496,17 +523,16 @@ OS.IgnoreItems = {
     [17969] = true, -- Red Sack of Gems
     [17965] = true, -- Yellow Sack of Gems
 
-    -- 02. World of Warcraft : The Burning Crusade
+    -- 02. World of Warcraft: The Burning Crusade
 
     [191060] = true, -- Black Sack of Gems
     [34846] = true, -- Black Sack of Gems
 
-    -- 03. World of Warcraft : Wrath of the Lich King
+    -- 03. World of Warcraft: Wrath of the Lich King
 
-   [46110] = true, -- Alchemist's Cache
-   [49294] = true, -- Ashen Sack of Gems
-   [43346] = true, -- Large Satchel of Spoils
-   [43347] = true, -- Satchel of Spoils
+    [46110] = true, -- Alchemist's Cache
+    [49294] = true, -- Ashen Sack of Gems
+    [43346] = true, -- Large Satchel of Spoils
+    [43347] = true, -- Satchel of Spoils
 
 }
-

@@ -1,17 +1,14 @@
 local ADDON_NAME, OS = ...
-local lastLootTime = 0
 
-local function Print(msg)
-    if not OS.BRAND_PREFIX or not OS.COLORS then
-        return
-    end
-    local output = OS.BRAND_PREFIX .. OS.COLORS.TEXT .. msg .. "|r"
-    if DEFAULT_CHAT_FRAME then
-        DEFAULT_CHAT_FRAME:AddMessage(output)
-    else
-        print(output)
-    end
-end
+--------------------------------------------------------------------------------
+-- Libraries
+--------------------------------------------------------------------------------
+
+local L = LibStub("AceLocale-3.0"):GetLocale("OpenSesame")
+
+--------------------------------------------------------------------------------
+-- Speedy Loot
+--------------------------------------------------------------------------------
 
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("LOOT_READY")
@@ -26,48 +23,49 @@ frame:SetScript(
         local modified = IsModifiedClick("AUTOLOOTTOGGLE")
         local shouldAutoLoot = (autoLoot ~= modified)
 
-        if shouldAutoLoot then
-            local now = GetTime()
-            if (now - lastLootTime) >= OS.LOOT_DELAY then
-                local numItems = GetNumLootItems()
-                if numItems > 0 then
+        if not shouldAutoLoot then
+            return
+        end
+
+        local now = GetTime()
+        if (now - OS.state.lastLootAt) < OS.LOOT_DELAY then
+            return
+        end
+
+        local numItems = GetNumLootItems()
+        if numItems < 1 then
+            return
+        end
+
+        if LootFrame then
+            LootFrame:Hide()
+        end
+
+        for slot = numItems, 1, -1 do
+            local link = GetLootSlotLink(slot)
+            local shouldLoot = true
+
+            if link then
+                local itemId = tonumber(link:match("item:(%d+)"))
+                if itemId and OS.IgnoreItems and OS.IgnoreItems[itemId] then
+                    shouldLoot = false
+
+                    local lastAnnounced = OS.state.recentAnnouncements[itemId] or 0
+                    if (now - lastAnnounced) > 5 then
+                        OS.Print(string.format(L["ITEM_OPEN_MANUALLY"], link))
+                        OS.state.recentAnnouncements[itemId] = now
+                    end
+
                     if LootFrame then
-                        LootFrame:Hide()
+                        LootFrame:Show()
                     end
-
-                    OS.state.recentAnnouncements = OS.state.recentAnnouncements or {}
-
-                    for slot = numItems, 1, -1 do
-                        local link = GetLootSlotLink(slot)
-                        local shouldLoot = true
-
-                        if link then
-                            local id = tonumber(link:match("item:(%d+)"))
-                            if id and OS.IgnoreItems and OS.IgnoreItems[id] then
-                                shouldLoot = false
-
-                                local lastAnnounced = OS.state.recentAnnouncements[id] or 0
-                                if (now - lastAnnounced) > 5 then
-                                    Print(
-                                        link ..
-                                            " needs to be opened manually. It may contain a Unique, Bind on Pickup, or Temporary item; or it was dropped by a raid boss."
-                                    )
-                                    OS.state.recentAnnouncements[id] = now
-                                end
-
-                                if LootFrame then
-                                    LootFrame:Show()
-                                end
-                            end
-                        end
-
-                        if shouldLoot and OS.GetFreeSlots() > 0 then
-                            LootSlot(slot)
-                        end
-                    end
-                    lastLootTime = now
                 end
             end
+
+            if shouldLoot and OS.GetFreeSlots() > 0 then
+                LootSlot(slot)
+            end
         end
+        OS.state.lastLootAt = now
     end
 )
