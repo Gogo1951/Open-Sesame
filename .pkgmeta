@@ -15,6 +15,12 @@ externals:
   Includes/LibDBIcon-1.0:
     url: https://repos.curseforge.com/wow/libdbicon-1-0/trunk/LibDBIcon-1.0/
 
+  Includes/AceGUI-3.0:
+    url: https://repos.curseforge.com/wow/ace3/trunk/AceGUI-3.0/
+
+  Includes/AceConfig-3.0:
+    url: https://repos.curseforge.com/wow/ace3/trunk/AceConfig-3.0/
+
 ignore:
   - .git
   - .gitignore
