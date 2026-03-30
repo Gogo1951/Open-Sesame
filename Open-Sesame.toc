@@ -20,9 +20,22 @@ Includes\LibDBIcon-1.0\LibDBIcon-1.0.lua
 Includes\AceGUI-3.0\AceGUI-3.0.xml
 Includes\AceConfig-3.0\AceConfig-3.0.xml
 
-## Open Sesame
+## Data
 Data.lua
+
+## Localization
 Locales\enUS.lua
+Locales\deDE.lua
+Locales\esES.lua
+Locales\frFR.lua
+Locales\itIT.lua
+Locales\koKR.lua
+Locales\ptBR.lua
+Locales\ruRU.lua
+Locales\zhCN.lua
+Locales\zhTW.lua
+
+## Open Sesame
 Core.lua
 Speedy-Loot.lua
 Minimap-Button.lua

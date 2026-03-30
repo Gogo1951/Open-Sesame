@@ -509,7 +509,7 @@ OS.AllowedItems = {
 -- Ignore List
 --------------------------------------------------------------------------------
 
--- { [itemId] = ignored }
+-- { [itemId] = true, -- Ignored Item }
 OS.IgnoreItems = {
 
     -- 01. World of Warcraft
