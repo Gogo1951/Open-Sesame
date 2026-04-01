@@ -6,8 +6,8 @@ if not L then return end
 --------------------------------------------------------------------------------
 
 L["ADDON_TITLE"]         = "Open Sesame"
-L["STATUS_ENABLED"]      = "활성화"
-L["STATUS_DISABLED"]     = "비활성화"
+L["STATUS_ENABLED"]      = "활성화됨"
+L["STATUS_DISABLED"]     = "비활성화됨"
 L["STATUS_PAUSED"]       = "일시정지"
 L["STATUS_ON"]           = "켜짐"
 L["STATUS_OFF"]          = "꺼짐"
@@ -16,7 +16,7 @@ L["STATUS_OFF"]          = "꺼짐"
 -- Chat Messages
 --------------------------------------------------------------------------------
 
-L["AUTO_LOOT_ENABLED"]   = "Open Sesame는 자동 줍기가 필요합니다. 자동 줍기가 활성화되었습니다."
+L["AUTO_LOOT_ENABLED"]   = "Open Sesame가 정상적으로 작동하려면 자동 줍기가 필요합니다. 자동 줍기가 활성화되었습니다."
 L["PAUSED_BAG_SLOTS"]    = "가방에 최소 %d칸의 빈 공간이 생길 때까지 일시정지합니다."
 L["RESUMED"]             = "재개되었습니다."
 L["INVENTORY_FULL"]      = "가방이 가득 찼습니다!"
@@ -49,7 +49,7 @@ L["TOOLTIP_HINT"]        = "추가 설정은 옵션 > 애드온 > Open Sesame에
 --------------------------------------------------------------------------------
 
 L["OPTIONS_INTRO"]       = "인벤토리에 있는 조개와 잠금 해제된 상자를 자동으로 엽니다. 더 빠른 전리품 획득을 위한 빠른 전리품 기능이 포함되어 있습니다."
-L["OPTIONS_FEEDBACK"]    = "피드백 및 지원"
+L["OPTIONS_FEEDBACK"]    = "피드백 & 지원"
 L["OPTIONS_CURSEFORGE"]  = "CurseForge"
 L["OPTIONS_GITHUB"]      = "GitHub"
 L["OPTIONS_DISCORD"]     = "Discord"

@@ -4,7 +4,7 @@ local ADDON_NAME, OS = ...
 -- Libraries
 --------------------------------------------------------------------------------
 
-local L = LibStub("AceLocale-3.0"):GetLocale("OpenSesame")
+local L = OS.L
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 
 --------------------------------------------------------------------------------

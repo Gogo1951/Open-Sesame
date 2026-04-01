@@ -16,23 +16,23 @@ L["STATUS_OFF"]          = "Off"
 -- Chat Messages
 --------------------------------------------------------------------------------
 
-L["AUTO_LOOT_ENABLED"]   = "Open Sesame necesita el boteo automatico activado. Se ha activado."
+L["AUTO_LOOT_ENABLED"]   = "Despojo automático es necesario para que Open Sesame funcione correctamente. Despojo automático ha sido activado."
 L["PAUSED_BAG_SLOTS"]    = "En pausa hasta tener al menos %d espacios libres en las bolsas."
 L["RESUMED"]             = "Reanudado."
-L["INVENTORY_FULL"]      = "El inventario esta lleno!"
-L["ITEM_WILL_AUTO_OPEN"] = "%s se abrira automaticamente cuando se desbloquee."
-L["ITEM_OPEN_MANUALLY"]  = "%s debe abrirse manualmente. Puede contener un objeto unico, ligado al recoger o temporal, o fue obtenido de un jefe de banda."
+L["INVENTORY_FULL"]      = "¡El inventario está lleno!"
+L["ITEM_WILL_AUTO_OPEN"] = "%s se abrirá automáticamente cuando se desbloquee."
+L["ITEM_OPEN_MANUALLY"]  = "%s debe abrirse manualmente. Puede contener un objeto único, ligado al recoger o temporal, o fue obtenido de un jefe de banda."
 
 --------------------------------------------------------------------------------
 -- Features
 --------------------------------------------------------------------------------
 
-L["AUTO_OPENING"]        = "Apertura automatica"
-L["AUTO_OPENING_DESC"]   = "Abre automaticamente almejas y contenedores desbloqueados cuando tienes mas de 4 espacios libres en las bolsas."
-L["SPEEDY_LOOT"]         = "Boteo rapido"
-L["SPEEDY_LOOT_DESC"]    = "Oculta la ventana de botin para un boteo casi instantaneo."
-L["LOOT_SOUNDS"]         = "Sonidos de botin"
-L["LOOT_SOUNDS_DESC"]    = "Reproduce un sonido especial al obtener un objeto de calidad Poco comun o superior."
+L["AUTO_OPENING"]        = "Apertura automática"
+L["AUTO_OPENING_DESC"]   = "Abre automáticamente almejas y contenedores desbloqueados cuando tienes más de 4 espacios libres en las bolsas."
+L["SPEEDY_LOOT"]         = "Despojo rápido"
+L["SPEEDY_LOOT_DESC"]    = "Oculta la ventana de botín para un despojo casi instantáneo."
+L["LOOT_SOUNDS"]         = "Sonidos de botín"
+L["LOOT_SOUNDS_DESC"]    = "Reproduce un sonido especial al obtener un objeto de calidad Poco común o superior."
 
 --------------------------------------------------------------------------------
 -- Tooltip
@@ -42,14 +42,14 @@ L["KEYBIND_LEFT_CLICK"]  = "Clic izquierdo"
 L["KEYBIND_RIGHT_CLICK"] = "Clic derecho"
 L["KEYBIND_MIDDLE_CLICK"] = "Clic central"
 L["ACTION_TOGGLE"]       = "Alternar"
-L["TOOLTIP_HINT"]        = "Mas opciones en Opciones > AddOns > Open Sesame"
+L["TOOLTIP_HINT"]        = "Más opciones en Opciones > AddOns > Open Sesame"
 
 --------------------------------------------------------------------------------
 -- Options
 --------------------------------------------------------------------------------
 
-L["OPTIONS_INTRO"]       = "Abre automaticamente almejas y contenedores desbloqueados en tu inventario. Incluye Boteo rapido para obtener botin mas rapidamente."
-L["OPTIONS_FEEDBACK"]    = "Comentarios y soporte"
+L["OPTIONS_INTRO"]       = "Abre automáticamente almejas y contenedores desbloqueados en tu inventario. Incluye Despojo rápido para obtener botín más rápidamente."
+L["OPTIONS_FEEDBACK"]    = "Comentarios & Soporte"
 L["OPTIONS_CURSEFORGE"]  = "CurseForge"
 L["OPTIONS_GITHUB"]      = "GitHub"
 L["OPTIONS_DISCORD"]     = "Discord"

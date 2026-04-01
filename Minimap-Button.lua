@@ -4,9 +4,9 @@ local ADDON_NAME, OS = ...
 -- Libraries
 --------------------------------------------------------------------------------
 
-local L = LibStub("AceLocale-3.0"):GetLocale("OpenSesame")
-local LDB = LibStub and LibStub:GetLibrary("LibDataBroker-1.1", true)
-local LDBIcon = LibStub and LibStub("LibDBIcon-1.0", true)
+local L = OS.L
+local LDB = LibStub("LibDataBroker-1.1")
+local LDBIcon = LibStub("LibDBIcon-1.0")
 
 local brokerObj
 
@@ -15,7 +15,7 @@ local brokerObj
 --------------------------------------------------------------------------------
 
 function OS.UpdateMinimapIcon()
-    if not LDB or not LDBIcon or not brokerObj then
+    if not brokerObj then
         return
     end
 
@@ -109,10 +109,6 @@ end
 --------------------------------------------------------------------------------
 
 function OS.InitMinimap()
-    if not LDB then
-        return
-    end
-
     brokerObj = LDB:NewDataObject(ADDON_NAME, {
         type = "launcher",
         label = L["ADDON_TITLE"],
@@ -138,7 +134,5 @@ function OS.InitMinimap()
         end,
     })
 
-    if LDBIcon then
-        LDBIcon:Register(ADDON_NAME, brokerObj, OS.DB.minimap)
-    end
+    LDBIcon:Register(ADDON_NAME, brokerObj, OS.DB.minimap)
 end

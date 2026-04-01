@@ -16,7 +16,7 @@ L["STATUS_OFF"]          = "關"
 -- Chat Messages
 --------------------------------------------------------------------------------
 
-L["AUTO_LOOT_ENABLED"]   = "Open Sesame 需要啟用自動拾取。自動拾取已開啟。"
+L["AUTO_LOOT_ENABLED"]   = "Open Sesame 需要啟用自動拾取才能正常運作。自動拾取已啟用。"
 L["PAUSED_BAG_SLOTS"]    = "已暫停，直到背包有至少 %d 個空位。"
 L["RESUMED"]             = "已恢復。"
 L["INVENTORY_FULL"]      = "背包已滿！"
@@ -49,7 +49,7 @@ L["TOOLTIP_HINT"]        = "更多設定請查看 選項 > 插件 > Open Sesame"
 --------------------------------------------------------------------------------
 
 L["OPTIONS_INTRO"]       = "自動開啟背包中的蛤蜊和已解鎖的容器。包含快速拾取功能，讓拾取更加迅速。"
-L["OPTIONS_FEEDBACK"]    = "回饋與支援"
+L["OPTIONS_FEEDBACK"]    = "回饋 & 支援"
 L["OPTIONS_CURSEFORGE"]  = "CurseForge"
 L["OPTIONS_GITHUB"]      = "GitHub"
 L["OPTIONS_DISCORD"]     = "Discord"

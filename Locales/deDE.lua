@@ -16,23 +16,23 @@ L["STATUS_OFF"]          = "Aus"
 -- Chat Messages
 --------------------------------------------------------------------------------
 
-L["AUTO_LOOT_ENABLED"]   = "Automatisches Aufsammeln wird von Open Sesame vorausgesetzt. Es wurde aktiviert."
-L["PAUSED_BAG_SLOTS"]    = "Pausiert, bis mindestens %d Taschenplaetze frei sind."
+L["AUTO_LOOT_ENABLED"]   = "Automatisches Plündern ist erforderlich, damit Open Sesame richtig funktioniert. Automatisches Plündern wurde aktiviert."
+L["PAUSED_BAG_SLOTS"]    = "Pausiert, bis mindestens %d Taschenplätze frei sind."
 L["RESUMED"]             = "Fortgesetzt."
 L["INVENTORY_FULL"]      = "Inventar ist voll!"
-L["ITEM_WILL_AUTO_OPEN"] = "%s wird automatisch geoeffnet, sobald es entsperrt ist."
-L["ITEM_OPEN_MANUALLY"]  = "%s muss manuell geoeffnet werden. Es kann einen einzigartigen, beim Aufheben gebundenen oder temporaeren Gegenstand enthalten oder wurde von einem Raidboss fallen gelassen."
+L["ITEM_WILL_AUTO_OPEN"] = "%s wird automatisch geöffnet, sobald es entsperrt ist."
+L["ITEM_OPEN_MANUALLY"]  = "%s muss manuell geöffnet werden. Es kann einen einzigartigen, beim Aufheben gebundenen oder temporären Gegenstand enthalten oder wurde von einem Schlachtzugsboss fallengelassen."
 
 --------------------------------------------------------------------------------
 -- Features
 --------------------------------------------------------------------------------
 
-L["AUTO_OPENING"]        = "Automatisches Oeffnen"
-L["AUTO_OPENING_DESC"]   = "Oeffnet automatisch Muscheln und entsperrte Behaelter, wenn mehr als 4 Taschenplaetze frei sind."
+L["AUTO_OPENING"]        = "Automatisches Öffnen"
+L["AUTO_OPENING_DESC"]   = "Öffnet automatisch Muscheln und entsperrte Behälter, wenn mehr als 4 Taschenplätze frei sind."
 L["SPEEDY_LOOT"]         = "Schnelle Beute"
 L["SPEEDY_LOOT_DESC"]    = "Blendet das Beutefenster aus, um Beute nahezu sofort aufzusammeln."
-L["LOOT_SOUNDS"]         = "Beutegeraeusche"
-L["LOOT_SOUNDS_DESC"]    = "Spielt einen besonderen Ton ab, wenn ein Gegenstand ungewoehnlicher oder hoeherer Qualitaet erbeutet wird."
+L["LOOT_SOUNDS"]         = "Beutegeräusche"
+L["LOOT_SOUNDS_DESC"]    = "Spielt einen besonderen Ton ab, wenn ein Gegenstand ungewöhnlicher oder höherer Qualität erbeutet wird."
 
 --------------------------------------------------------------------------------
 -- Tooltip
@@ -48,8 +48,8 @@ L["TOOLTIP_HINT"]        = "Weitere Einstellungen unter Optionen > AddOns > Open
 -- Options
 --------------------------------------------------------------------------------
 
-L["OPTIONS_INTRO"]       = "Oeffnet automatisch Muscheln und entsperrte Behaelter im Inventar. Mit Schnelle Beute fuer schnelleres Aufsammeln."
-L["OPTIONS_FEEDBACK"]    = "Feedback und Support"
+L["OPTIONS_INTRO"]       = "Öffnet automatisch Muscheln und entsperrte Behälter im Inventar. Mit Schnelle Beute für schnelleres Aufsammeln."
+L["OPTIONS_FEEDBACK"]    = "Feedback & Support"
 L["OPTIONS_CURSEFORGE"]  = "CurseForge"
 L["OPTIONS_GITHUB"]      = "GitHub"
 L["OPTIONS_DISCORD"]     = "Discord"

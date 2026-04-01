@@ -6,7 +6,7 @@ if not L then return end
 --------------------------------------------------------------------------------
 
 L["ADDON_TITLE"]         = "Open Sesame"
-L["STATUS_ENABLED"]      = "Attivo"
+L["STATUS_ENABLED"]      = "Attivato"
 L["STATUS_DISABLED"]     = "Disattivato"
 L["STATUS_PAUSED"]       = "In pausa"
 L["STATUS_ON"]           = "On"
@@ -16,23 +16,23 @@ L["STATUS_OFF"]          = "Off"
 -- Chat Messages
 --------------------------------------------------------------------------------
 
-L["AUTO_LOOT_ENABLED"]   = "Open Sesame richiede il saccheggio automatico. E' stato attivato."
-L["PAUSED_BAG_SLOTS"]    = "In pausa finche non avrai almeno %d spazi liberi nelle borse."
+L["AUTO_LOOT_ENABLED"]   = "Il Razziamento Automatico è necessario affinché Open Sesame funzioni correttamente. Il Razziamento Automatico è stato attivato."
+L["PAUSED_BAG_SLOTS"]    = "In pausa finché non avrai almeno %d spazi liberi nelle borse."
 L["RESUMED"]             = "Ripreso."
-L["INVENTORY_FULL"]      = "L'inventario e' pieno!"
-L["ITEM_WILL_AUTO_OPEN"] = "%s verra aperto automaticamente una volta sbloccato."
-L["ITEM_OPEN_MANUALLY"]  = "%s deve essere aperto manualmente. Potrebbe contenere un oggetto unico, legato al raccoglimento o temporaneo, oppure e' stato ottenuto da un boss di raid."
+L["INVENTORY_FULL"]      = "L'inventario è pieno!"
+L["ITEM_WILL_AUTO_OPEN"] = "%s verrà aperto automaticamente una volta sbloccato."
+L["ITEM_OPEN_MANUALLY"]  = "%s deve essere aperto manualmente. Potrebbe contenere un oggetto unico, vincolato alla raccolta o temporaneo, oppure è stato rilasciato da un boss di incursione."
 
 --------------------------------------------------------------------------------
 -- Features
 --------------------------------------------------------------------------------
 
 L["AUTO_OPENING"]        = "Apertura automatica"
-L["AUTO_OPENING_DESC"]   = "Apre automaticamente molluschi e contenitori sbloccati quando hai piu di 4 spazi liberi nelle borse."
-L["SPEEDY_LOOT"]         = "Saccheggio rapido"
-L["SPEEDY_LOOT_DESC"]    = "Nasconde la finestra del bottino per un saccheggio quasi istantaneo."
+L["AUTO_OPENING_DESC"]   = "Apre automaticamente molluschi e contenitori sbloccati quando hai più di 4 spazi liberi nelle borse."
+L["SPEEDY_LOOT"]         = "Razziamento rapido"
+L["SPEEDY_LOOT_DESC"]    = "Nasconde la finestra del bottino per un razziamento quasi istantaneo."
 L["LOOT_SOUNDS"]         = "Suoni del bottino"
-L["LOOT_SOUNDS_DESC"]    = "Riproduce un suono speciale quando saccheggi un oggetto di qualita Non comune o superiore."
+L["LOOT_SOUNDS_DESC"]    = "Riproduce un suono speciale quando raccogli un oggetto di qualità Non Comune o superiore."
 
 --------------------------------------------------------------------------------
 -- Tooltip
@@ -48,8 +48,8 @@ L["TOOLTIP_HINT"]        = "Altre impostazioni in Opzioni > AddOn > Open Sesame"
 -- Options
 --------------------------------------------------------------------------------
 
-L["OPTIONS_INTRO"]       = "Apre automaticamente molluschi e contenitori sbloccati nel tuo inventario. Include Saccheggio rapido per un saccheggio piu veloce."
-L["OPTIONS_FEEDBACK"]    = "Feedback e supporto"
+L["OPTIONS_INTRO"]       = "Apre automaticamente molluschi e contenitori sbloccati nel tuo inventario. Include Razziamento rapido per una raccolta più veloce."
+L["OPTIONS_FEEDBACK"]    = "Feedback & Supporto"
 L["OPTIONS_CURSEFORGE"]  = "CurseForge"
 L["OPTIONS_GITHUB"]      = "GitHub"
 L["OPTIONS_DISCORD"]     = "Discord"
