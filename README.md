@@ -18,7 +18,7 @@ Open Sesame automatically opens clams, unlocked containers, and lockboxes sittin
 
 🔐 **Locked Items** : Loot a lockbox and Open Sesame queues it up. The moment a Rogue unlocks it, it opens automatically.
 
-🗺️ **Localized** : Works with all Classic WoW Locales (enUS, deDE, esES, esMX, frFR, itIT, koKR, ptBR, ruRU, zhCN, zhTW).
+🗺️ Localized : Works with all Classic WoW Locales (enUS, deDE, esES, esMX, frFR, itIT, koKR, ptBR, ruRU, zhCN, zhTW).
 
 ## Setup
 
