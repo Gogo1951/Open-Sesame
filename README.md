@@ -1,30 +1,36 @@
 # Open Sesame
 
-Automatically opens clams and unlocked containers in your inventory. Features Speedy Loot for faster looting.
+Open Sesame automatically opens clams, unlocked containers, and lockboxes sitting in your inventory. Pair it with Speedy Loot to hide the loot window entirely and pick up items near-instantly. Less time clicking, more time playing.
 
-<img width="265" src="https://github.com/user-attachments/assets/48e86839-798f-4086-82d1-bcf9c23dc1eb" />
+<img width="360" src="https://github.com/user-attachments/assets/48e86839-798f-4086-82d1-bcf9c23dc1eb" />
 
-## How it Works
+## Features
 
-⚠️ **Important**: Auto Loot must be enabled in your game settings for Open Sesame to function correctly.
+📦 **Auto-Opening** : Opens clams and unlocked containers in the background whenever you have more than 4 free bag slots. No clicks required.
 
-* **Toggle Control** : Left-click the minimap icon to quickly toggle the addon ON or OFF. (It is enabled by default).
-* **Speedy Loot** : This option hides the loot window entirely to achieve significantly faster looting.
-* **Optional Loot Sounds** : Play a sound when you loot a green (or better) item. This is off by default.
-* **Smart Pausing** : Automatically protects your inventory space. The addon pauses when you drop below 4 free bag slots and resumes once you have 5 or more.
-* **Safety First** : Containers will never open during combat, while interacting with NPCs (vendors, mail, quest givers), or if the container holds BoP/Unique items requiring confirmation.
-* **Locked Items** : If you loot a locked item (like a lockbox), Open Sesame attempts to open it automatically the moment you unlock it.
-* **Raid Safe** : To prevent Master Looter accidents or clutter during raids, gem bags dropped by bosses are excluded from auto-opening.
+⚡ **Speedy Loot** : Hides the loot window for near-instant looting. Toggle it from the minimap button or the options panel.
 
-## Download
+🔊 **Loot Sounds** : Plays a distinct sound when you loot an Uncommon or higher quality item. Off by default.
 
-You can find this on Curseforge.
+🧠 **Smart Pausing** : Automatically pauses when you drop below 4 free bag slots and resumes once you free up space. Your bags stay protected.
 
-https://www.curseforge.com/wow/addons/open-sesame
+🦺 **Safety First** : Containers never open during combat, while stealthed, while casting, or while interacting with NPCs. Items that are Bind on Pickup, Unique, or dropped by raid bosses are skipped entirely.
+
+🔐 **Locked Items** : Loot a lockbox and Open Sesame queues it up. The moment a Rogue unlocks it, it opens automatically.
+
+🗺️ **Localized** : Works with all Classic WoW Locales (enUS, deDE, esES, esMX, frFR, itIT, koKR, ptBR, ruRU, zhCN, zhTW).
+
+## Setup
+
+1. Install the addon.
+2. Log in.
+3. Open Sesame starts working immediately — clams and containers open on their own.
+4. Left-click the minimap button to toggle Auto-Opening. Right-click to toggle Speedy Loot. Middle-click to toggle Loot Sounds.
+5. Done — your bags open themselves. (=
 
 ## Testing Status
 
-🟢 World of Warcraft Classic (🟡 Season of Discover)
+🟢 World of Warcraft Classic (🟡 Season of Discovery)
 
 🟢 Burning Crusade Anniversary
 
@@ -34,11 +40,11 @@ https://www.curseforge.com/wow/addons/open-sesame
 
 Please reach out if you would like to be involved with testing!
 
-## Report Issues & Get Involved
+## Links
 
-You can find this project on GitHub // https://github.com/Gogo1951/Open-Sesame
-
-😈 Gogo1951 on Discord // https://discord.gg/eh8hKq992Q
+* [CurseForge](https://www.curseforge.com/wow/addons/open-sesame)
+* [GitHub](https://github.com/Gogo1951/Open-Sesame)
+* [Discord](https://discord.gg/eh8hKq992Q)
 
 ## History
 
