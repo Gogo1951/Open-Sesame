@@ -8,9 +8,9 @@ Open Sesame automatically opens clams, junkboxes, lockboxes, and unlocked contai
 
 📦 **Auto-Opening** // Opens clams, junkboxes, and unlocked containers in the background — no clicks required.
 
-⚡ **Speedy Loot** // Hides the loot window so you can pick up loot near-instantly.
-
 🔐 **Locked Items** // Loot a lockbox and Open Sesame queues it up — the moment it's unlocked, it pops open automatically.
+
+⚡ **Speedy Loot** // Hides the loot window so you can pick up loot near-instantly.
 
 🔊 **Loot Sounds** // Plays a distinct sound when you loot an Uncommon or higher quality item. Off by default.
 
@@ -22,7 +22,7 @@ Open Sesame automatically opens clams, junkboxes, lockboxes, and unlocked contai
 2. Make sure Auto Loot is enabled in your game settings — Open Sesame needs it to function.
 3. Log in. Open Sesame starts working immediately, no setup required.
 4. Left-click the minimap button to toggle Auto-Opening, right-click for Speedy Loot, middle-click for Loot Sounds.
-5. Crack every clam in Azeroth without lifting a finger. (=
+5. Clams, what clams? (=
 
 ## How It Works
 
