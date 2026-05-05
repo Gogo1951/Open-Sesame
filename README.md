@@ -81,10 +81,10 @@ Please reach out if you would like to be involved!
 
 🟡 Some Overlap // Yuyuli's [Speedy AutoLoot](https://www.curseforge.com/wow/addons/speedyautoloot)
 
-🔴 Direct Alternative / Competitor // Dapal003's [Openable be gone](https://www.curseforge.com/wow/addons/auto-open-anything-updated)
+🔴 Direct Alternative // Dapal003's [Openable be gone](https://www.curseforge.com/wow/addons/auto-open-anything-updated)
 
-🔴 Direct Alternative / Competitor // dtabacaru's [Clam Pulp](https://www.curseforge.com/wow/addons/clam-pulp)
+🔴 Direct Alternative // dtabacaru's [Clam Pulp](https://www.curseforge.com/wow/addons/clam-pulp)
 
-🔴 Direct Alternative / Competitor // LazyLoafs_Addons's [Lazy LockBoxes](https://www.curseforge.com/wow/addons/lazy-lockboxes)
+🔴 Direct Alternative // LazyLoafs_Addons's [Lazy LockBoxes](https://www.curseforge.com/wow/addons/lazy-lockboxes)
 
-🔴 Direct Alternative / Competitor // mrmaffen's [Auto Open Anything](https://www.curseforge.com/wow/addons/auto-open-anything)
+🔴 Direct Alternative // mrmaffen's [Auto Open Anything](https://www.curseforge.com/wow/addons/auto-open-anything)
