@@ -22,7 +22,7 @@ Open Sesame automatically opens clams, junkboxes, lockboxes, and unlocked contai
 2. Make sure Auto Loot is enabled in your game settings — Open Sesame needs it to function.
 3. Log in. Open Sesame starts working immediately, no setup required.
 4. Left-click the minimap button to toggle Auto-Opening, right-click for Speedy Loot, middle-click for Loot Sounds.
-5. Clams, what clams? (=
+5. Frankly, my dear, I don't give a clam.
 
 ## How It Works
 
@@ -33,6 +33,7 @@ Open Sesame automatically opens clams, junkboxes, lockboxes, and unlocked contai
 | Left-click | Toggle Auto-Opening on or off |
 | Right-click | Toggle Speedy Loot on or off |
 | Middle-click | Toggle Loot Sounds on or off |
+
 
 ## Testing & Localization Status
 
@@ -66,14 +67,24 @@ Please reach out if you would like to be involved!
 
 ## Related Add-ons
 
-* 🟢 Pairs With // gogo1951's [GogoLoot](https://www.curseforge.com/wow/addons/gogoloot)
-* 🟡 Some Overlap // FoobarZA's [FasterLoot](https://www.curseforge.com/wow/addons/fasterloot)
-* 🟡 Some Overlap // Hyphie24's [LockboxHelper](https://www.curseforge.com/wow/addons/unlockhelper)
-* 🟡 Some Overlap // Lotimar's [Locksmith](https://www.curseforge.com/wow/addons/locksmith)
-* 🟡 Some Overlap // Michigras's [Lockbox Cracker](https://www.curseforge.com/wow/addons/lockbox-cracker)
-* 🟡 Some Overlap // Xarano's [Faster Loot](https://www.curseforge.com/wow/addons/faster-loot)
-* 🟡 Some Overlap // Yuyuli's [Speedy AutoLoot](https://www.curseforge.com/wow/addons/speedyautoloot)
-* 🔴 Direct Alternative / Competitor // Dapal003's [Openable be gone](https://www.curseforge.com/wow/addons/auto-open-anything-updated)
-* 🔴 Direct Alternative / Competitor // dtabacaru's [Clam Pulp](https://www.curseforge.com/wow/addons/clam-pulp)
-* 🔴 Direct Alternative / Competitor // LazyLoafs_Addons's [Lazy LockBoxes](https://www.curseforge.com/wow/addons/lazy-lockboxes)
-* 🔴 Direct Alternative / Competitor // mrmaffen's [Auto Open Anything](https://www.curseforge.com/wow/addons/auto-open-anything)
+🟢 Pairs With // gogo1951's [GogoLoot](https://www.curseforge.com/wow/addons/gogoloot)
+
+🟡 Some Overlap // FoobarZA's [FasterLoot](https://www.curseforge.com/wow/addons/fasterloot)
+
+🟡 Some Overlap // Hyphie24's [LockboxHelper](https://www.curseforge.com/wow/addons/unlockhelper)
+
+🟡 Some Overlap // Lotimar's [Locksmith](https://www.curseforge.com/wow/addons/locksmith)
+
+🟡 Some Overlap // Michigras's [Lockbox Cracker](https://www.curseforge.com/wow/addons/lockbox-cracker)
+
+🟡 Some Overlap // Xarano's [Faster Loot](https://www.curseforge.com/wow/addons/faster-loot)
+
+🟡 Some Overlap // Yuyuli's [Speedy AutoLoot](https://www.curseforge.com/wow/addons/speedyautoloot)
+
+🔴 Direct Alternative / Competitor // Dapal003's [Openable be gone](https://www.curseforge.com/wow/addons/auto-open-anything-updated)
+
+🔴 Direct Alternative / Competitor // dtabacaru's [Clam Pulp](https://www.curseforge.com/wow/addons/clam-pulp)
+
+🔴 Direct Alternative / Competitor // LazyLoafs_Addons's [Lazy LockBoxes](https://www.curseforge.com/wow/addons/lazy-lockboxes)
+
+🔴 Direct Alternative / Competitor // mrmaffen's [Auto Open Anything](https://www.curseforge.com/wow/addons/auto-open-anything)
