@@ -1,44 +1,52 @@
 # Open Sesame
 
-Open Sesame automatically opens clams, unlocked containers, and lockboxes sitting in your inventory. Pair it with Speedy Loot to hide the loot window entirely and pick up items near-instantly. Less time clicking, more time playing.
+Open Sesame automatically opens clams, junkboxes, lockboxes, and unlocked containers in your bags. Built-in Speedy Loot hides the loot window for near-instant looting. Less time clicking, more time playing.
 
 <img width="360" src="https://github.com/user-attachments/assets/48e86839-798f-4086-82d1-bcf9c23dc1eb" />
 
 ## Features
 
-📦 **Auto-Opening** : Opens clams and unlocked containers in the background whenever you have more than 4 free bag slots. No clicks required.
+📦 **Auto-Opening** // Opens clams, junkboxes, and unlocked containers in the background — no clicks required.
 
-⚡ **Speedy Loot** : Hides the loot window for near-instant looting. Toggle it from the minimap button or the options panel.
+⚡ **Speedy Loot** // Hides the loot window so you can pick up loot near-instantly.
 
-🔊 **Loot Sounds** : Plays a distinct sound when you loot an Uncommon or higher quality item. Off by default.
+🔐 **Locked Items** // Loot a lockbox and Open Sesame queues it up — the moment it's unlocked, it pops open automatically.
 
-🧠 **Smart Pausing** : Automatically pauses when you drop below 4 free bag slots and resumes once you free up space. Your bags stay protected.
+🔊 **Loot Sounds** // Plays a distinct sound when you loot an Uncommon or higher quality item. Off by default.
 
-🦺 **Safety First** : Containers never open during combat, while stealthed, while casting, or while interacting with NPCs. Items that are Bind on Pickup, Unique, or dropped by raid bosses are skipped entirely.
-
-🔐 **Locked Items** : Loot a lockbox and Open Sesame queues it up. The moment a Rogue unlocks it, it opens automatically.
-
-🗺️ Localized : Works with all Classic WoW Locales (enUS, deDE, esES, esMX, frFR, itIT, koKR, ptBR, ruRU, zhCN, zhTW).
+🦺 **Safety First** // Combat, casting, low bag space, Bind on Pickup, Unique, and raid-boss items are all skipped automatically — your bags stay protected.
 
 ## Setup
 
-1. Install the addon.
-2. Log in.
-3. Open Sesame starts working immediately — clams and containers open on their own.
-4. Left-click the minimap button to toggle Auto-Opening. Right-click to toggle Speedy Loot. Middle-click to toggle Loot Sounds.
-5. Done — your bags open themselves. (=
+1. Install the add-on, ideally using [CurseForge](https://www.curseforge.com/wow/addons/open-sesame).
+2. Make sure Auto Loot is enabled in your game settings — Open Sesame needs it to function.
+3. Log in. Open Sesame starts working immediately, no setup required.
+4. Left-click the minimap button to toggle Auto-Opening, right-click for Speedy Loot, middle-click for Loot Sounds.
+5. Crack every clam in Azeroth without lifting a finger. (=
 
-## Testing Status
+## How It Works
 
-🟢 World of Warcraft Classic (🟡 Season of Discovery)
+### Minimap Button
 
-🟢 Burning Crusade Anniversary
+| Action | Effect |
+| --- | --- |
+| Left-click | Toggle Auto-Opening on or off |
+| Right-click | Toggle Speedy Loot on or off |
+| Middle-click | Toggle Loot Sounds on or off |
 
-🔴 Mists of Pandaria Classic
+## Testing & Localization Status
 
-🔴 World of Warcraft
+🟢 World of Warcraft Classic (🟡 Season of Discovery) // WoW 1.15.8
 
-Please reach out if you would like to be involved with testing!
+🟢 Burning Crusade Anniversary // WoW 2.5.5
+
+🔴 Mists of Pandaria Classic // WoW 5.5.3
+
+🔴 World of Warcraft // WoW 12.0.5
+
+**Localization Status** // Works with all Classic WoW Locales (enUS, deDE, esES, esMX, frFR, itIT, koKR, ptBR, ruRU, zhCN, zhTW).
+
+Please reach out if you would like to be involved!
 
 ## Links
 
@@ -48,13 +56,24 @@ Please reach out if you would like to be involved with testing!
 
 ## History
 
-👏 **I didn't create this add-on, I just updated it for TBC and Wrath.**
+👾 **I didn't create this add-on, I just updated it.**
 
-Looking around CurseForge, it looks like the bulk of the original code came from kAutoOpen.
-
-* [Auto Open Items](https://www.curseforge.com/wow/addons/auto-open-items)
-* [AutoClam](https://www.curseforge.com/wow/addons/autoclam)
-* [AutoOpen](https://www.curseforge.com/wow/addons/autoopen)
-* [kAutoOpen Dragonflight](https://www.curseforge.com/wow/addons/kautoopen-dragonflight)
-* [kAutoOpen](https://www.curseforge.com/wow/addons/kautoopen)
+* lord_glofuss's [Auto Open Items](https://www.curseforge.com/wow/addons/auto-open-items)
+* pipsqueakcurse's [AutoClam](https://www.curseforge.com/wow/addons/autoclam)
+* fr0z3nights' [kAutoOpen Dragonflight](https://www.curseforge.com/wow/addons/kautoopen-dragonflight)
+* _ForgeUser1016257's [kAutoOpen](https://www.curseforge.com/wow/addons/kautoopen)
 * [Openables (Weak Aura)](https://wago.io/gtRVJZetK)
+
+## Related Add-ons
+
+* 🟢 Pairs With // gogo1951's [GogoLoot](https://www.curseforge.com/wow/addons/gogoloot)
+* 🟡 Some Overlap // FoobarZA's [FasterLoot](https://www.curseforge.com/wow/addons/fasterloot)
+* 🟡 Some Overlap // Hyphie24's [LockboxHelper](https://www.curseforge.com/wow/addons/unlockhelper)
+* 🟡 Some Overlap // Lotimar's [Locksmith](https://www.curseforge.com/wow/addons/locksmith)
+* 🟡 Some Overlap // Michigras's [Lockbox Cracker](https://www.curseforge.com/wow/addons/lockbox-cracker)
+* 🟡 Some Overlap // Xarano's [Faster Loot](https://www.curseforge.com/wow/addons/faster-loot)
+* 🟡 Some Overlap // Yuyuli's [Speedy AutoLoot](https://www.curseforge.com/wow/addons/speedyautoloot)
+* 🔴 Direct Alternative / Competitor // Dapal003's [Openable be gone](https://www.curseforge.com/wow/addons/auto-open-anything-updated)
+* 🔴 Direct Alternative / Competitor // dtabacaru's [Clam Pulp](https://www.curseforge.com/wow/addons/clam-pulp)
+* 🔴 Direct Alternative / Competitor // LazyLoafs_Addons's [Lazy LockBoxes](https://www.curseforge.com/wow/addons/lazy-lockboxes)
+* 🔴 Direct Alternative / Competitor // mrmaffen's [Auto Open Anything](https://www.curseforge.com/wow/addons/auto-open-anything)
