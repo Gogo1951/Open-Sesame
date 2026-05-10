@@ -70,7 +70,7 @@ frame:SetScript(
         -- no selectedLootButton, which crashes on a nil colorInfo.
         local lootMethod, mlPartyID = GetLootMethodCompat()
         local isMasterLooter = (lootMethod == "master" and mlPartyID == 0)
-        local lootThreshold = (GetLootThreshold and GetLootThreshold()) or 2
+        local lootThreshold = (GetLootThreshold and GetLootThreshold()) or 2 -- 2 = Uncommon
 
         local freeSlots = OS.GetFreeSlots()
 
