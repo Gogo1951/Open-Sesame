@@ -7,6 +7,29 @@ local ADDON_NAME, OS = ...
 local L = OS.L
 
 --------------------------------------------------------------------------------
+-- API Compatibility
+--------------------------------------------------------------------------------
+
+-- Pick the auto-loot CVar API by availability, not by truthy result. The
+-- previous `(modern call) or (legacy call)` pattern fell through to the
+-- legacy check whenever the modern API returned false (auto-loot off).
+local IsAutoLootEnabled
+if C_CVar and C_CVar.GetCVarBool then
+    IsAutoLootEnabled = function() return C_CVar.GetCVarBool("autoLootDefault") end
+else
+    IsAutoLootEnabled = function() return GetCVar("autoLootDefault") == "1" end
+end
+
+local GetLootMethodCompat
+if C_PartyInfo and C_PartyInfo.GetLootMethod then
+    GetLootMethodCompat = function() return C_PartyInfo.GetLootMethod() end
+elseif GetLootMethod then
+    GetLootMethodCompat = GetLootMethod
+else
+    GetLootMethodCompat = function() return "freeforall" end
+end
+
+--------------------------------------------------------------------------------
 -- Speedy Loot
 --------------------------------------------------------------------------------
 
@@ -19,7 +42,7 @@ frame:SetScript(
             return
         end
 
-        local autoLoot = (C_CVar and C_CVar.GetCVarBool("autoLootDefault")) or GetCVar("autoLootDefault") == "1"
+        local autoLoot = IsAutoLootEnabled()
         local modified = IsModifiedClick("AUTOLOOTTOGGLE")
         local shouldAutoLoot = (autoLoot ~= modified)
 
@@ -41,7 +64,21 @@ frame:SetScript(
             LootFrame:Hide()
         end
 
+        -- Skip auto-loot for items Blizzard wants to route through the
+        -- Master Looter dialog. Calling LootSlot on a threshold item
+        -- when we're the master looter pops MasterLooterFrame_Show with
+        -- no selectedLootButton, which crashes on a nil colorInfo.
+        local lootMethod, mlPartyID = GetLootMethodCompat()
+        local isMasterLooter = (lootMethod == "master" and mlPartyID == 0)
+        local lootThreshold = (GetLootThreshold and GetLootThreshold()) or 2 -- 2 = Uncommon
+
+        local freeSlots = OS.GetFreeSlots()
+
         for slot = numItems, 1, -1 do
+            if freeSlots <= 0 then
+                break
+            end
+
             local link = GetLootSlotLink(slot)
             local shouldLoot = true
 
@@ -62,8 +99,19 @@ frame:SetScript(
                 end
             end
 
-            if shouldLoot and OS.GetFreeSlots() > 0 then
+            if shouldLoot and isMasterLooter then
+                local _, _, _, _, quality = GetLootSlotInfo(slot)
+                if quality and quality >= lootThreshold then
+                    shouldLoot = false
+                    if LootFrame then
+                        LootFrame:Show()
+                    end
+                end
+            end
+
+            if shouldLoot then
                 LootSlot(slot)
+                freeSlots = freeSlots - 1
             end
         end
         OS.state.lastLootAt = now

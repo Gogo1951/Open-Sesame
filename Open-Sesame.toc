@@ -1,5 +1,5 @@
 ## Title: Open Sesame
-## Notes: Automatically opens clams and unlocked containers in your inventory. Features Speedy Loot for faster looting.
+## Notes: Open Sesame automatically opens clams, lockboxes, and unlocked containers in your bags. Built-in Speedy Loot hides the loot window for near-instant looting. Less time clicking, more time playing.
 ## Author: Gogo1951
 
 ## IconTexture: Interface/AddOns/Open-Sesame/Open-Sesame.tga
@@ -10,8 +10,6 @@
 ## Version: @project-version@
 ## X-Curse-Project-ID: 830638
 
-## X-Discord: https://discord.gg/eh8hKq992Q
-
 ## SavedVariables: OpenSesameDB
 
 # Includes
@@ -21,7 +19,6 @@ Includes/AceLocale-3.0/AceLocale-3.0.lua
 Includes/AceGUI-3.0/AceGUI-3.0.xml
 Includes/AceConfig-3.0/AceConfigRegistry-3.0/AceConfigRegistry-3.0.lua
 Includes/AceConfig-3.0/AceConfigDialog-3.0/AceConfigDialog-3.0.lua
-Includes/AceConfig-3.0/AceConfig-3.0.lua
 Includes/LibDataBroker-1.1/LibDataBroker-1.1.lua
 Includes/LibDBIcon-1.0/LibDBIcon-1.0.lua
 

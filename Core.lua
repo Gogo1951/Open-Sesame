@@ -14,7 +14,14 @@ local CreateFrame, C_Timer, UnitAffectingCombat, GetTime = CreateFrame, C_Timer,
 local tonumber, wipe, UnitRace, UnitSex = tonumber, wipe, UnitRace, UnitSex
 local UnitCastingInfo, UnitChannelInfo = UnitCastingInfo, UnitChannelInfo
 
-local UnitBuff = (C_UnitAuras and C_UnitAuras.GetBuffDataByIndex) or _G.UnitBuff
+local function GetPlayerBuffSpellID(index)
+    if C_UnitAuras and C_UnitAuras.GetBuffDataByIndex then
+        local data = C_UnitAuras.GetBuffDataByIndex("player", index)
+        return data and data.spellId
+    end
+    local _, _, _, _, _, _, _, _, _, spellID = _G.UnitBuff("player", index)
+    return spellID
+end
 local GetCVarBool = (C_CVar and C_CVar.GetCVarBool) or function(cvar)
         return GetCVar(cvar) == "1"
     end
@@ -64,6 +71,17 @@ local function EnsureAutoLoot()
     end
 end
 
+local function PrintWelcome()
+    if not OS.DB.showWelcome then
+        return
+    end
+    local msg = L["CHAT_LOADED"]
+    if msg:find("@") then
+        msg = msg:gsub("@project%-version@", "Dev")
+    end
+    OS.Print(msg)
+end
+
 local function PlayBagFullSound()
     local _, raceEn = UnitRace("player")
     local gender = UnitSex("player")
@@ -95,7 +113,7 @@ local function IsPlayerStealthed()
         return true
     end
     for buffIndex = 1, 40 do
-        local _, _, _, _, _, _, _, _, _, spellID = UnitBuff("player", buffIndex)
+        local spellID = GetPlayerBuffSpellID(buffIndex)
         if not spellID then
             break
         end
@@ -304,6 +322,9 @@ function EventHandlers:PLAYER_LOGIN()
     if OS.DB.lootSounds == nil then
         OS.DB.lootSounds = false
     end
+    if OS.DB.showWelcome == nil then
+        OS.DB.showWelcome = true
+    end
 
     OS.isEnabled = OS.DB.autoOpen
     OS.isSpeedyLoot = OS.DB.speedyLoot
@@ -312,6 +333,7 @@ function EventHandlers:PLAYER_LOGIN()
         OS.InitMinimap()
     end
     OS.UpdateMinimapIcon()
+    PrintWelcome()
 end
 
 function EventHandlers:PLAYER_ENTERING_WORLD(isInitialLogin, isReloadingUi)
