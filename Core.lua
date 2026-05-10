@@ -1,509 +1,219 @@
-local ADDON_NAME, OS = ...
+local _, namespace = ...
+local L = namespace.L
 
 --------------------------------------------------------------------------------
--- Libraries
+-- Constants
 --------------------------------------------------------------------------------
 
-local L = OS.L
+local ERROR_ID_LOCKED_CHEST = namespace.ERROR_ID_LOCKED_CHEST
+local ANNOUNCE_COOLDOWN = namespace.ANNOUNCE_COOLDOWN
 
 --------------------------------------------------------------------------------
--- API References
+-- Performance Aliases
 --------------------------------------------------------------------------------
 
-local CreateFrame, C_Timer, UnitAffectingCombat, GetTime = CreateFrame, C_Timer, UnitAffectingCombat, GetTime
-local tonumber, wipe, UnitRace, UnitSex = tonumber, wipe, UnitRace, UnitSex
-local UnitCastingInfo, UnitChannelInfo = UnitCastingInfo, UnitChannelInfo
+-- Only aliasing hot-path globals and long C_Map paths; ChatFrame_OpenChat is
+-- called at most once per cooldown window so it stays unaliased.
+local GetTime = GetTime
+local IsInInstance = IsInInstance
+local InCombatLockdown = InCombatLockdown
+local format = string.format
 
-local function GetPlayerBuffSpellID(index)
-    if C_UnitAuras and C_UnitAuras.GetBuffDataByIndex then
-        local data = C_UnitAuras.GetBuffDataByIndex("player", index)
-        return data and data.spellId
-    end
-    local _, _, _, _, _, _, _, _, _, spellID = _G.UnitBuff("player", index)
-    return spellID
+-- C_Map may be nil on very early Classic builds; each reference is guarded at
+-- the call site in AnnounceNode().
+local GetBestMapForUnit = C_Map and C_Map.GetBestMapForUnit
+local GetPlayerMapPosition = C_Map and C_Map.GetPlayerMapPosition
+local GetMapInfo = C_Map and C_Map.GetMapInfo
+
+--------------------------------------------------------------------------------
+-- State
+--------------------------------------------------------------------------------
+
+local lastAnnounceTime = 0
+
+--------------------------------------------------------------------------------
+-- Error Mapping
+--------------------------------------------------------------------------------
+
+-- Maps either a numeric error ID or a localized profession-skill substring to
+-- the data needed to build the announcement.  Locked chests use the integer
+-- because Blizzard fires a stable error ID.  Herb and mining nodes fire a
+-- generic "Requires <Skill>" message, so we match on the localized skill name.
+local ERROR_MAPPING = {
+    [ERROR_ID_LOCKED_CHEST] = {
+        role        = L["ROGUES"],
+        prefix      = L["PREFIX_LOCKED"],
+        defaultNode = L["DEFAULT_TREASURE"],
+        action      = L["ACTION_OPEN"],
+    },
+    [L["MATCH_HERB"]] = {
+        role        = L["HERBALISTS"],
+        prefix      = L["PREFIX_HERB"],
+        defaultNode = L["DEFAULT_HERB"],
+        action      = L["ACTION_PICK"],
+    },
+    [L["MATCH_MINE"]] = {
+        role        = L["MINERS"],
+        prefix      = L["PREFIX_MINE"],
+        defaultNode = L["DEFAULT_MINE"],
+        action      = L["ACTION_MINE"],
+    },
+}
+
+--------------------------------------------------------------------------------
+-- Utility Functions
+--------------------------------------------------------------------------------
+
+local function GetNodeName()
+    local tooltipLine = _G.GameTooltipTextLeft1
+    return tooltipLine and tooltipLine:GetText()
 end
-local GetCVarBool = (C_CVar and C_CVar.GetCVarBool) or function(cvar)
-        return GetCVar(cvar) == "1"
+
+local function MatchError(messageID, message)
+    -- Fast path: locked chests fire a known numeric ID.
+    if ERROR_MAPPING[messageID] then
+        return ERROR_MAPPING[messageID]
     end
-local SetCVar = (C_CVar and C_CVar.SetCVar) or _G.SetCVar
 
---------------------------------------------------------------------------------
--- Flags
---------------------------------------------------------------------------------
+    if not message then
+        return nil
+    end
 
-OS.isEnabled = true
-OS.isPaused = false
-OS.isSpeedyLoot = true
+    -- Slow path: profession errors only give us a localized message string,
+    -- so we scan for a substring match against the skill name.
+    local lowerMessage = string.lower(message)
+    for key, mapping in pairs(ERROR_MAPPING) do
+        if type(key) == "string" and string.find(lowerMessage, string.lower(key), 1, true) then
+            return mapping
+        end
+    end
 
---------------------------------------------------------------------------------
--- Helper Functions
---------------------------------------------------------------------------------
-
-local function IsQuiet()
-    return GetTime() < OS.state.quietUntil
+    return nil
 end
 
-local function SetQuiet(seconds)
-    local untilTimestamp = GetTime() + (seconds or 0)
-    if untilTimestamp > OS.state.quietUntil then
-        OS.state.quietUntil = untilTimestamp
-    end
-end
+--------------------------------------------------------------------------------
+-- Announcement Logic
+--------------------------------------------------------------------------------
 
-local function StatusPrint(msg, ...)
-    if IsQuiet() then
+local function AnnounceNode(mapping)
+    if IsInInstance() then
         return
     end
-    local text = (...) and string.format(msg, ...) or msg
+
+    -- Opening the chat editbox in combat steals keyboard focus and breaks
+    -- WASD movement, so suppress announcements until combat ends.
+    if InCombatLockdown() then
+        return
+    end
+
     local now = GetTime()
-    if text == OS.state.lastStatusMsg and (now - OS.state.lastStatusAt) < 5 then
+    if now - lastAnnounceTime < ANNOUNCE_COOLDOWN then
         return
     end
-    OS.state.lastStatusMsg, OS.state.lastStatusAt = text, now
-    OS.Print(text)
-end
-OS.StatusPrint = StatusPrint
 
-local function EnsureAutoLoot()
-    if not GetCVarBool("autoLootDefault") then
-        SetCVar("autoLootDefault", "1")
-        OS.Print(L["AUTO_LOOT_ENABLED"])
+    -- C_Map APIs are nil on some Classic Era builds where world-map position
+    -- tracking was added later.  Bail gracefully rather than error.
+    if not GetBestMapForUnit or not GetPlayerMapPosition or not GetMapInfo then
+        return
     end
+
+    local mapID = GetBestMapForUnit("player")
+    if not mapID then
+        return
+    end
+
+    local position = GetPlayerMapPosition(mapID, "player")
+    if not position then
+        return
+    end
+
+    local mapInfo = GetMapInfo(mapID)
+    if not mapInfo or not mapInfo.name then
+        return
+    end
+
+    local nodeName = GetNodeName() or mapping.defaultNode
+    if not nodeName or nodeName == "" then
+        return
+    end
+
+    -- English indefinite article correction: "a Arcane Crystal" → "an Arcane Crystal"
+    local currentPrefix = mapping.prefix
+    local currentLocale = GetLocale()
+    if (currentLocale == "enUS" or currentLocale == "enGB")
+        and currentPrefix == "a"
+        and string.find(nodeName, "^[AEIOUaeiou]")
+    then
+        currentPrefix = "an"
+    end
+
+    local announcement = format(
+        L["MSG_FORMAT"],
+        mapping.role,
+        currentPrefix,
+        nodeName,
+        mapping.action,
+        format("%.0f", position.x * 100),
+        format("%.0f", position.y * 100),
+        mapInfo.name
+    )
+
+    -- Don't clobber a draft the user is already typing in the editbox.
+    if ChatFrame1EditBox and ChatFrame1EditBox:IsShown() then
+        return
+    end
+
+    ChatFrame_OpenChat("/1 " .. announcement, ChatFrame1)
+    lastAnnounceTime = now
+end
+
+--------------------------------------------------------------------------------
+-- Chat
+--------------------------------------------------------------------------------
+
+local GetColor = namespace.GetColor
+
+local function PrintMessage(msg)
+    print(GetColor("INFO") .. "Come & Get It" .. "|r "
+        .. GetColor("SEP") .. "//" .. "|r "
+        .. GetColor("TEXT") .. msg .. "|r")
 end
 
 local function PrintWelcome()
-    if not OS.DB.showWelcome then
-        return
-    end
-    local msg = L["CHAT_LOADED"]
-    if msg:find("@") then
-        msg = msg:gsub("@project%-version@", "Dev")
-    end
-    OS.Print(msg)
-end
-
-local function PlayBagFullSound()
-    local _, raceEn = UnitRace("player")
-    local gender = UnitSex("player")
-    if raceEn and OS.RACE_SOUNDS[raceEn] and OS.RACE_SOUNDS[raceEn][gender] then
-        PlaySound(OS.RACE_SOUNDS[raceEn][gender], "Master")
-    else
-        PlaySound(846, "Master")
-    end
-end
-
-local scanTooltip = CreateFrame("GameTooltip", "OS_ScanTooltip", nil, "GameTooltipTemplate")
-scanTooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
-
-local function IsItemLocked(bag, slot)
-    scanTooltip:ClearLines()
-    scanTooltip:SetBagItem(bag, slot)
-    for lineIndex = 1, scanTooltip:NumLines() do
-        local line = _G["OS_ScanTooltipTextLeft" .. lineIndex]
-        local text = line and line:GetText()
-        if text and text == LOCKED then
-            return true
-        end
-    end
-    return false
-end
-
-local function IsPlayerStealthed()
-    if _G.IsStealthed and _G.IsStealthed() then
-        return true
-    end
-    for buffIndex = 1, 40 do
-        local spellID = GetPlayerBuffSpellID(buffIndex)
-        if not spellID then
-            break
-        end
-        if spellID == OS.SPELLS.SHADOWMELD then
-            return true
-        end
-    end
-    return false
-end
-
-local function IsInteractionActive()
-    if C_PlayerInteractionManager and C_PlayerInteractionManager.GetInteractionType then
-        local interactionType = C_PlayerInteractionManager.GetInteractionType()
-        if interactionType and (interactionType ~= 0) then
-            return true
-        end
-    end
-    return (MerchantFrame and MerchantFrame:IsShown()) or (MailFrame and MailFrame:IsShown()) or
-        (TradeFrame and TradeFrame:IsShown()) or
-        (BankFrame and BankFrame:IsShown()) or
-        (GossipFrame and GossipFrame:IsShown()) or
-        (QuestFrame and QuestFrame:IsShown()) or
-        (StaticPopup1 and StaticPopup1:IsShown())
-end
-
-local function IsSafeToOpen()
-    if not OS.isEnabled or OS.isPaused then
-        return false
-    end
-    if UnitAffectingCombat("player") or IsInteractionActive() or IsPlayerStealthed() then
-        return false
-    end
-    if (UnitCastingInfo and UnitCastingInfo("player")) or (UnitChannelInfo and UnitChannelInfo("player")) then
-        return false
-    end
-
-    if GameTooltip:IsShown() then
-        local hasItem, itemLink = GameTooltip:GetItem()
-        if hasItem or itemLink then
-            return false
-        end
-    end
-
-    OS.state.lastFreeSlots = OS.GetFreeSlots()
-    return OS.state.lastFreeSlots >= OS.MIN_FREE_SLOTS
-end
-
-local function ShouldPause(free)
-    return OS.isPaused and free < (OS.MIN_FREE_SLOTS + 1) or free < OS.MIN_FREE_SLOTS
+    if not ComeAndGetItDB.showWelcome then return end
+    PrintMessage(format(L["CHAT_LOADED"], namespace.Version))
 end
 
 --------------------------------------------------------------------------------
--- Queue System
+-- Saved Variables
 --------------------------------------------------------------------------------
 
-local queue, queueHead, queueTail = {}, 1, 0
-
-local function QueuePush(bag, slot, itemId)
-    queueTail = queueTail + 3
-    queue[queueTail - 2], queue[queueTail - 1], queue[queueTail] = bag, slot, itemId
-end
-
-local function QueuePop()
-    if queueHead > queueTail then
-        return nil
-    end
-    local bag, slot, itemId = queue[queueHead], queue[queueHead + 1], queue[queueHead + 2]
-    queueHead = queueHead + 3
-    if queueHead > queueTail then
-        wipe(queue)
-        queueHead, queueTail = 1, 0
-    end
-    return bag, slot, itemId
-end
-
-local function SafeFastItemID(bag, slot)
-    local itemId = OS.GetContainerItemID(bag, slot)
-    if itemId then
-        return itemId
-    end
-    local link = OS.GetContainerItemLink(bag, slot)
-    return link and tonumber(link:match("item:(%d+)"))
-end
-
-local function BuildQueue()
-    wipe(queue)
-    queueHead, queueTail = 1, 0
-    for bag = 0, 4 do
-        local slots = OS.GetContainerNumSlots(bag)
-        for slot = 1, slots or 0 do
-            local itemId = SafeFastItemID(bag, slot)
-            if itemId then
-                local allowed = OS.AllowedItems[itemId]
-                if allowed == true or (allowed == false and not IsItemLocked(bag, slot)) then
-                    QueuePush(bag, slot, itemId)
-                end
-            end
-        end
-    end
-end
-
-local function OpenTick()
-    OS.state.openTimerLive = false
-    if (UnitCastingInfo and UnitCastingInfo("player")) or (UnitChannelInfo and UnitChannelInfo("player")) then
-        OS.state.openTimerLive = true
-        C_Timer.After(OS.OPEN_TICK_INTERVAL, OpenTick)
-        return
-    end
-    if not IsSafeToOpen() then
-        return
-    end
-
-    local bag, slot, cachedId = QueuePop()
-    if not bag then
-        return
-    end
-
-    if SafeFastItemID(bag, slot) == cachedId then
-        PlaySound(565975, "Master")
-        OS.UseContainerItem(bag, slot)
-        C_Timer.After(
-            0.25,
-            function()
-                local still = SafeFastItemID(bag, slot)
-                if still == cachedId then
-                    local allowed = OS.AllowedItems[still]
-                    if allowed == true or (allowed == false and not IsItemLocked(bag, slot)) then
-                        QueuePush(bag, slot, still)
-                    end
-                end
-                if IsSafeToOpen() and not OS.state.openTimerLive and queueHead <= queueTail then
-                    OS.state.openTimerLive = true
-                    C_Timer.After(OS.OPEN_TICK_INTERVAL, OpenTick)
-                end
-            end
-        )
-    end
-    if queueHead <= queueTail then
-        OS.state.openTimerLive = true
-        C_Timer.After(OS.OPEN_TICK_INTERVAL, OpenTick)
-    end
-end
-
-local function ScheduleScan(force)
-    local function run()
-        OS.state.scanPending = false
-        OS.state.lastFreeSlots = OS.GetFreeSlots()
-        if OS.isEnabled then
-            local shouldPause = ShouldPause(OS.state.lastFreeSlots)
-            if shouldPause ~= OS.isPaused then
-                OS.isPaused = shouldPause
-                if shouldPause then
-                    OS.state.openTimerLive = false
-                    StatusPrint(L["PAUSED_BAG_SLOTS"], OS.MIN_FREE_SLOTS)
-                else
-                    StatusPrint(L["RESUMED"])
-                end
-                if OS.UpdateMinimapIcon then
-                    OS.UpdateMinimapIcon()
-                end
-            end
-        end
-        BuildQueue()
-        if IsSafeToOpen() and not OS.state.openTimerLive and queueHead <= queueTail then
-            OS.state.openTimerLive = true
-            C_Timer.After(OS.OPEN_TICK_INTERVAL, OpenTick)
-        end
-    end
-
-    if force then
-        run()
-        return
-    end
-    local wantAt = GetTime() + OS.SCAN_DEBOUNCE
-    if OS.state.scanPending and wantAt >= OS.state.scanTimerAt then
-        return
-    end
-    OS.state.scanPending, OS.state.scanTimerAt = true, wantAt
-    C_Timer.After(
-        OS.SCAN_DEBOUNCE,
-        function()
-            if GetTime() >= OS.state.scanTimerAt then
-                run()
-            end
-        end
-    )
-end
-OS.ScheduleScan = ScheduleScan
-
---------------------------------------------------------------------------------
--- PLAYER_LOGIN, PLAYER_ENTERING_WORLD
---------------------------------------------------------------------------------
-
-local EventHandlers = {}
-
-function EventHandlers:PLAYER_LOGIN()
-    OpenSesameDB = OpenSesameDB or {}
-    OpenSesameDB.minimap = OpenSesameDB.minimap or {}
-    OS.DB = OpenSesameDB
-    if OS.DB.autoOpen == nil then
-        OS.DB.autoOpen = true
-    end
-    if OS.DB.speedyLoot == nil then
-        OS.DB.speedyLoot = true
-    end
-    if OS.DB.lootSounds == nil then
-        OS.DB.lootSounds = false
-    end
-    if OS.DB.showWelcome == nil then
-        OS.DB.showWelcome = true
-    end
-
-    OS.isEnabled = OS.DB.autoOpen
-    OS.isSpeedyLoot = OS.DB.speedyLoot
-
-    if OS.InitMinimap then
-        OS.InitMinimap()
-    end
-    OS.UpdateMinimapIcon()
-    PrintWelcome()
-end
-
-function EventHandlers:PLAYER_ENTERING_WORLD(isInitialLogin, isReloadingUi)
-    if isInitialLogin or isReloadingUi then
-        C_Timer.After(
-            OS.WORLD_LOAD_DELAY,
-            function()
-                OS.state.lastFreeSlots = OS.GetFreeSlots()
-                if OS.isEnabled then
-                    OS.isPaused =
-                        (OS.isPaused and OS.state.lastFreeSlots < (OS.MIN_FREE_SLOTS + 1)) or
-                        (OS.state.lastFreeSlots < OS.MIN_FREE_SLOTS)
-                    OS.ScheduleScan(true)
-                    EnsureAutoLoot()
-                end
-                OS.UpdateMinimapIcon()
-            end
-        )
-    else
-        SetQuiet(2)
+local function InitSavedVariables()
+    ComeAndGetItDB = ComeAndGetItDB or {}
+    if ComeAndGetItDB.showWelcome == nil then
+        ComeAndGetItDB.showWelcome = true
     end
 end
 
 --------------------------------------------------------------------------------
--- Combat, Stealth, Spellcast
---------------------------------------------------------------------------------
-
-function EventHandlers:PLAYER_REGEN_ENABLED()
-    if OS.isEnabled then
-        ScheduleScan(true)
-    end
-end
-
-function EventHandlers:UPDATE_STEALTH()
-    if not IsPlayerStealthed() and OS.isEnabled then
-        ScheduleScan(true)
-    end
-end
-
-function EventHandlers:UNIT_SPELLCAST_SUCCEEDED(unit, castGUID, spellID)
-    if unit == "player" and spellID == OS.SPELLS.PICK_LOCK then
-        C_Timer.After(
-            0.5,
-            function()
-                OS.ScheduleScan(true)
-            end
-        )
-    end
-end
-
---------------------------------------------------------------------------------
--- UI_ERROR_MESSAGE
---------------------------------------------------------------------------------
-
-function EventHandlers:UI_ERROR_MESSAGE(errTypeOrID, msg)
-    local isBagFull = (msg and msg:find(ERR_INV_FULL or "Inventory is full"))
-    if not isBagFull and type(errTypeOrID) == "number" then
-        isBagFull =
-            (errTypeOrID == (LE_GAME_ERR_INV_FULL or 0)) or
-            (Enum and Enum.UIERRORS and errTypeOrID == Enum.UIERRORS.ERR_INV_FULL)
-    end
-    if isBagFull then
-        local now = GetTime()
-        if (now - OS.state.lastBagFullAt) > OS.BAG_FULL_COOLDOWN then
-            OS.state.lastBagFullAt = now
-            OS.isPaused = true
-            OS.state.openTimerLive = false
-            OS.UpdateMinimapIcon()
-            StatusPrint(L["INVENTORY_FULL"])
-            PlayBagFullSound()
-        end
-    end
-end
-
---------------------------------------------------------------------------------
--- Bag, Loot, Interaction Events
---------------------------------------------------------------------------------
-
-local function OnScanRequest()
-    ScheduleScan()
-end
-local function OnForceScan()
-    ScheduleScan(true)
-end
-local function OnLoadStart()
-    SetQuiet(10)
-end
-local function OnLoadEnd()
-    SetQuiet(3)
-end
-
-function EventHandlers:LOOT_READY()
-    OS.state.lastLootWindowAt = GetTime()
-end
-
-function EventHandlers:LOOT_OPENED()
-    OS.state.lastLootWindowAt = GetTime()
-end
-
-EventHandlers.BAG_UPDATE_DELAYED = OnScanRequest
-EventHandlers.BAG_NEW_ITEMS_UPDATED = OnScanRequest
-
-function EventHandlers:CHAT_MSG_LOOT(msg)
-    if not msg then
-        OnScanRequest()
-        return
-    end
-
-    local prefix = LOOT_ITEM_SELF and LOOT_ITEM_SELF:gsub("%%s", ""):gsub("%.$", "")
-    local prefix2 = LOOT_ITEM_PUSHED_SELF and LOOT_ITEM_PUSHED_SELF:gsub("%%s", ""):gsub("%.$", "")
-
-    if not ((prefix and msg:find(prefix, 1, true)) or (prefix2 and msg:find(prefix2, 1, true))) then
-        OnScanRequest()
-        return
-    end
-
-    local link = msg:match("(|c%x+|Hitem:.-|h%[.-%]|h|r)")
-    if not link then
-        OnScanRequest()
-        return
-    end
-
-    local itemId = tonumber(link:match("item:(%d+)"))
-
-    if itemId and OS.AllowedItems and OS.AllowedItems[itemId] == false then
-        OS.Print(string.format(L["ITEM_WILL_AUTO_OPEN"], link))
-    end
-
-    if OS.DB.lootSounds then
-        local lootWindowOpen = (LootFrame and LootFrame:IsShown())
-        local lootWindowRecentlyOpen = (GetTime() - OS.state.lastLootWindowAt) < 2
-
-        if lootWindowOpen or lootWindowRecentlyOpen then
-            local colorSequence = link:match("|c(%x+)|H")
-            if colorSequence and #colorSequence == 8 then
-                local hex = string.lower(string.sub(colorSequence, 3, 8))
-                if hex ~= "9d9d9d" and hex ~= "ffffff" then
-                    PlaySound(OS.LOOT_SOUND_ID, "Master")
-                end
-            end
-        end
-    end
-
-    OnScanRequest()
-end
-
-EventHandlers.BANKFRAME_CLOSED = OnForceScan
-EventHandlers.GOSSIP_CLOSED = OnForceScan
-EventHandlers.MAIL_CLOSED = OnForceScan
-EventHandlers.MERCHANT_CLOSED = OnForceScan
-EventHandlers.QUEST_FINISHED = OnForceScan
-EventHandlers.TRADE_CLOSED = OnForceScan
-EventHandlers.PLAYER_INTERACTION_MANAGER_FRAME_HIDE = OnForceScan
-EventHandlers.LOADING_SCREEN_ENABLED = OnLoadStart
-EventHandlers.LOADING_SCREEN_DISABLED = OnLoadEnd
-
---------------------------------------------------------------------------------
--- Event Frame
+-- Event Handling
 --------------------------------------------------------------------------------
 
 local eventFrame = CreateFrame("Frame")
-eventFrame:SetScript(
-    "OnEvent",
-    function(self, event, ...)
-        if EventHandlers[event] then
-            EventHandlers[event](self, ...)
+eventFrame:RegisterEvent("PLAYER_LOGIN")
+eventFrame:RegisterEvent("UI_ERROR_MESSAGE")
+eventFrame:SetScript("OnEvent", function(_, event, ...)
+    if event == "PLAYER_LOGIN" then
+        InitSavedVariables()
+        PrintWelcome()
+        return
+    end
+
+    if event == "UI_ERROR_MESSAGE" then
+        local messageID, message = ...
+        local mapping = MatchError(messageID, message)
+        if mapping then
+            AnnounceNode(mapping)
         end
     end
-)
-
-for event in pairs(EventHandlers) do
-    eventFrame:RegisterEvent(event)
-end
+end)

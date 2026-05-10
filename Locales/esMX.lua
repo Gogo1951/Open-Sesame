@@ -1,68 +1,60 @@
 local strings = {}
 
 --------------------------------------------------------------------------------
--- General
+-- Announcement Strings
 --------------------------------------------------------------------------------
 
-strings["ADDON_TITLE"] = "Open Sesame"
-strings["STATUS_ENABLED"] = "Activado"
-strings["STATUS_DISABLED"] = "Desactivado"
-strings["STATUS_PAUSED"] = "En pausa"
+strings["ROGUES"] = "Pícaros"
+strings["HERBALISTS"] = "Herboristas"
+strings["MINERS"] = "Mineros"
+
+strings["ACTION_OPEN"] = "abrir"
+strings["ACTION_PICK"] = "recolectar"
+strings["ACTION_MINE"] = "minar"
+
+strings["PREFIX_LOCKED"] = "un"
+strings["PREFIX_HERB"] = "algunas"
+strings["PREFIX_MINE"] = "una"
+
+strings["MATCH_HERB"] = "Herboristería"
+strings["MATCH_MINE"] = "Minería"
+
+strings["DEFAULT_TREASURE"] = "Cofre cerrado"
+strings["DEFAULT_HERB"] = "Hierba"
+strings["DEFAULT_MINE"] = "Veta de mineral"
+
+strings["MSG_FORMAT"] = "{rt7} Come & Get It // ¡Oye %s, encontré %s %s que no puedo %s en %s, %s en %s!"
 
 --------------------------------------------------------------------------------
--- Chat Messages
+-- Chat
 --------------------------------------------------------------------------------
 
-strings["AUTO_LOOT_ENABLED"] = "Despojo automático es necesario para que Open Sesame funcione correctamente. Despojo automático ha sido activado."
-strings["PAUSED_BAG_SLOTS"] = "En pausa hasta tener al menos %d espacios libres en las bolsas."
-strings["RESUMED"] = "Reanudado."
-strings["INVENTORY_FULL"] = "¡El inventario está lleno!"
-strings["ITEM_WILL_AUTO_OPEN"] = "%s se abrirá automáticamente cuando se desbloquee."
-strings["ITEM_OPEN_MANUALLY"] = "%s debe abrirse manualmente. Puede contener un objeto único, ligado al recoger o temporal, o fue obtenido de un jefe de banda."
-strings["CHAT_LOADED"] = "Versión @project-version@. La configuración (incluida la opción para desactivar este mensaje) se puede encontrar en Opciones > AddOns > Open Sesame. ¿Te gusta el addon? ¡Cuéntaselo a un amigo! (="
+strings["CHAT_LOADED"] = "Version %s. Settings (including the option to disable this message) can be found under Options > AddOns > Come & Get It. Enjoying the addon? Tell a friend about it! (="
 
 --------------------------------------------------------------------------------
--- Features
+-- Options Panel
 --------------------------------------------------------------------------------
 
-strings["AUTO_OPENING"] = "Apertura automática"
-strings["AUTO_OPENING_DESC"] = "Abre automáticamente almejas y contenedores desbloqueados cuando tienes más de 4 espacios libres en las bolsas."
-strings["SPEEDY_LOOT"] = "Despojo rápido"
-strings["SPEEDY_LOOT_DESC"] = "Oculta la ventana de botín para un despojo casi instantáneo."
-strings["LOOT_SOUNDS"] = "Sonidos de botín"
-strings["LOOT_SOUNDS_DESC"] = "Reproduce un sonido especial al obtener un objeto de calidad Poco común o superior."
+strings["OPTIONS_DESCRIPTION"] = "Found an herb you can’t pick, a mineral vein you can’t mine, or a locked treasure chest with no Rogue in sight? Right-click it, and Come & Get It creates a message you can use to share or broadcast the coordinates. Being a hero has never been so easy."
+
+strings["OPTIONS_WELCOME_NAME"] = "Enable Welcome Message"
+strings["OPTIONS_WELCOME_DESC"] = "Print the welcome message in chat when you log in."
+
+strings["FEEDBACK_HEADER"] = "Feedback and Support"
+strings["FEEDBACK_CURSEFORGE"] = "CurseForge"
+strings["FEEDBACK_GITHUB"] = "GitHub"
+strings["FEEDBACK_DISCORD"] = "Discord"
 
 --------------------------------------------------------------------------------
--- Tooltip
+-- Registration
 --------------------------------------------------------------------------------
 
-strings["KEYBIND_LEFT_CLICK"] = "Clic izquierdo"
-strings["KEYBIND_RIGHT_CLICK"] = "Clic derecho"
-strings["KEYBIND_MIDDLE_CLICK"] = "Clic central"
-strings["ACTION_TOGGLE"] = "Alternar"
-strings["TOOLTIP_HINT"] = "Más opciones en Opciones > AddOns > Open Sesame"
-
---------------------------------------------------------------------------------
--- Options
---------------------------------------------------------------------------------
-
-strings["OPTIONS_INTRO"] = "Abre automáticamente almejas y contenedores desbloqueados en tu inventario. Incluye Despojo rápido para obtener botín más rápidamente."
-strings["OPTIONS_ENABLE_WELCOME"] = "Activar mensaje de bienvenida"
-strings["OPTIONS_FEEDBACK"] = "Comentarios & Soporte"
-strings["OPTIONS_CURSEFORGE"] = "CurseForge"
-strings["OPTIONS_GITHUB"] = "GitHub"
-strings["OPTIONS_DISCORD"] = "Discord"
-
---------------------------------------------------------------------------------
--- Registration (esES + esMX share the same table)
---------------------------------------------------------------------------------
-
-local L = LibStub("AceLocale-3.0"):NewLocale("OpenSesame", "esES")
+local L = LibStub("AceLocale-3.0"):NewLocale("ComeAndGetIt", "esES")
 if L then
     for k, v in pairs(strings) do L[k] = v end
 end
 
-local L2 = LibStub("AceLocale-3.0"):NewLocale("OpenSesame", "esMX")
+local L2 = LibStub("AceLocale-3.0"):NewLocale("ComeAndGetIt", "esMX")
 if L2 then
     for k, v in pairs(strings) do L2[k] = v end
 end
