@@ -4,7 +4,7 @@ This document combines architecture notes and contribution guidance for develope
 
 ## File Map
 
-```
+```text
 Open-Sesame/
 ├── .github/workflows/package.yml   CurseForge release + library vendoring
 ├── .pkgmeta                        Externals + ignore list
@@ -156,7 +156,7 @@ When filing a bug report, include:
 PR guidelines:
 
 - Keep changes scoped — one feature or fix per PR.
-- Match the existing code style (see [Add-on Coding & Style Guide](https://github.com/Gogo1951) — no `=` alignment padding, no abbreviations, locale all user-facing strings).
+- Match the existing code style — no `=` alignment padding, no abbreviations, locale all user-facing strings.
 - If you add or rename a SavedVariables field, write a migration in `PLAYER_LOGIN` rather than overwriting existing values.
 - If you change item-list behavior (allowlist semantics, ignore list scope), update this document and `README.md`.
 - Update the File Map and Architecture sections of this document if you add a new file or move logic between phases.
