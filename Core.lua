@@ -158,8 +158,8 @@ local function AnnounceNode(mapping)
         mapInfo.name
     )
 
-    -- Don't clobber a draft the user is already typing in the editbox.
-    if ChatFrame1EditBox and ChatFrame1EditBox:IsShown() then
+    -- Don't clobber a draft the user is already typing in any chat editbox.
+    if ChatEdit_GetActiveWindow and ChatEdit_GetActiveWindow() then
         return
     end
 
