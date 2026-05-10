@@ -1,47 +1,55 @@
-local L = LibStub("AceLocale-3.0"):NewLocale("ComeAndGetIt", "itIT")
+local L = LibStub("AceLocale-3.0"):NewLocale("OpenSesame", "itIT")
 if not L then return end
 
 --------------------------------------------------------------------------------
--- Announcement Strings
+-- General
 --------------------------------------------------------------------------------
 
-L["ROGUES"] = "Ladri"
-L["HERBALISTS"] = "Erbalisti"
-L["MINERS"] = "Minatori"
-
-L["ACTION_OPEN"] = "aprire"
-L["ACTION_PICK"] = "raccogliere"
-L["ACTION_MINE"] = "estrarre"
-
-L["PREFIX_LOCKED"] = "un"
-L["PREFIX_HERB"] = "un po' di"
-L["PREFIX_MINE"] = "un"
-
-L["MATCH_HERB"] = "Erbalismo"
-L["MATCH_MINE"] = "Estrazione"
-
-L["DEFAULT_TREASURE"] = "Forziere Chiuso"
-L["DEFAULT_HERB"] = "Erba"
-L["DEFAULT_MINE"] = "Filone di Minerali"
-
-L["MSG_FORMAT"] = "{rt7} Come & Get It // Ehi %s, ho trovato %s %s che non posso %s alle %s, %s in %s!"
+L["ADDON_TITLE"] = "Open Sesame"
+L["STATUS_ENABLED"] = "Attivato"
+L["STATUS_DISABLED"] = "Disattivato"
+L["STATUS_PAUSED"] = "In pausa"
 
 --------------------------------------------------------------------------------
--- Chat
+-- Chat Messages
 --------------------------------------------------------------------------------
 
-L["CHAT_LOADED"] = "Versione %s. Le impostazioni (inclusa l'opzione per disabilitare questo messaggio) si trovano in Opzioni > AddOn > Come & Get It. Ti piace l'addon? Parlane con un amico! (="
+L["AUTO_LOOT_ENABLED"] = "Il Razziamento Automatico è necessario affinché Open Sesame funzioni correttamente. Il Razziamento Automatico è stato attivato."
+L["PAUSED_BAG_SLOTS"] = "In pausa finché non avrai almeno %d spazi liberi nelle borse."
+L["RESUMED"] = "Ripreso."
+L["INVENTORY_FULL"] = "L'inventario è pieno!"
+L["ITEM_WILL_AUTO_OPEN"] = "%s verrà aperto automaticamente una volta sbloccato."
+L["ITEM_OPEN_MANUALLY"] = "%s deve essere aperto manualmente. Potrebbe contenere un oggetto unico, vincolato alla raccolta o temporaneo, oppure è stato rilasciato da un boss di incursione."
+L["CHAT_LOADED"] = "Versione @project-version@. Le impostazioni (inclusa l'opzione per disabilitare questo messaggio) si trovano in Opzioni > AddOn > Open Sesame. Ti piace l'addon? Parlane con un amico! (="
 
 --------------------------------------------------------------------------------
--- Options Panel
+-- Features
 --------------------------------------------------------------------------------
 
-L["OPTIONS_DESCRIPTION"] = "Hai trovato un'erba che non puoi raccogliere, un filone di minerali che non puoi estrarre o un forziere chiuso senza nessun Ladro in vista? Fai clic col tasto destro su di esso e Come & Get It creerà un messaggio che puoi usare per condividere o trasmettere le coordinate. Essere un eroe non è mai stato così facile."
+L["AUTO_OPENING"] = "Apertura automatica"
+L["AUTO_OPENING_DESC"] = "Apre automaticamente molluschi e contenitori sbloccati quando hai più di 4 spazi liberi nelle borse."
+L["SPEEDY_LOOT"] = "Razziamento rapido"
+L["SPEEDY_LOOT_DESC"] = "Nasconde la finestra del bottino per un razziamento quasi istantaneo."
+L["LOOT_SOUNDS"] = "Suoni del bottino"
+L["LOOT_SOUNDS_DESC"] = "Riproduce un suono speciale quando raccogli un oggetto di qualità Non Comune o superiore."
 
-L["OPTIONS_WELCOME_NAME"] = "Abilita Messaggio di Benvenuto"
-L["OPTIONS_WELCOME_DESC"] = "Stampa il messaggio di benvenuto nella chat al momento dell'accesso."
+--------------------------------------------------------------------------------
+-- Tooltip
+--------------------------------------------------------------------------------
 
-L["FEEDBACK_HEADER"] = "Feedback e Supporto"
-L["FEEDBACK_CURSEFORGE"] = "CurseForge"
-L["FEEDBACK_GITHUB"] = "GitHub"
-L["FEEDBACK_DISCORD"] = "Discord"
+L["KEYBIND_LEFT_CLICK"] = "Clic sinistro"
+L["KEYBIND_RIGHT_CLICK"] = "Clic destro"
+L["KEYBIND_MIDDLE_CLICK"] = "Clic centrale"
+L["ACTION_TOGGLE"] = "Attiva/Disattiva"
+L["TOOLTIP_HINT"] = "Altre impostazioni in Opzioni > AddOn > Open Sesame"
+
+--------------------------------------------------------------------------------
+-- Options
+--------------------------------------------------------------------------------
+
+L["OPTIONS_INTRO"] = "Apre automaticamente molluschi e contenitori sbloccati nel tuo inventario. Include Razziamento rapido per una raccolta più veloce."
+L["OPTIONS_ENABLE_WELCOME"] = "Abilita il messaggio di benvenuto"
+L["OPTIONS_FEEDBACK"] = "Feedback & Supporto"
+L["OPTIONS_CURSEFORGE"] = "CurseForge"
+L["OPTIONS_GITHUB"] = "GitHub"
+L["OPTIONS_DISCORD"] = "Discord"

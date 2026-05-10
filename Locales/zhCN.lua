@@ -1,47 +1,55 @@
-local L = LibStub("AceLocale-3.0"):NewLocale("ComeAndGetIt", "zhCN")
+local L = LibStub("AceLocale-3.0"):NewLocale("OpenSesame", "zhCN")
 if not L then return end
 
 --------------------------------------------------------------------------------
--- Announcement Strings
+-- General
 --------------------------------------------------------------------------------
 
-L["ROGUES"] = "潜行者"
-L["HERBALISTS"] = "草药师"
-L["MINERS"] = "矿工"
-
-L["ACTION_OPEN"] = "打开"
-L["ACTION_PICK"] = "采集"
-L["ACTION_MINE"] = "开采"
-
-L["PREFIX_LOCKED"] = "上锁的"
-L["PREFIX_HERB"] = "一些"
-L["PREFIX_MINE"] = "一个"
-
-L["MATCH_HERB"] = "草药学"
-L["MATCH_MINE"] = "采矿"
-
-L["DEFAULT_TREASURE"] = "宝箱"
-L["DEFAULT_HERB"] = "草药"
-L["DEFAULT_MINE"] = "矿脉"
-
-L["MSG_FORMAT"] = "{rt7} Come & Get It // 嘿 %s，我发现了%s%s，但我无法%s！坐标：%s, %s 于 %s"
+L["ADDON_TITLE"] = "Open Sesame"
+L["STATUS_ENABLED"] = "已启用"
+L["STATUS_DISABLED"] = "已禁用"
+L["STATUS_PAUSED"] = "已暂停"
 
 --------------------------------------------------------------------------------
--- Chat
+-- Chat Messages
 --------------------------------------------------------------------------------
 
-L["CHAT_LOADED"] = "版本 %s。设置（包括禁用此消息的选项）可以在 选项 > 插件 > Come & Get It 下找到。喜欢这个插件吗？告诉你的朋友吧！(="
+L["AUTO_LOOT_ENABLED"] = "Open Sesame 需要启用自动拾取才能正常工作。自动拾取已启用。"
+L["PAUSED_BAG_SLOTS"] = "已暂停，直到背包有至少 %d 个空位。"
+L["RESUMED"] = "已恢复。"
+L["INVENTORY_FULL"] = "背包已满！"
+L["ITEM_WILL_AUTO_OPEN"] = "%s 将在解锁后自动打开。"
+L["ITEM_OPEN_MANUALLY"] = "%s 需要手动打开。它可能包含唯一、拾取绑定或临时物品，或者是从团队首领处获得的。"
+L["CHAT_LOADED"] = "版本 @project-version@。设置（包括禁用此消息的选项）可以在 选项 > 插件 > Open Sesame 中找到。喜欢这个插件吗？告诉你的朋友吧！(="
 
 --------------------------------------------------------------------------------
--- Options Panel
+-- Features
 --------------------------------------------------------------------------------
 
-L["OPTIONS_DESCRIPTION"] = "发现了你无法采集的草药、无法开采的矿脉，或者是一个上锁的宝箱，而附近却没有潜行者？右键点击它，Come & Get It 会生成一条消息，你可以用来分享或广播坐标。成为英雄从未如此简单。"
+L["AUTO_OPENING"] = "自动开启"
+L["AUTO_OPENING_DESC"] = "当背包有4个以上空位时，自动打开蛤蜊和已解锁的容器。"
+L["SPEEDY_LOOT"] = "快速拾取"
+L["SPEEDY_LOOT_DESC"] = "隐藏拾取窗口以实现近乎即时的拾取。"
+L["LOOT_SOUNDS"] = "拾取音效"
+L["LOOT_SOUNDS_DESC"] = "拾取到优秀或更高品质的物品时播放特殊音效。"
 
-L["OPTIONS_WELCOME_NAME"] = "启用欢迎消息"
-L["OPTIONS_WELCOME_DESC"] = "登录时在聊天窗口打印欢迎消息。"
+--------------------------------------------------------------------------------
+-- Tooltip
+--------------------------------------------------------------------------------
 
-L["FEEDBACK_HEADER"] = "反馈与支持"
-L["FEEDBACK_CURSEFORGE"] = "CurseForge"
-L["FEEDBACK_GITHUB"] = "GitHub"
-L["FEEDBACK_DISCORD"] = "Discord"
+L["KEYBIND_LEFT_CLICK"] = "左键点击"
+L["KEYBIND_RIGHT_CLICK"] = "右键点击"
+L["KEYBIND_MIDDLE_CLICK"] = "中键点击"
+L["ACTION_TOGGLE"] = "切换"
+L["TOOLTIP_HINT"] = "更多设置请查看 选项 > 插件 > Open Sesame"
+
+--------------------------------------------------------------------------------
+-- Options
+--------------------------------------------------------------------------------
+
+L["OPTIONS_INTRO"] = "自动打开背包中的蛤蜊和已解锁的容器。包含快速拾取功能，让拾取更加迅速。"
+L["OPTIONS_ENABLE_WELCOME"] = "启用欢迎消息"
+L["OPTIONS_FEEDBACK"] = "反馈 & 支持"
+L["OPTIONS_CURSEFORGE"] = "CurseForge"
+L["OPTIONS_GITHUB"] = "GitHub"
+L["OPTIONS_DISCORD"] = "Discord"

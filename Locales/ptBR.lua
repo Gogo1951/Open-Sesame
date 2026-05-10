@@ -1,47 +1,55 @@
-local L = LibStub("AceLocale-3.0"):NewLocale("ComeAndGetIt", "ptBR")
+local L = LibStub("AceLocale-3.0"):NewLocale("OpenSesame", "ptBR")
 if not L then return end
 
 --------------------------------------------------------------------------------
--- Announcement Strings
+-- General
 --------------------------------------------------------------------------------
 
-L["ROGUES"] = "Ladinos"
-L["HERBALISTS"] = "Herboristas"
-L["MINERS"] = "Mineiros"
-
-L["ACTION_OPEN"] = "abrir"
-L["ACTION_PICK"] = "coletar"
-L["ACTION_MINE"] = "minerar"
-
-L["PREFIX_LOCKED"] = "um"
-L["PREFIX_HERB"] = "alguma"
-L["PREFIX_MINE"] = "um"
-
-L["MATCH_HERB"] = "Herborismo"
-L["MATCH_MINE"] = "Mineração"
-
-L["DEFAULT_TREASURE"] = "Baú Trancado"
-L["DEFAULT_HERB"] = "Erva"
-L["DEFAULT_MINE"] = "Veio de Minério"
-
-L["MSG_FORMAT"] = "{rt7} Come & Get It // Ei %s, encontrei %s %s que não consigo %s em %s, %s em %s!"
+L["ADDON_TITLE"] = "Open Sesame"
+L["STATUS_ENABLED"] = "Ativado"
+L["STATUS_DISABLED"] = "Desativado"
+L["STATUS_PAUSED"] = "Pausado"
 
 --------------------------------------------------------------------------------
--- Chat
+-- Chat Messages
 --------------------------------------------------------------------------------
 
-L["CHAT_LOADED"] = "Versão %s. As configurações (incluindo a opção de desativar esta mensagem) podem ser encontradas em Opções > AddOns > Come & Get It. Gostando do addon? Conte para um amigo! (="
+L["AUTO_LOOT_ENABLED"] = "O Saque Automático é necessário para que o Open Sesame funcione corretamente. O Saque Automático foi ativado."
+L["PAUSED_BAG_SLOTS"] = "Pausado até que você tenha pelo menos %d espaços livres na bolsa."
+L["RESUMED"] = "Retomado."
+L["INVENTORY_FULL"] = "O inventário está cheio!"
+L["ITEM_WILL_AUTO_OPEN"] = "%s será aberto automaticamente quando for desbloqueado."
+L["ITEM_OPEN_MANUALLY"] = "%s precisa ser aberto manualmente. Pode conter um item Único, Vinculado ao Coletar ou Temporário, ou foi deixado por um chefe de raide."
+L["CHAT_LOADED"] = "Versão @project-version@. As configurações (incluindo a opção de desativar esta mensagem) podem ser encontradas em Opções > AddOns > Open Sesame. Gostando do addon? Conte para um amigo! (="
 
 --------------------------------------------------------------------------------
--- Options Panel
+-- Features
 --------------------------------------------------------------------------------
 
-L["OPTIONS_DESCRIPTION"] = "Encontrou uma erva que você não pode coletar, um veio de minério que você não pode minerar ou um baú de tesouro trancado sem nenhum Ladino à vista? Clique com o botão direito nele e o Come & Get It criará uma mensagem que você pode usar para compartilhar ou transmitir as coordenadas. Ser um herói nunca foi tão fácil."
+L["AUTO_OPENING"] = "Abertura automática"
+L["AUTO_OPENING_DESC"] = "Abre automaticamente mariscos e recipientes desbloqueados quando você tem mais de 4 espaços livres na bolsa."
+L["SPEEDY_LOOT"] = "Saque rápido"
+L["SPEEDY_LOOT_DESC"] = "Oculta a janela de saque para coletar itens quase instantaneamente."
+L["LOOT_SOUNDS"] = "Sons de saque"
+L["LOOT_SOUNDS_DESC"] = "Toca um som especial quando você coleta um item de qualidade Incomum ou superior."
 
-L["OPTIONS_WELCOME_NAME"] = "Ativar Mensagem de Boas-vindas"
-L["OPTIONS_WELCOME_DESC"] = "Mostra a mensagem de boas-vindas no chat ao entrar no jogo."
+--------------------------------------------------------------------------------
+-- Tooltip
+--------------------------------------------------------------------------------
 
-L["FEEDBACK_HEADER"] = "Feedback e Suporte"
-L["FEEDBACK_CURSEFORGE"] = "CurseForge"
-L["FEEDBACK_GITHUB"] = "GitHub"
-L["FEEDBACK_DISCORD"] = "Discord"
+L["KEYBIND_LEFT_CLICK"] = "Clique esquerdo"
+L["KEYBIND_RIGHT_CLICK"] = "Clique direito"
+L["KEYBIND_MIDDLE_CLICK"] = "Clique do meio"
+L["ACTION_TOGGLE"] = "Alternar"
+L["TOOLTIP_HINT"] = "Mais opções em Opções > AddOns > Open Sesame"
+
+--------------------------------------------------------------------------------
+-- Options
+--------------------------------------------------------------------------------
+
+L["OPTIONS_INTRO"] = "Abre automaticamente mariscos e recipientes desbloqueados no seu inventário. Inclui Saque rápido para coletar itens mais rapidamente."
+L["OPTIONS_ENABLE_WELCOME"] = "Ativar mensagem de boas-vindas"
+L["OPTIONS_FEEDBACK"] = "Feedback & Suporte"
+L["OPTIONS_CURSEFORGE"] = "CurseForge"
+L["OPTIONS_GITHUB"] = "GitHub"
+L["OPTIONS_DISCORD"] = "Discord"

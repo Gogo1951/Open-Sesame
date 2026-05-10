@@ -1,47 +1,55 @@
-local L = LibStub("AceLocale-3.0"):NewLocale("ComeAndGetIt", "frFR")
+local L = LibStub("AceLocale-3.0"):NewLocale("OpenSesame", "frFR")
 if not L then return end
 
 --------------------------------------------------------------------------------
--- Announcement Strings
+-- General
 --------------------------------------------------------------------------------
 
-L["ROGUES"] = "Voleurs"
-L["HERBALISTS"] = "Herboristes"
-L["MINERS"] = "Mineurs"
-
-L["ACTION_OPEN"] = "ouvrir"
-L["ACTION_PICK"] = "cueillir"
-L["ACTION_MINE"] = "miner"
-
-L["PREFIX_LOCKED"] = "un"
-L["PREFIX_HERB"] = "quelques"
-L["PREFIX_MINE"] = "un"
-
-L["MATCH_HERB"] = "Herboristerie"
-L["MATCH_MINE"] = "Minage"
-
-L["DEFAULT_TREASURE"] = "Coffre verrouillé"
-L["DEFAULT_HERB"] = "Herbe"
-L["DEFAULT_MINE"] = "Filon de minerai"
-
-L["MSG_FORMAT"] = "{rt7} Come & Get It // Hé %s, j'ai trouvé %s %s que je ne peux pas %s à %s, %s dans %s !"
+L["ADDON_TITLE"] = "Open Sesame"
+L["STATUS_ENABLED"] = "Activé"
+L["STATUS_DISABLED"] = "Désactivé"
+L["STATUS_PAUSED"] = "En pause"
 
 --------------------------------------------------------------------------------
--- Chat
+-- Chat Messages
 --------------------------------------------------------------------------------
 
-L["CHAT_LOADED"] = "Version %s. Les paramètres (y compris l'option pour désactiver ce message) se trouvent sous Options > AddOns > Come & Get It. Vous aimez l'addon ? Parlez-en à un ami ! (="
+L["AUTO_LOOT_ENABLED"] = "La Fouille automatique est requise pour qu'Open Sesame fonctionne correctement. La Fouille automatique a été activée."
+L["PAUSED_BAG_SLOTS"] = "En pause jusqu'à ce que vous ayez au moins %d emplacements de sac libres."
+L["RESUMED"] = "Reprise."
+L["INVENTORY_FULL"] = "L'inventaire est plein !"
+L["ITEM_WILL_AUTO_OPEN"] = "%s sera automatiquement ouvert une fois déverrouillé."
+L["ITEM_OPEN_MANUALLY"] = "%s doit être ouvert manuellement. Il peut contenir un objet unique, lié quand ramassé ou temporaire, ou a été lâché par un boss de raid."
+L["CHAT_LOADED"] = "Version @project-version@. Les paramètres (y compris l'option pour désactiver ce message) se trouvent dans Options > AddOns > Open Sesame. Vous aimez l'addon ? Parlez-en à un ami ! (="
 
 --------------------------------------------------------------------------------
--- Options Panel
+-- Features
 --------------------------------------------------------------------------------
 
-L["OPTIONS_DESCRIPTION"] = "Vous avez trouvé une herbe que vous ne pouvez pas cueillir, un filon de minerai que vous ne pouvez pas miner ou un coffre au trésor verrouillé sans aucun voleur en vue ? Faites un clic droit dessus, et Come & Get It créera un message que vous pourrez utiliser pour partager ou diffuser les coordonnées. Être un héros n'a jamais été aussi facile."
+L["AUTO_OPENING"] = "Ouverture automatique"
+L["AUTO_OPENING_DESC"] = "Ouvre automatiquement les palourdes et les conteneurs déverrouillés quand vous avez plus de 4 emplacements de sac libres."
+L["SPEEDY_LOOT"] = "Butin rapide"
+L["SPEEDY_LOOT_DESC"] = "Masque la fenêtre de butin pour un ramassage quasi instantané."
+L["LOOT_SOUNDS"] = "Sons de butin"
+L["LOOT_SOUNDS_DESC"] = "Joue un son distinct quand vous ramassez un objet de qualité Inhabituelle ou supérieure."
 
-L["OPTIONS_WELCOME_NAME"] = "Activer le message de bienvenue"
-L["OPTIONS_WELCOME_DESC"] = "Affiche le message de bienvenue dans le chat lors de la connexion."
+--------------------------------------------------------------------------------
+-- Tooltip
+--------------------------------------------------------------------------------
 
-L["FEEDBACK_HEADER"] = "Commentaires et Assistance"
-L["FEEDBACK_CURSEFORGE"] = "CurseForge"
-L["FEEDBACK_GITHUB"] = "GitHub"
-L["FEEDBACK_DISCORD"] = "Discord"
+L["KEYBIND_LEFT_CLICK"] = "Clic gauche"
+L["KEYBIND_RIGHT_CLICK"] = "Clic droit"
+L["KEYBIND_MIDDLE_CLICK"] = "Clic molette"
+L["ACTION_TOGGLE"] = "Basculer"
+L["TOOLTIP_HINT"] = "Plus d'options dans Options > AddOns > Open Sesame"
+
+--------------------------------------------------------------------------------
+-- Options
+--------------------------------------------------------------------------------
+
+L["OPTIONS_INTRO"] = "Ouvre automatiquement les palourdes et les conteneurs déverrouillés dans votre inventaire. Inclut Butin rapide pour un ramassage plus rapide."
+L["OPTIONS_ENABLE_WELCOME"] = "Activer le message de bienvenue"
+L["OPTIONS_FEEDBACK"] = "Commentaires & Support"
+L["OPTIONS_CURSEFORGE"] = "CurseForge"
+L["OPTIONS_GITHUB"] = "GitHub"
+L["OPTIONS_DISCORD"] = "Discord"
