@@ -1,0 +1,45 @@
+## Title: Come & Get It
+## Notes: Found an herb you can't pick, a mineral vein you can't mine, or a locked treasure chest with no Rogue in sight? Right-click it, and Come & Get It creates a message you can use to share or broadcast the coordinates. Being a hero has never been so easy.
+## Author: Gogo1951
+
+## IconTexture: Interface/AddOns/ComeAndGetIt/ComeAndGetIt.tga
+## Category-enUS: Farming
+## X-License: MIT
+
+## Interface: 11508, 20505, 50503, 120001
+## Version: @project-version@
+## X-Curse-Project-ID: 1128926
+
+## SavedVariables: ComeAndGetItDB
+
+# Includes
+Includes/LibStub/LibStub.lua
+Includes/CallbackHandler-1.0/CallbackHandler-1.0.lua
+Includes/AceLocale-3.0/AceLocale-3.0.lua
+Includes/AceGUI-3.0/AceGUI-3.0.xml
+Includes/AceConfig-3.0/AceConfigRegistry-3.0/AceConfigRegistry-3.0.lua
+Includes/AceConfig-3.0/AceConfigDialog-3.0/AceConfigDialog-3.0.lua
+
+# Localization
+Locales/enUS.lua
+Locales/deDE.lua
+Locales/esMX.lua
+Locales/frFR.lua
+Locales/itIT.lua
+Locales/koKR.lua
+Locales/ptBR.lua
+Locales/ruRU.lua
+Locales/zhCN.lua
+Locales/zhTW.lua
+
+# Data
+Data.lua
+
+# Come & Get It
+Core.lua
+Options.lua
+
+# Feedback Welcome! (=
+# Come & Get It on CurseForge // https://www.curseforge.com/wow/addons/come-get-it
+# Come & Get It on GitHub // https://github.com/Gogo1951/Come-and-Get-It
+# Come & Get It on Discord // https://discord.gg/eh8hKq992Q
