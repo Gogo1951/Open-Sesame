@@ -24,7 +24,7 @@ function OS.UpdateMinimapIcon()
     brokerObj.text = string.format(
         "%s : %s",
         L["ADDON_TITLE"],
-        OS.isEnabled and (OS.isPaused and L["STATUS_PAUSED"] or L["STATUS_ON"]) or L["STATUS_OFF"]
+        OS.isEnabled and (OS.isPaused and L["STATUS_PAUSED"] or L["STATUS_ENABLED"]) or L["STATUS_DISABLED"]
     )
 
     if OS.DB and OS.DB.minimap then
