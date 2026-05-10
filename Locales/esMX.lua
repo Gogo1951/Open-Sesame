@@ -29,18 +29,18 @@ strings["MSG_FORMAT"] = "{rt7} Come & Get It // ¡Oye %s, encontré %s %s que no
 -- Chat
 --------------------------------------------------------------------------------
 
-strings["CHAT_LOADED"] = "Version %s. Settings (including the option to disable this message) can be found under Options > AddOns > Come & Get It. Enjoying the addon? Tell a friend about it! (="
+strings["CHAT_LOADED"] = "Versión %s. Los ajustes (incluida la opción para desactivar este mensaje) se encuentran en Opciones > AddOns > Come & Get It. ¿Te gusta el addon? ¡Cuéntaselo a un amigo! (="
 
 --------------------------------------------------------------------------------
 -- Options Panel
 --------------------------------------------------------------------------------
 
-strings["OPTIONS_DESCRIPTION"] = "Found an herb you can’t pick, a mineral vein you can’t mine, or a locked treasure chest with no Rogue in sight? Right-click it, and Come & Get It creates a message you can use to share or broadcast the coordinates. Being a hero has never been so easy."
+strings["OPTIONS_DESCRIPTION"] = "¿Encontraste una hierba que no puedes recolectar, una veta de mineral que no puedes minar o un cofre cerrado sin un Pícaro a la vista? Haz clic derecho y Come & Get It creará un mensaje que puedes usar para compartir o anunciar las coordenadas. Ser un héroe nunca fue tan fácil."
 
-strings["OPTIONS_WELCOME_NAME"] = "Enable Welcome Message"
-strings["OPTIONS_WELCOME_DESC"] = "Print the welcome message in chat when you log in."
+strings["OPTIONS_WELCOME_NAME"] = "Activar mensaje de bienvenida"
+strings["OPTIONS_WELCOME_DESC"] = "Mostrar el mensaje de bienvenida en el chat al iniciar sesión."
 
-strings["FEEDBACK_HEADER"] = "Feedback and Support"
+strings["FEEDBACK_HEADER"] = "Comentarios y soporte"
 strings["FEEDBACK_CURSEFORGE"] = "CurseForge"
 strings["FEEDBACK_GITHUB"] = "GitHub"
 strings["FEEDBACK_DISCORD"] = "Discord"
