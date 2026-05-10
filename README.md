@@ -6,7 +6,7 @@ Open Sesame automatically opens clams, lockboxes, and unlocked containers in you
 
 ## Features
 
-📦 **Auto-Opening** // Opens clams, junkboxes, and unlocked containers in the background — no clicks required.
+📦 **Auto-Opening** // Opens clams, lockboxes, and unlocked containers in the background — no clicks required.
 
 🔐 **Locked Items** // Loot a lockbox and Open Sesame queues it up — the moment it's unlocked, it pops open automatically.
 
