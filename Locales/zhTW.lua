@@ -1,4 +1,4 @@
-local L = LibStub("AceLocale-3.0"):NewLocale("OpenSesame", "zhTW")
+local L = LibStub("AceLocale-3.0"):NewLocale("Open-Sesame", "zhTW")
 if not L then return end
 
 --------------------------------------------------------------------------------
@@ -20,14 +20,14 @@ L["RESUMED"] = "已恢復。"
 L["INVENTORY_FULL"] = "背包已滿！"
 L["ITEM_WILL_AUTO_OPEN"] = "%s 將在解鎖後自動開啟。"
 L["ITEM_OPEN_MANUALLY"] = "%s 需要手動開啟。它可能包含唯一、拾取綁定或暫時物品，或者是從團隊首領處獲得的。"
-L["CHAT_LOADED"] = "版本 @project-version@。設定（包括停用此訊息的選項）可以在 選項 > 插件 > Open Sesame 中找到。喜歡這個插件嗎？告訴你的朋友吧！(="
+L["CHAT_LOADED"] = "版本 %s。設定（包括停用此訊息的選項）可以在 選項 > 插件 > Open Sesame 中找到。喜歡這個插件嗎？告訴你的朋友吧！(="
 
 --------------------------------------------------------------------------------
 -- Features
 --------------------------------------------------------------------------------
 
 L["AUTO_OPENING"] = "自動開啟"
-L["AUTO_OPENING_DESC"] = "當背包有4個以上空位時，自動開啟蛤蜊和已解鎖的容器。"
+L["AUTO_OPENING_DESC"] = "當背包有至少 %d 個空位時，自動開啟蛤蜊和已解鎖的容器。"
 L["SPEEDY_LOOT"] = "快速拾取"
 L["SPEEDY_LOOT_DESC"] = "隱藏拾取視窗以實現近乎即時的拾取。"
 L["LOOT_SOUNDS"] = "拾取音效"
@@ -41,13 +41,13 @@ L["KEYBIND_LEFT_CLICK"] = "左鍵點擊"
 L["KEYBIND_RIGHT_CLICK"] = "右鍵點擊"
 L["KEYBIND_MIDDLE_CLICK"] = "中鍵點擊"
 L["ACTION_TOGGLE"] = "切換"
-L["TOOLTIP_HINT"] = "更多設定請查看 選項 > 插件 > Open Sesame"
+L["TOOLTIP_HINT"] = "其他設定可以在 選項 > 插件 > Open Sesame 中找到。"
 
 --------------------------------------------------------------------------------
 -- Options
 --------------------------------------------------------------------------------
 
-L["OPTIONS_INTRO"] = "自動開啟背包中的蛤蜊和已解鎖的容器。包含快速拾取功能，讓拾取更加迅速。"
+L["OPTIONS_INTRO"] = "自動開啟背包中的蛤蜊和已解鎖的容器。具備快速拾取功能，讓拾取更加迅速。"
 L["OPTIONS_ENABLE_WELCOME"] = "啟用歡迎訊息"
 L["OPTIONS_FEEDBACK"] = "回饋 & 支援"
 L["OPTIONS_CURSEFORGE"] = "CurseForge"

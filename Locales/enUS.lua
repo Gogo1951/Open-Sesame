@@ -1,4 +1,5 @@
-local L = LibStub("AceLocale-3.0"):NewLocale("OpenSesame", "enUS", true)
+local L = LibStub("AceLocale-3.0"):NewLocale("Open-Sesame", "enUS", true)
+if not L then return end
 
 --------------------------------------------------------------------------------
 -- General
@@ -14,19 +15,19 @@ L["STATUS_PAUSED"] = "Paused"
 --------------------------------------------------------------------------------
 
 L["AUTO_LOOT_ENABLED"] = "Auto Loot is required for Open Sesame to function properly. Auto Loot has been enabled."
-L["PAUSED_BAG_SLOTS"] = "Paused until you have at least %d empty bag slots."
-L["RESUMED"] = "Resumed."
+L["PAUSED_BAG_SLOTS"] = "Auto-Open is Paused until you have at least %d empty bag slots."
+L["RESUMED"] = "Auto-Open has Resumed."
 L["INVENTORY_FULL"] = "Inventory is full!"
 L["ITEM_WILL_AUTO_OPEN"] = "%s will be automatically opened once it's unlocked."
 L["ITEM_OPEN_MANUALLY"] = "%s needs to be opened manually. It may contain a Unique, Bind on Pickup, or Temporary item; or it was dropped by a raid boss."
-L["CHAT_LOADED"] = "Version @project-version@. Settings (including the option to disable this message) can be found under Options > AddOns > Open Sesame. Enjoying the addon? Tell a friend about it! (="
+L["CHAT_LOADED"] = "Version %s. Settings (including the option to disable this message) can be found under Options > AddOns > Open Sesame. Enjoying the addon? Tell a friend about it! (="
 
 --------------------------------------------------------------------------------
 -- Features
 --------------------------------------------------------------------------------
 
 L["AUTO_OPENING"] = "Auto-Opening"
-L["AUTO_OPENING_DESC"] = "Automatically opens clams and unlocked containers when you have more than 4 empty bag slots."
+L["AUTO_OPENING_DESC"] = "Automatically opens clams and unlocked containers when you have at least %d empty bag slots."
 L["SPEEDY_LOOT"] = "Speedy Loot"
 L["SPEEDY_LOOT_DESC"] = "Hides the loot window for near-instant looting."
 L["LOOT_SOUNDS"] = "Loot Sounds"

@@ -1,41 +1,51 @@
-local ADDON_NAME, OS = ...
+local ADDON_NAME, ns = ...
 
-OS.L = LibStub("AceLocale-3.0"):GetLocale("OpenSesame")
+ns.L = LibStub("AceLocale-3.0"):GetLocale(ADDON_NAME)
 
 --------------------------------------------------------------------------------
--- Metadata
+-- Links
 --------------------------------------------------------------------------------
 
-local GetMetadata = (C_AddOns and C_AddOns.GetAddOnMetadata) or GetAddOnMetadata
-local version = GetMetadata and GetMetadata(ADDON_NAME, "Version") or "Dev"
-if version:find("@") then
-    version = "Dev"
-end
-OS.Version = version
+ns.CURSEFORGE_URL = "https://www.curseforge.com/wow/addons/open-sesame"
+ns.GITHUB_URL = "https://github.com/Gogo1951/Open-Sesame"
+ns.DISCORD_URL = "https://discord.gg/eh8hKq992Q"
 
-OS.CURSEFORGE_URL = "https://www.curseforge.com/wow/addons/open-sesame"
-OS.GITHUB_URL = "https://github.com/Gogo1951/Open-Sesame"
-OS.DISCORD_URL = "https://discord.gg/eh8hKq992Q"
+--------------------------------------------------------------------------------
+-- Options Registry
+--------------------------------------------------------------------------------
+
+--[[
+    AceConfig registry names, derived from ADDON_NAME. Stable identifiers
+    referenced by NotifyChange; never built inline, never localized.
+]]
+ns.OPTIONS_REGISTRY = {
+    General = ADDON_NAME,
+    Diagnostics = ADDON_NAME .. "_Diagnostics"
+}
 
 --------------------------------------------------------------------------------
 -- Constants
 --------------------------------------------------------------------------------
 
-OS.MIN_FREE_SLOTS = 4
-OS.WORLD_LOAD_DELAY = 8
-OS.SCAN_DEBOUNCE = 0.5
-OS.OPEN_TICK_INTERVAL = 0.25
-OS.BAG_FULL_COOLDOWN = 10
-OS.LOOT_SOUND_ID = 2847
-OS.LOOT_DELAY = 0.25
+ns.MIN_FREE_SLOTS = 4
+ns.WORLD_LOAD_DELAY = 8
+ns.SCAN_DEBOUNCE = 0.5
+ns.OPEN_TICK_INTERVAL = 0.25
+ns.OPEN_RECHECK_DELAY = 0.25 -- Delay before re-checking a slot after opening
+ns.PICK_LOCK_RESCAN_DELAY = 0.5 -- Delay after Pick Lock before rescanning bags
+ns.STATUS_FLUSH_DELAY = 0.25 -- Delay after closing an interaction window before flushing a held status message
+ns.BAG_FULL_COOLDOWN = 10
+ns.LOOT_SOUND_ID = 2847 -- SoundKitID; play with PlaySound
+ns.BAG_FULL_SOUND_FALLBACK = 846 -- SoundKitID; play with PlaySound
+ns.LOOT_DELAY = 0.25
 
-OS.SPELLS = {
+ns.SPELLS = {
     PICK_LOCK = 1804,
     SHADOWMELD = 20580
 }
 
 -- { [raceKey] = { [genderId] = soundId } }
-OS.RACE_SOUNDS = {
+ns.RACE_SOUNDS = {
     ["Human"] = {[2] = 1897, [3] = 2021},
     ["Orc"] = {[2] = 2308, [3] = 2363},
     ["Dwarf"] = {[2] = 1609, [3] = 1673},
@@ -52,105 +62,39 @@ OS.RACE_SOUNDS = {
 -- Colors
 --------------------------------------------------------------------------------
 
-local CHAT_NAME = "Open Sesame"
-
-local C_TITLE = "FFD100" -- Gold: Titles, Headers, Section Names
-local C_INFO = "00BBFF" -- Blue: Interactions, Toggles, Links, Keybinds, Slash Commands
-local C_BODY = "CCCCCC" -- Silver: Descriptions, Help Text
-local C_TEXT = "FFFFFF" -- White: Messages, Values, Spell Names
-local C_SUCCESS = "33CC33" -- Green: Enabled / On
-local C_DISABLED = "CC3333" -- Red: Disabled / Off
-local C_SEP = "AAAAAA" -- Gray: Separators, Dividers
-local C_MUTED = "808080" -- Dark Gray: Meta-data, Version Numbers
-
-local COLOR_PREFIX = "|cff"
-
-OS.COLORS = {
-    TITLE = COLOR_PREFIX .. C_TITLE,
-    INFO = COLOR_PREFIX .. C_INFO,
-    DESC = COLOR_PREFIX .. C_BODY,
-    TEXT = COLOR_PREFIX .. C_TEXT,
-    SUCCESS = COLOR_PREFIX .. C_SUCCESS,
-    DISABLED = COLOR_PREFIX .. C_DISABLED,
-    SEP = COLOR_PREFIX .. C_SEP,
-    MUTED = COLOR_PREFIX .. C_MUTED
+--[[
+    Raw hex palette only. The derived ns.COLORS table (with the |cff escape
+    prefix) and the ns.GetColor accessor live in Features/Utilities.lua, because
+    data files hold no logic.
+]]
+ns.HEX = {
+    TITLE = "FFD100", -- Gold: Titles, Headers, Section Names
+    INFO = "00BBFF", -- Blue: Interactions, Toggles, Links, Keybinds, Slash Commands
+    BODY = "CCCCCC", -- Silver: Descriptions, Help Text
+    TEXT = "FFFFFF", -- White: Messages, Values, Spell Names
+    ON = "33CC33", -- Green: Enabled / On
+    OFF = "CC3333", -- Red: Disabled / Off
+    SEPARATOR = "AAAAAA", -- Gray: Separators, Dividers
+    MUTED = "808080" -- Dark Gray: Meta-data, Version Numbers
 }
 
 --------------------------------------------------------------------------------
 -- Icons
 --------------------------------------------------------------------------------
 
-OS.ICONS = {
+ns.ICONS = {
     on = "Interface\\Icons\\inv_misc_bag_09_green",
     paused = "Interface\\Icons\\inv_misc_bag_09_black",
     off = "Interface\\Icons\\inv_misc_bag_09_red"
 }
 
 --------------------------------------------------------------------------------
--- Chat
---------------------------------------------------------------------------------
-
-OS.BRAND_PREFIX = string.format("%s%s|r %s//|r ", OS.COLORS.INFO, CHAT_NAME, OS.COLORS.SEP)
-
---------------------------------------------------------------------------------
--- API Abstraction (C_Container / Legacy)
---------------------------------------------------------------------------------
-
-OS.GetContainerNumSlots = (C_Container and C_Container.GetContainerNumSlots) or _G.GetContainerNumSlots
-OS.UseContainerItem = (C_Container and C_Container.UseContainerItem) or _G.UseContainerItem
-OS.GetContainerItemLink = (C_Container and C_Container.GetContainerItemLink) or _G.GetContainerItemLink
-OS.GetContainerItemID = (C_Container and C_Container.GetContainerItemID) or _G.GetContainerItemID
-OS.GetContainerNumFreeSlots = (C_Container and C_Container.GetContainerNumFreeSlots) or _G.GetContainerNumFreeSlots
-
---------------------------------------------------------------------------------
--- State
---------------------------------------------------------------------------------
-
-OS.state = {
-    lastBagFullAt = 0,
-    lastFreeSlots = 0,
-    lastLootAt = 0,
-    lastLootWindowAt = 0,
-    lastStatusAt = 0,
-    lastStatusMsg = nil,
-    openTimerLive = false,
-    quietUntil = 0,
-    recentAnnouncements = {},
-    scanPending = false,
-    scanTimerAt = 0
-}
-
---------------------------------------------------------------------------------
--- Utility Functions
---------------------------------------------------------------------------------
-
-function OS.Print(msg, ...)
-    local text = (...) and string.format(msg, ...) or msg
-    local output = OS.BRAND_PREFIX .. OS.COLORS.TEXT .. text .. "|r"
-    if DEFAULT_CHAT_FRAME then
-        DEFAULT_CHAT_FRAME:AddMessage(output)
-    else
-        print(output)
-    end
-end
-
-function OS.GetFreeSlots()
-    local free = 0
-    for bag = 0, 4 do
-        local slotCount, family = OS.GetContainerNumFreeSlots(bag)
-        if (family == nil or family == 0) and slotCount then
-            free = free + slotCount
-        end
-    end
-    return free
-end
-
---------------------------------------------------------------------------------
 -- Item Database
 --------------------------------------------------------------------------------
 
 -- { [itemId] = canOpenImmediately (true) or requiresUnlock (false) }
-OS.AllowedItems = {
+-- Hand-curated by item ID; no source query.
+ns.AllowedItems = {
     --------------------------------------------------------------------------------
     -- 01. World of Warcraft
     --------------------------------------------------------------------------------
@@ -354,6 +298,7 @@ OS.AllowedItems = {
     [16883] = false, -- Worn Junkbox
     [22137] = true, -- Ysida's Satchel
     [22233] = true, -- Zigris' Footlocker
+    
     --------------------------------------------------------------------------------
     -- 02. World of Warcraft: The Burning Crusade
     --------------------------------------------------------------------------------
@@ -427,6 +372,7 @@ OS.AllowedItems = {
     [25419] = true, -- Unmarked Bag of Gems
     [30260] = true, -- Voren'thal's Package
     [34426] = true, -- Winter Veil Gift
+
     --------------------------------------------------------------------------------
     -- 03. World of Warcraft: Wrath of the Lich King
     --------------------------------------------------------------------------------
@@ -509,7 +455,8 @@ OS.AllowedItems = {
 --------------------------------------------------------------------------------
 
 -- { [itemId] = true }
-OS.IgnoreItems = {
+-- Hand-curated by item ID; no source query.
+ns.IgnoreItems = {
     --------------------------------------------------------------------------------
     -- 01. World of Warcraft
     --------------------------------------------------------------------------------
@@ -522,12 +469,14 @@ OS.IgnoreItems = {
     [9276] = true, -- Pirate's Footlocker
     [17969] = true, -- Red Sack of Gems
     [17965] = true, -- Yellow Sack of Gems
+
     --------------------------------------------------------------------------------
     -- 02. World of Warcraft: The Burning Crusade
     --------------------------------------------------------------------------------
 
     [191060] = true, -- Black Sack of Gems
     [34846] = true, -- Black Sack of Gems
+
     --------------------------------------------------------------------------------
     -- 03. World of Warcraft: Wrath of the Lich King
     --------------------------------------------------------------------------------
