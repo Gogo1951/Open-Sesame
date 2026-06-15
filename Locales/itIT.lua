@@ -1,4 +1,4 @@
-local L = LibStub("AceLocale-3.0"):NewLocale("OpenSesame", "itIT")
+local L = LibStub("AceLocale-3.0"):NewLocale("Open-Sesame", "itIT")
 if not L then return end
 
 --------------------------------------------------------------------------------
@@ -20,14 +20,14 @@ L["RESUMED"] = "Ripreso."
 L["INVENTORY_FULL"] = "L'inventario è pieno!"
 L["ITEM_WILL_AUTO_OPEN"] = "%s verrà aperto automaticamente una volta sbloccato."
 L["ITEM_OPEN_MANUALLY"] = "%s deve essere aperto manualmente. Potrebbe contenere un oggetto unico, vincolato alla raccolta o temporaneo, oppure è stato rilasciato da un boss di incursione."
-L["CHAT_LOADED"] = "Versione @project-version@. Le impostazioni (inclusa l'opzione per disabilitare questo messaggio) si trovano in Opzioni > AddOn > Open Sesame. Ti piace l'addon? Parlane con un amico! (="
+L["CHAT_LOADED"] = "Versione %s. Le impostazioni (inclusa l'opzione per disabilitare questo messaggio) si trovano in Opzioni > AddOn > Open Sesame. Ti piace l'addon? Parlane con un amico! (="
 
 --------------------------------------------------------------------------------
 -- Features
 --------------------------------------------------------------------------------
 
 L["AUTO_OPENING"] = "Apertura automatica"
-L["AUTO_OPENING_DESC"] = "Apre automaticamente molluschi e contenitori sbloccati quando hai più di 4 spazi liberi nelle borse."
+L["AUTO_OPENING_DESC"] = "Apre automaticamente molluschi e contenitori sbloccati quando hai almeno %d spazi liberi nelle borse."
 L["SPEEDY_LOOT"] = "Razziamento rapido"
 L["SPEEDY_LOOT_DESC"] = "Nasconde la finestra del bottino per un razziamento quasi istantaneo."
 L["LOOT_SOUNDS"] = "Suoni del bottino"
@@ -41,13 +41,13 @@ L["KEYBIND_LEFT_CLICK"] = "Clic sinistro"
 L["KEYBIND_RIGHT_CLICK"] = "Clic destro"
 L["KEYBIND_MIDDLE_CLICK"] = "Clic centrale"
 L["ACTION_TOGGLE"] = "Attiva/Disattiva"
-L["TOOLTIP_HINT"] = "Altre impostazioni in Opzioni > AddOn > Open Sesame"
+L["TOOLTIP_HINT"] = "Impostazioni aggiuntive si trovano in Opzioni > AddOn > Open Sesame."
 
 --------------------------------------------------------------------------------
 -- Options
 --------------------------------------------------------------------------------
 
-L["OPTIONS_INTRO"] = "Apre automaticamente molluschi e contenitori sbloccati nel tuo inventario. Include Razziamento rapido per una raccolta più veloce."
+L["OPTIONS_INTRO"] = "Apre automaticamente molluschi e contenitori sbloccati nel tuo inventario. Offre Razziamento rapido per una raccolta più veloce."
 L["OPTIONS_ENABLE_WELCOME"] = "Abilita il messaggio di benvenuto"
 L["OPTIONS_FEEDBACK"] = "Feedback & Supporto"
 L["OPTIONS_CURSEFORGE"] = "CurseForge"

@@ -1,4 +1,4 @@
-local L = LibStub("AceLocale-3.0"):NewLocale("OpenSesame", "deDE")
+local L = LibStub("AceLocale-3.0"):NewLocale("Open-Sesame", "deDE")
 if not L then return end
 
 --------------------------------------------------------------------------------
@@ -20,14 +20,14 @@ L["RESUMED"] = "Fortgesetzt."
 L["INVENTORY_FULL"] = "Inventar ist voll!"
 L["ITEM_WILL_AUTO_OPEN"] = "%s wird automatisch geöffnet, sobald es entsperrt ist."
 L["ITEM_OPEN_MANUALLY"] = "%s muss manuell geöffnet werden. Es kann einen einzigartigen, beim Aufheben gebundenen oder temporären Gegenstand enthalten oder wurde von einem Schlachtzugsboss fallengelassen."
-L["CHAT_LOADED"] = "Version @project-version@. Einstellungen (einschließlich der Option, diese Nachricht zu deaktivieren) finden Sie unter Optionen > AddOns > Open Sesame. Gefällt dir das Addon? Erzähl einem Freund davon! (="
+L["CHAT_LOADED"] = "Version %s. Einstellungen (einschließlich der Option, diese Nachricht zu deaktivieren) finden Sie unter Optionen > AddOns > Open Sesame. Gefällt dir das Addon? Erzähl einem Freund davon! (="
 
 --------------------------------------------------------------------------------
 -- Features
 --------------------------------------------------------------------------------
 
 L["AUTO_OPENING"] = "Automatisches Öffnen"
-L["AUTO_OPENING_DESC"] = "Öffnet automatisch Muscheln und entsperrte Behälter, wenn mehr als 4 Taschenplätze frei sind."
+L["AUTO_OPENING_DESC"] = "Öffnet automatisch Muscheln und entsperrte Behälter, wenn mindestens %d Taschenplätze frei sind."
 L["SPEEDY_LOOT"] = "Schnelle Beute"
 L["SPEEDY_LOOT_DESC"] = "Blendet das Beutefenster aus, um Beute nahezu sofort aufzusammeln."
 L["LOOT_SOUNDS"] = "Beutegeräusche"
@@ -41,7 +41,7 @@ L["KEYBIND_LEFT_CLICK"] = "Linksklick"
 L["KEYBIND_RIGHT_CLICK"] = "Rechtsklick"
 L["KEYBIND_MIDDLE_CLICK"] = "Mittelklick"
 L["ACTION_TOGGLE"] = "Umschalten"
-L["TOOLTIP_HINT"] = "Weitere Einstellungen unter Optionen > AddOns > Open Sesame"
+L["TOOLTIP_HINT"] = "Weitere Einstellungen finden Sie unter Optionen > AddOns > Open Sesame."
 
 --------------------------------------------------------------------------------
 -- Options
