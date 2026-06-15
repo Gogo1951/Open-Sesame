@@ -2,19 +2,19 @@ package-as: Open-Sesame
 enable-nolib-creation: no
 
 externals:
-  Includes/LibStub:
+  Includes/Libraries/LibStub:
     url: https://repos.curseforge.com/wow/libstub/trunk
-  Includes/CallbackHandler-1.0:
+  Includes/Libraries/CallbackHandler-1.0:
     url: https://repos.curseforge.com/wow/callbackhandler/trunk/CallbackHandler-1.0
-  Includes/AceLocale-3.0:
+  Includes/Libraries/AceLocale-3.0:
     url: https://repos.curseforge.com/wow/ace3/trunk/AceLocale-3.0
-  Includes/LibDataBroker-1.1:
+  Includes/Libraries/LibDataBroker-1.1:
     url: https://github.com/tekkub/libdatabroker-1-1
-  Includes/LibDBIcon-1.0:
+  Includes/Libraries/LibDBIcon-1.0:
     url: https://repos.curseforge.com/wow/libdbicon-1-0/trunk/LibDBIcon-1.0
-  Includes/AceGUI-3.0:
+  Includes/Libraries/AceGUI-3.0:
     url: https://repos.curseforge.com/wow/ace3/trunk/AceGUI-3.0
-  Includes/AceConfig-3.0:
+  Includes/Libraries/AceConfig-3.0:
     url: https://repos.curseforge.com/wow/ace3/trunk/AceConfig-3.0
 
 ignore:
