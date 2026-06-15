@@ -18,7 +18,7 @@ local L = ns.L
 ns.BRAND_PREFIX = string.format("%s%s|r %s//|r ", ns.COLORS.INFO, L["ADDON_TITLE"], ns.COLORS.SEPARATOR)
 
 function ns.PrintMessage(msg, ...)
-    local text = (...) and string.format(msg, ...) or msg
+    local text = select("#", ...) > 0 and string.format(msg, ...) or msg
     local output = ns.BRAND_PREFIX .. ns.COLORS.TEXT .. text .. "|r"
     if DEFAULT_CHAT_FRAME then
         DEFAULT_CHAT_FRAME:AddMessage(output)
@@ -51,7 +51,7 @@ function ns.StatusPrint(msg, ...)
     if IsQuiet() then
         return
     end
-    local text = (...) and string.format(msg, ...) or msg
+    local text = select("#", ...) > 0 and string.format(msg, ...) or msg
     local now = GetTime()
     if text == ns.state.lastStatusMsg and (now - ns.state.lastStatusAt) < 5 then
         return
