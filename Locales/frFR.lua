@@ -15,8 +15,8 @@ L["STATUS_PAUSED"] = "En pause"
 --------------------------------------------------------------------------------
 
 L["AUTO_LOOT_ENABLED"] = "La Fouille automatique est requise pour qu'Open Sesame fonctionne correctement. La Fouille automatique a été activée."
-L["PAUSED_BAG_SLOTS"] = "En pause jusqu'à ce que vous ayez au moins %d emplacements de sac libres."
-L["RESUMED"] = "Reprise."
+L["PAUSED_BAG_SLOTS"] = "L'ouverture automatique est en pause jusqu'à ce que vous ayez au moins %d emplacements de sac libres."
+L["RESUMED"] = "L'ouverture automatique a repris."
 L["INVENTORY_FULL"] = "L'inventaire est plein !"
 L["ITEM_WILL_AUTO_OPEN"] = "%s sera automatiquement ouvert une fois déverrouillé."
 L["ITEM_OPEN_MANUALLY"] = "%s doit être ouvert manuellement. Il peut contenir un objet unique, lié quand ramassé ou temporaire, ou a été lâché par un boss de raid."
@@ -49,6 +49,11 @@ L["TOOLTIP_HINT"] = "Des paramètres supplémentaires se trouvent dans Options >
 
 L["OPTIONS_INTRO"] = "Ouvre automatiquement les palourdes et les conteneurs déverrouillés dans votre inventaire. Propose Butin rapide pour un ramassage plus rapide."
 L["OPTIONS_ENABLE_WELCOME"] = "Activer le message de bienvenue"
+L["OPTIONS_ENABLE_MINIMAP"] = "Activer le bouton de la mini-carte"
+L["OPTIONS_RESET"] = "Réinitialiser"
+L["OPTIONS_RESET_DESC"] = "Restaure tous les paramètres d'Open Sesame à leurs valeurs par défaut."
+L["OPTIONS_RESET_BUTTON"] = "Réinitialiser toutes les options d'Open Sesame"
+L["OPTIONS_RESET_CONFIRM"] = "Réinitialiser tous les paramètres d'Open Sesame à leurs valeurs par défaut ?"
 L["OPTIONS_FEEDBACK"] = "Commentaires & Support"
 L["OPTIONS_CURSEFORGE"] = "CurseForge"
 L["OPTIONS_GITHUB"] = "GitHub"

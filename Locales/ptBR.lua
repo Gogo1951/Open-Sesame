@@ -15,8 +15,8 @@ L["STATUS_PAUSED"] = "Pausado"
 --------------------------------------------------------------------------------
 
 L["AUTO_LOOT_ENABLED"] = "O Saque Automático é necessário para que o Open Sesame funcione corretamente. O Saque Automático foi ativado."
-L["PAUSED_BAG_SLOTS"] = "Pausado até que você tenha pelo menos %d espaços livres na bolsa."
-L["RESUMED"] = "Retomado."
+L["PAUSED_BAG_SLOTS"] = "A abertura automática está pausada até que você tenha pelo menos %d espaços livres na bolsa."
+L["RESUMED"] = "A abertura automática foi retomada."
 L["INVENTORY_FULL"] = "O inventário está cheio!"
 L["ITEM_WILL_AUTO_OPEN"] = "%s será aberto automaticamente quando for desbloqueado."
 L["ITEM_OPEN_MANUALLY"] = "%s precisa ser aberto manualmente. Pode conter um item Único, Vinculado ao Coletar ou Temporário, ou foi deixado por um chefe de raide."
@@ -49,6 +49,11 @@ L["TOOLTIP_HINT"] = "Configurações adicionais podem ser encontradas em Opçõe
 
 L["OPTIONS_INTRO"] = "Abre automaticamente mariscos e recipientes desbloqueados no seu inventário. Possui Saque rápido para coletar itens mais rapidamente."
 L["OPTIONS_ENABLE_WELCOME"] = "Ativar mensagem de boas-vindas"
+L["OPTIONS_ENABLE_MINIMAP"] = "Ativar botão do minimapa"
+L["OPTIONS_RESET"] = "Redefinir"
+L["OPTIONS_RESET_DESC"] = "Restaura todas as configurações do Open Sesame para o valor padrão."
+L["OPTIONS_RESET_BUTTON"] = "Redefinir todas as opções do Open Sesame"
+L["OPTIONS_RESET_CONFIRM"] = "Redefinir todas as configurações do Open Sesame para os valores padrão?"
 L["OPTIONS_FEEDBACK"] = "Feedback & Suporte"
 L["OPTIONS_CURSEFORGE"] = "CurseForge"
 L["OPTIONS_GITHUB"] = "GitHub"

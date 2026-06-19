@@ -15,8 +15,8 @@ L["STATUS_PAUSED"] = "Pausiert"
 --------------------------------------------------------------------------------
 
 L["AUTO_LOOT_ENABLED"] = "Automatisches Plündern ist erforderlich, damit Open Sesame richtig funktioniert. Automatisches Plündern wurde aktiviert."
-L["PAUSED_BAG_SLOTS"] = "Pausiert, bis mindestens %d Taschenplätze frei sind."
-L["RESUMED"] = "Fortgesetzt."
+L["PAUSED_BAG_SLOTS"] = "Das automatische Öffnen ist pausiert, bis mindestens %d Taschenplätze frei sind."
+L["RESUMED"] = "Das automatische Öffnen wurde fortgesetzt."
 L["INVENTORY_FULL"] = "Inventar ist voll!"
 L["ITEM_WILL_AUTO_OPEN"] = "%s wird automatisch geöffnet, sobald es entsperrt ist."
 L["ITEM_OPEN_MANUALLY"] = "%s muss manuell geöffnet werden. Es kann einen einzigartigen, beim Aufheben gebundenen oder temporären Gegenstand enthalten oder wurde von einem Schlachtzugsboss fallengelassen."
@@ -49,6 +49,11 @@ L["TOOLTIP_HINT"] = "Weitere Einstellungen finden Sie unter Optionen > AddOns > 
 
 L["OPTIONS_INTRO"] = "Öffnet automatisch Muscheln und entsperrte Behälter im Inventar. Mit Schnelle Beute für schnelleres Aufsammeln."
 L["OPTIONS_ENABLE_WELCOME"] = "Willkommensnachricht aktivieren"
+L["OPTIONS_ENABLE_MINIMAP"] = "Minikarten-Schaltfläche aktivieren"
+L["OPTIONS_RESET"] = "Zurücksetzen"
+L["OPTIONS_RESET_DESC"] = "Stellt jede Einstellung von Open Sesame auf den Standardwert zurück."
+L["OPTIONS_RESET_BUTTON"] = "Alle Open Sesame Optionen zurücksetzen"
+L["OPTIONS_RESET_CONFIRM"] = "Alle Open Sesame Einstellungen auf die Standardwerte zurücksetzen?"
 L["OPTIONS_FEEDBACK"] = "Feedback & Support"
 L["OPTIONS_CURSEFORGE"] = "CurseForge"
 L["OPTIONS_GITHUB"] = "GitHub"

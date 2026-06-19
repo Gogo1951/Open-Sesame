@@ -33,6 +33,23 @@ function ns.UpdateMinimapIcon()
     end
 end
 
+--[[
+    showMinimap (Data/Default-Settings.lua) is the source of truth, so a settings
+    reset restores the button to on. The LibDBIcon subtable's `hide` field is kept
+    in sync (inverted) so the button library obeys it; PLAYER_LOGIN re-derives hide
+    from showMinimap at load. The minimap subtable itself is never wiped, so the
+    button's saved position survives a reset.
+]]
+function ns.SetMinimapShown(shown)
+    ns.DB.showMinimap = shown
+    ns.DB.minimap.hide = not shown
+    if shown then
+        LDBIcon:Show(ADDON_NAME)
+    else
+        LDBIcon:Hide(ADDON_NAME)
+    end
+end
+
 --------------------------------------------------------------------------------
 -- Utility Functions
 --------------------------------------------------------------------------------
