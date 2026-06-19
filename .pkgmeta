@@ -18,6 +18,7 @@ externals:
     url: https://repos.curseforge.com/wow/ace3/trunk/AceConfig-3.0
 
 ignore:
+  - .DS_Store
   - .git
   - .github
   - .gitignore
