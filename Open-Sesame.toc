@@ -1,5 +1,5 @@
 ## Title: Open Sesame
-## Notes: Automatically opens clams, lockboxes, and unlocked containers in your bags, with optional Speedy Loot for near-instant looting.
+## Notes: Open Sesame automatically opens clams, lockboxes, and unlocked containers in your bags. Built-in Speedy Loot hides the loot window for near-instant looting. Less time clicking, more time playing.
 ## Author: Gogo1951
 
 ## IconTexture: Interface/AddOns/Open-Sesame/Includes/Images/Open-Sesame.tga

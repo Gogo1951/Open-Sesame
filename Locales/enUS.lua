@@ -47,9 +47,13 @@ L["TOOLTIP_HINT"] = "Additional settings can be found under Options > AddOns > O
 -- Options
 --------------------------------------------------------------------------------
 
-L["OPTIONS_INTRO"] =
-    "Automatically opens clams and unlocked containers in your inventory. Features Speedy Loot for faster looting."
+L["OPTIONS_INTRO"] = "Open Sesame automatically opens clams, lockboxes, and unlocked containers in your bags. Built-in Speedy Loot hides the loot window for near-instant looting. Less time clicking, more time playing."
 L["OPTIONS_ENABLE_WELCOME"] = "Enable Welcome Message"
+L["OPTIONS_ENABLE_MINIMAP"] = "Enable Mini-map Button"
+L["OPTIONS_RESET"] = "Reset"
+L["OPTIONS_RESET_DESC"] = "Restore every Open Sesame setting to its default value."
+L["OPTIONS_RESET_BUTTON"] = "Reset All Open Sesame Options"
+L["OPTIONS_RESET_CONFIRM"] = "Reset all Open Sesame settings to their default values?"
 L["OPTIONS_FEEDBACK"] = "Feedback & Support"
 L["OPTIONS_CURSEFORGE"] = "CurseForge"
 L["OPTIONS_GITHUB"] = "GitHub"

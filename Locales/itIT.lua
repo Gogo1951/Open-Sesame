@@ -15,8 +15,8 @@ L["STATUS_PAUSED"] = "In pausa"
 --------------------------------------------------------------------------------
 
 L["AUTO_LOOT_ENABLED"] = "Il Razziamento Automatico è necessario affinché Open Sesame funzioni correttamente. Il Razziamento Automatico è stato attivato."
-L["PAUSED_BAG_SLOTS"] = "In pausa finché non avrai almeno %d spazi liberi nelle borse."
-L["RESUMED"] = "Ripreso."
+L["PAUSED_BAG_SLOTS"] = "L'apertura automatica è in pausa finché non avrai almeno %d spazi liberi nelle borse."
+L["RESUMED"] = "L'apertura automatica è ripresa."
 L["INVENTORY_FULL"] = "L'inventario è pieno!"
 L["ITEM_WILL_AUTO_OPEN"] = "%s verrà aperto automaticamente una volta sbloccato."
 L["ITEM_OPEN_MANUALLY"] = "%s deve essere aperto manualmente. Potrebbe contenere un oggetto unico, vincolato alla raccolta o temporaneo, oppure è stato rilasciato da un boss di incursione."
@@ -49,6 +49,11 @@ L["TOOLTIP_HINT"] = "Impostazioni aggiuntive si trovano in Opzioni > AddOn > Ope
 
 L["OPTIONS_INTRO"] = "Apre automaticamente molluschi e contenitori sbloccati nel tuo inventario. Offre Razziamento rapido per una raccolta più veloce."
 L["OPTIONS_ENABLE_WELCOME"] = "Abilita il messaggio di benvenuto"
+L["OPTIONS_ENABLE_MINIMAP"] = "Abilita pulsante minimappa"
+L["OPTIONS_RESET"] = "Reimposta"
+L["OPTIONS_RESET_DESC"] = "Riporta ogni impostazione di Open Sesame al suo valore predefinito."
+L["OPTIONS_RESET_BUTTON"] = "Reimposta tutte le opzioni di Open Sesame"
+L["OPTIONS_RESET_CONFIRM"] = "Reimpostare tutte le impostazioni di Open Sesame ai valori predefiniti?"
 L["OPTIONS_FEEDBACK"] = "Feedback & Supporto"
 L["OPTIONS_CURSEFORGE"] = "CurseForge"
 L["OPTIONS_GITHUB"] = "GitHub"

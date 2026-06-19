@@ -340,6 +340,9 @@ function EventHandlers:PLAYER_LOGIN()
     ns.isEnabled = ns.DB.autoOpen
     ns.isSpeedyLoot = ns.DB.speedyLoot
 
+    -- Re-derive the LibDBIcon hide flag from showMinimap so a settings reset restores the button to on.
+    ns.DB.minimap.hide = not ns.DB.showMinimap
+
     if ns.InitMinimap then
         ns.InitMinimap()
     end
@@ -367,6 +370,35 @@ function EventHandlers:PLAYER_ENTERING_WORLD(isInitialLogin, isReloadingUi)
     else
         ns.SetQuiet(2)
     end
+end
+
+--------------------------------------------------------------------------------
+-- Reset
+--------------------------------------------------------------------------------
+
+--[[
+    Restore every saved setting to its Default-Settings value (a full overwrite,
+    not the additive login merge). The minimap subtable is preserved so the
+    button's saved position survives; only its hide flag is re-derived from the
+    restored showMinimap. Runtime flags and side effects are re-applied so the
+    reset takes hold immediately without a reload.
+]]
+function ns.ResetSettings()
+    for key, value in pairs(ns.DEFAULT_CONFIGURATION) do
+        ns.DB[key] = value
+    end
+
+    ns.isEnabled = ns.DB.autoOpen
+    ns.isSpeedyLoot = ns.DB.speedyLoot
+
+    if ns.SetMinimapShown then
+        ns.SetMinimapShown(ns.DB.showMinimap)
+    end
+    if ns.isEnabled then
+        ns.EnsureAutoLoot()
+    end
+    ns.ScheduleScan(true)
+    ns.UpdateMinimapIcon()
 end
 
 --------------------------------------------------------------------------------

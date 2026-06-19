@@ -2,6 +2,7 @@ local ADDON_NAME, ns = ...
 
 local L = ns.L
 local GetColor = ns.GetColor
+local AceConfigRegistry = LibStub("AceConfigRegistry-3.0")
 
 --------------------------------------------------------------------------------
 -- Options Table
@@ -26,6 +27,18 @@ function ns.BuildGeneralOptions()
                 end,
                 set = function(_, value)
                     ns.DB.showWelcome = value
+                end
+            },
+            toggleMinimap = {
+                type = "toggle",
+                name = L["OPTIONS_ENABLE_MINIMAP"],
+                order = 7,
+                width = "full",
+                get = function()
+                    return ns.DB.showMinimap
+                end,
+                set = function(_, value)
+                    ns.SetMinimapShown(value)
                 end
             },
             -- Auto-Opening
@@ -91,6 +104,24 @@ function ns.BuildGeneralOptions()
                 end,
                 set = function(_, value)
                     ns.DB.lootSounds = value
+                end
+            },
+            -- Reset
+
+            spaceReset0 = ns.OptionsSpacer(80),
+            headerReset = ns.OptionsHeader(L["OPTIONS_RESET"], 81),
+            descReset = ns.OptionsDesc(L["OPTIONS_RESET_DESC"], 82),
+            spaceReset1 = ns.OptionsSpacer(83),
+            buttonReset = {
+                type = "execute",
+                name = L["OPTIONS_RESET_BUTTON"],
+                order = 84,
+                width = "full",
+                confirm = true,
+                confirmText = L["OPTIONS_RESET_CONFIRM"],
+                func = function()
+                    ns.ResetSettings()
+                    AceConfigRegistry:NotifyChange(ns.OPTIONS_REGISTRY.General)
                 end
             },
             -- Feedback & Support

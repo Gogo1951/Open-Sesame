@@ -47,7 +47,7 @@ Core.lua owns the single event frame. Handlers live in the `EventHandlers` table
 
 Events the addon listens for:
 
-- **`PLAYER_LOGIN`** — initialize `OpenSesameDB`, merge defaults, mirror `autoOpen`/`speedyLoot` into the runtime flags, init the minimap button, print the welcome message.
+- **`PLAYER_LOGIN`** — initialize `OpenSesameDB`, merge defaults, mirror `autoOpen`/`speedyLoot` into the runtime flags, derive `minimap.hide` from `showMinimap`, init the minimap button, print the welcome message.
 - **`PLAYER_ENTERING_WORLD`** — on initial login or `/reload`, wait `ns.WORLD_LOAD_DELAY` (8s) for bag/loot APIs to settle, then run a forced scan and ensure Auto Loot is on (whenever Auto-Opening *or* Speedy Loot is enabled). On zone changes, just enter a 2s "quiet" window to suppress chat noise.
 - **`BAG_UPDATE_DELAYED`** / **`BAG_NEW_ITEMS_UPDATED`** — debounced `ScheduleScan()` (the soft form). Fires often; debouncing collapses bursts.
 - **`LOOT_READY`** / **`LOOT_OPENED`** — record the loot-window timestamp that gates the loot sound in `CHAT_MSG_LOOT`.
@@ -115,6 +115,14 @@ Two guards inside the loop:
 
 Auto-loot and loot-method detection both use availability-based picks (`if C_CVar.GetCVarBool then … else …`, `if GetLootMethod then … elseif C_PartyInfo.GetLootMethod then …`) rather than `(modern() or legacy())`, which would fall through to the legacy path whenever the modern call legitimately returns `false`/an enum. Keep the `if`-form. `C_PartyInfo.GetLootMethod` returns the method as an enum number; `GetLootMethodCompat` maps enum `2` (or `Enum.LootMethod.MasterLoot` where present) back to the legacy `"master"` string so the master-looter guard reads consistently across clients.
 
+### Minimap Button
+
+Minimap-Button.lua registers a single LibDataBroker launcher (`ns.InitMinimap`, called from `PLAYER_LOGIN`) and hands its `minimap` subtable to `LDBIcon:Register`. The click handlers map to the three feature toggles — left-click Auto-Opening, right-click Speedy Loot, middle-click Loot Sounds — and the tooltip reflects each feature's current state.
+
+`ns.UpdateMinimapIcon` swaps the icon and broker text between three states derived from the runtime flags: `off` (not enabled), `paused` (enabled but out of bag space), and `on`. Core calls it after every state change.
+
+Visibility is a separate concern from icon state. `showMinimap` (SavedVariables) is the source of truth; `ns.SetMinimapShown(shown)` writes it and mirrors the inverse onto `minimap.hide` — the field LibDBIcon actually reads — then calls `LDBIcon:Show` / `LDBIcon:Hide`. `PLAYER_LOGIN` re-derives `hide` from `showMinimap` at load, and a settings reset restores `showMinimap` to on. The `minimap` subtable that stores the button's position is never wiped, so neither resets nor visibility toggles ever move the button.
+
 ### Item Allowlist
 
 `ns.AllowedItems` in Data.lua is a flat `{ [itemId] = boolean }` map; the boolean carries meaning, not just presence:
@@ -153,11 +161,14 @@ The panel exposes eight tools:
 - `speedyLoot` (boolean, default `true`) — toggles the `LOOT_READY` handler in Speedy-Loot.lua. Mirrored to `ns.isSpeedyLoot`.
 - `lootSounds` (boolean, default `false`) — plays a distinct sound on Uncommon+ loot in `CHAT_MSG_LOOT`.
 - `showWelcome` (boolean, default `true`) — toggles the login welcome message.
-- `minimap` (table) — owned by LibDBIcon; holds the minimap button position. Passed straight to `LDBIcon:Register`.
+- `showMinimap` (boolean, default `true`) — source of truth for the minimap button's visibility. Mirrored (inverted) onto `minimap.hide` so LibDBIcon obeys it; see Minimap Button.
+- `minimap` (table) — owned by LibDBIcon; holds the minimap button position and its `hide` flag. Passed straight to `LDBIcon:Register`. `hide` is a derived mirror of `showMinimap`, not an independent setting.
 
 There is no per-character DB — all settings are account-scoped, and there is no migration chain.
 
-Defaults live in `ns.DEFAULT_CONFIGURATION` (Data/Default-Settings.lua). `EventHandlers:PLAYER_LOGIN` merges them additively: `if ns.DB[key] == nil then ns.DB[key] = value end`. It only fills nil fields and never overrides an explicit user value — `false` is a legitimate stored value, and the `or` form would wipe a deliberately-disabled toggle on every login.
+Defaults live in `ns.DEFAULT_CONFIGURATION` (Data/Default-Settings.lua). `EventHandlers:PLAYER_LOGIN` merges them additively: `if ns.DB[key] == nil then ns.DB[key] = value end`. It only fills nil fields and never overrides an explicit user value — `false` is a legitimate stored value, and the `or` form would wipe a deliberately-disabled toggle on every login. Login then derives `minimap.hide` from the merged `showMinimap`, so the LibDBIcon button matches the saved setting.
+
+`ns.ResetSettings` (Core.lua, fired by the **Reset All Open Sesame Options** button under Options → General) is the one place that *overwrites* every `ns.DEFAULT_CONFIGURATION` key back to its default instead of filling nil — so a reset turns the minimap button back on through `showMinimap`. It never wipes the `minimap` subtable; it mirrors the restored `showMinimap` onto `minimap.hide` instead, so the button's saved position survives the reset (wiping it would snap the button back to its default angle). It then re-applies the runtime flags and side effects (`EnsureAutoLoot`, a forced scan, icon refresh) so the reset is live without a `/reload`.
 
 ## Adding a New Item to the Allowlist
 
@@ -190,6 +201,10 @@ Every locale is an independent file in this format. Spanish is no exception: `es
 - **The `OS_ScanTooltip` frame name is intentional**: the scanning tooltip keeps the `OS_` prefix even though the namespace local is `ns`. It's a global frame name — and the source of the `OS_ScanTooltipTextLeft*` font strings `IsItemLocked` reads — so renaming it would break those lookups for no benefit.
 
 - **Event log escaping order**: in `ns:LogEvent`, the 255-byte length cut happens *before* the `|` → `||` escape. Reverse them and a loot line cut mid-link renders as a broken clickable swatch (the classic collapse to a stray `[Sc`) instead of readable text.
+
+- **Resetting must not wipe the `minimap` subtable**: `ns.ResetSettings` overwrites the `ns.DEFAULT_CONFIGURATION` keys back to their defaults but deliberately leaves `OpenSesameDB.minimap` in place, re-deriving only its `hide` field from the restored `showMinimap`. Replacing that with a blanket `OpenSesameDB = {}` (or wiping `minimap`) discards the button's saved position and snaps it back to its default angle. Keep the targeted key overwrite.
+
+- **`minimap.hide` is derived, not authoritative**: write button visibility through `ns.SetMinimapShown`, which keeps `showMinimap` (the source of truth) and `minimap.hide` in sync. Setting `minimap.hide` directly drifts from `showMinimap` and is overwritten on the next `PLAYER_LOGIN`.
 
 ## Contributing
 

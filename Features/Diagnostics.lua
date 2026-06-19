@@ -244,7 +244,6 @@ ns.DIAGNOSTIC_API_CHECKS = {
     {"GetNumLootItems", function() return type(GetNumLootItems) == "function" end},
     {"GetLootSlotType", function() return type(GetLootSlotType) == "function" end},
     {"GetLootSlotLink", function() return type(GetLootSlotLink) == "function" end},
-    {"GetLootSlotInfo", function() return type(GetLootSlotInfo) == "function" end},
     {"GetLootThreshold", function() return type(GetLootThreshold) == "function" end},
     {"LootSlot", function() return type(LootSlot) == "function" end},
     {"IsModifiedClick", function() return type(IsModifiedClick) == "function" end},
