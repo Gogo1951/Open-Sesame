@@ -51,7 +51,7 @@ L["TOOLTIP_HINT"] = "추가 설정은 옵션 > 애드온 > Open Sesame에서 확
 -- Options
 --------------------------------------------------------------------------------
 
-L["OPTIONS_INTRO"] = "인벤토리에 있는 조개와 잠금 해제된 상자를 자동으로 엽니다. 더 빠른 전리품 획득을 위한 빠른 전리품 기능을 제공합니다."
+L["OPTIONS_INTRO"] = "인벤토리에 있는 조개, 자물쇠 상자, 잠금 해제된 상자를 자동으로 엽니다. 더 빠른 전리품 획득을 위한 빠른 전리품 기능을 제공합니다."
 L["OPTIONS_ENABLE_WELCOME"] = "환영 메시지 활성화"
 L["OPTIONS_ENABLE_MINIMAP"] = "미니맵 버튼 활성화"
 L["OPTIONS_ENABLE_LOCKBOX_NOTIFICATIONS"] = "자물쇠 상자 알림 활성화"

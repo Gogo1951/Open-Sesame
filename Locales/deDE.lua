@@ -51,7 +51,7 @@ L["TOOLTIP_HINT"] = "Weitere Einstellungen finden Sie unter Optionen > AddOns > 
 -- Options
 --------------------------------------------------------------------------------
 
-L["OPTIONS_INTRO"] = "Öffnet automatisch Muscheln und entsperrte Behälter im Inventar. Mit Schnelle Beute für schnelleres Aufsammeln."
+L["OPTIONS_INTRO"] = "Öffnet automatisch Muscheln, Schließfächer und entsperrte Behälter im Inventar. Mit Schnelle Beute für schnelleres Aufsammeln."
 L["OPTIONS_ENABLE_WELCOME"] = "Willkommensnachricht aktivieren"
 L["OPTIONS_ENABLE_MINIMAP"] = "Minikarten-Schaltfläche aktivieren"
 L["OPTIONS_ENABLE_LOCKBOX_NOTIFICATIONS"] = "Schließfach-Benachrichtigungen aktivieren"

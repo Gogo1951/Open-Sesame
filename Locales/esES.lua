@@ -51,7 +51,7 @@ L["TOOLTIP_HINT"] = "La configuración adicional se puede encontrar en Opciones 
 -- Options
 --------------------------------------------------------------------------------
 
-L["OPTIONS_INTRO"] = "Abre automáticamente almejas y contenedores desbloqueados en tu inventario. Cuenta con Despojo rápido para obtener botín más rápidamente."
+L["OPTIONS_INTRO"] = "Abre automáticamente almejas, cajas con cerradura y contenedores desbloqueados en tu inventario. Cuenta con Despojo rápido para obtener botín más rápidamente."
 L["OPTIONS_ENABLE_WELCOME"] = "Activar mensaje de bienvenida"
 L["OPTIONS_ENABLE_MINIMAP"] = "Activar botón del minimapa"
 L["OPTIONS_ENABLE_LOCKBOX_NOTIFICATIONS"] = "Activar notificaciones de cajas con cerradura"

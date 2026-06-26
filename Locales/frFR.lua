@@ -51,7 +51,7 @@ L["TOOLTIP_HINT"] = "Des paramètres supplémentaires se trouvent dans Options >
 -- Options
 --------------------------------------------------------------------------------
 
-L["OPTIONS_INTRO"] = "Ouvre automatiquement les palourdes et les conteneurs déverrouillés dans votre inventaire. Propose Butin rapide pour un ramassage plus rapide."
+L["OPTIONS_INTRO"] = "Ouvre automatiquement les palourdes, les coffres-forts et les conteneurs déverrouillés dans votre inventaire. Propose Butin rapide pour un ramassage plus rapide."
 L["OPTIONS_ENABLE_WELCOME"] = "Activer le message de bienvenue"
 L["OPTIONS_ENABLE_MINIMAP"] = "Activer le bouton de la mini-carte"
 L["OPTIONS_ENABLE_LOCKBOX_NOTIFICATIONS"] = "Activer les notifications de coffres-forts"

@@ -51,7 +51,7 @@ L["TOOLTIP_HINT"] = "Impostazioni aggiuntive si trovano in Opzioni > AddOn > Ope
 -- Options
 --------------------------------------------------------------------------------
 
-L["OPTIONS_INTRO"] = "Apre automaticamente molluschi e contenitori sbloccati nel tuo inventario. Offre Razziamento rapido per una raccolta più veloce."
+L["OPTIONS_INTRO"] = "Apre automaticamente molluschi, cassette di sicurezza e contenitori sbloccati nel tuo inventario. Offre Razziamento rapido per una raccolta più veloce."
 L["OPTIONS_ENABLE_WELCOME"] = "Abilita il messaggio di benvenuto"
 L["OPTIONS_ENABLE_MINIMAP"] = "Abilita pulsante minimappa"
 L["OPTIONS_ENABLE_LOCKBOX_NOTIFICATIONS"] = "Abilita le notifiche delle cassette di sicurezza"

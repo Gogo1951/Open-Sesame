@@ -51,7 +51,7 @@ L["TOOLTIP_HINT"] = "Configurações adicionais podem ser encontradas em Opçõe
 -- Options
 --------------------------------------------------------------------------------
 
-L["OPTIONS_INTRO"] = "Abre automaticamente mariscos e recipientes desbloqueados no seu inventário. Possui Saque rápido para coletar itens mais rapidamente."
+L["OPTIONS_INTRO"] = "Abre automaticamente mariscos, caixas trancadas e recipientes desbloqueados no seu inventário. Possui Saque rápido para coletar itens mais rapidamente."
 L["OPTIONS_ENABLE_WELCOME"] = "Ativar mensagem de boas-vindas"
 L["OPTIONS_ENABLE_MINIMAP"] = "Ativar botão do minimapa"
 L["OPTIONS_ENABLE_LOCKBOX_NOTIFICATIONS"] = "Ativar notificações de caixas trancadas"
