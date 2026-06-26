@@ -14,13 +14,17 @@ L["STATUS_PAUSED"] = "Paused"
 -- Chat Messages
 --------------------------------------------------------------------------------
 
+-- System
 L["AUTO_LOOT_ENABLED"] = "Auto Loot is required for Open Sesame to function properly. Auto Loot has been enabled."
+L["CHAT_LOADED"] = "Version %s. Settings (including the option to disable this message) can be found under Options > AddOns > Open Sesame. Enjoying the addon? Tell a friend about it! (="
+L["MESSAGE_RESET"] = "All settings have been reset to defaults."
+
+-- Auto-Open
 L["PAUSED_BAG_SLOTS"] = "Auto-Open is Paused until you have at least %d empty bag slots."
 L["RESUMED"] = "Auto-Open has Resumed."
 L["INVENTORY_FULL"] = "Inventory is full!"
 L["ITEM_WILL_AUTO_OPEN"] = "%s will be automatically opened once it's unlocked."
 L["ITEM_OPEN_MANUALLY"] = "%s needs to be opened manually. It may contain a Unique, Bind on Pickup, or Temporary item; or it was dropped by a raid boss."
-L["CHAT_LOADED"] = "Version %s. Settings (including the option to disable this message) can be found under Options > AddOns > Open Sesame. Enjoying the addon? Tell a friend about it! (="
 
 --------------------------------------------------------------------------------
 -- Features
@@ -50,6 +54,13 @@ L["TOOLTIP_HINT"] = "Additional settings can be found under Options > AddOns > O
 L["OPTIONS_INTRO"] = "Open Sesame automatically opens clams, lockboxes, and unlocked containers in your bags. Built-in Speedy Loot hides the loot window for near-instant looting. Less time clicking, more time playing."
 L["OPTIONS_ENABLE_WELCOME"] = "Enable Welcome Message"
 L["OPTIONS_ENABLE_MINIMAP"] = "Enable Mini-map Button"
+L["OPTIONS_ENABLE_LOCKBOX_NOTIFICATIONS"] = "Enable Lockbox Notifications"
+L["OPTIONS_ENABLE_AUTO_OPENING"] = "Enable Auto-Opening"
+L["OPTIONS_ENABLE_SPEEDY_LOOT"] = "Enable Speedy Loot"
+L["OPTIONS_ENABLE_LOOT_SOUNDS"] = "Enable Loot Sounds"
+L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
+L["OPTIONS_CMD_OS"] = "/os"
+L["OPTIONS_CMD_OS_DESCRIPTION"] = "Opens the Open Sesame options interface."
 L["OPTIONS_RESET"] = "Reset"
 L["OPTIONS_RESET_DESC"] = "Restore every Open Sesame setting to its default value."
 L["OPTIONS_RESET_BUTTON"] = "Reset All Open Sesame Options"

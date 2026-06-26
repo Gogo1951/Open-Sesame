@@ -399,6 +399,8 @@ function ns.ResetSettings()
     end
     ns.ScheduleScan(true)
     ns.UpdateMinimapIcon()
+
+    ns.PrintMessage(L["MESSAGE_RESET"])
 end
 
 --------------------------------------------------------------------------------
@@ -501,7 +503,7 @@ function EventHandlers:CHAT_MSG_LOOT(msg)
 
     local itemId = tonumber(link:match("item:(%d+)"))
 
-    if itemId and ns.AllowedItems and ns.AllowedItems[itemId] == false then
+    if itemId and ns.AllowedItems and ns.AllowedItems[itemId] == false and ns.DB.autoOpen and ns.DB.lockboxNotifications then
         ns.PrintMessage(string.format(L["ITEM_WILL_AUTO_OPEN"], link))
     end
 
