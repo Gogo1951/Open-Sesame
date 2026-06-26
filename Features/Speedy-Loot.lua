@@ -148,7 +148,7 @@ frame:SetScript(
                         shouldLoot = false
 
                         local lastAnnounced = ns.state.recentAnnouncements[itemId] or 0
-                        if (now - lastAnnounced) > 5 then
+                        if (now - lastAnnounced) > 5 and ns.DB.autoOpen and ns.DB.lockboxNotifications then
                             ns.PrintMessage(string.format(L["ITEM_OPEN_MANUALLY"], link))
                             ns.state.recentAnnouncements[itemId] = now
                         end

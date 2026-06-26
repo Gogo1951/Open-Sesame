@@ -41,16 +41,26 @@ function ns.BuildGeneralOptions()
                     ns.SetMinimapShown(value)
                 end
             },
+            -- /Commands
+
+            spaceCommands0 = ns.OptionsSpacer(10),
+            headerCommands = ns.OptionsHeader(L["OPTIONS_COMMANDS_HEADER"], 11),
+            spaceCommands1 = ns.OptionsSpacer(12),
+            descCommands = ns.OptionsDesc(
+                GetColor("INFO") .. L["OPTIONS_CMD_OS"] .. "|r" .. "  " .. L["OPTIONS_CMD_OS_DESCRIPTION"],
+                13
+            ),
             -- Auto-Opening
 
-            spaceAutoOpen0 = ns.OptionsSpacer(10),
-            headerAutoOpen = ns.OptionsHeader(L["AUTO_OPENING"], 11),
-            descAutoOpen = ns.OptionsDesc(string.format(L["AUTO_OPENING_DESC"], ns.MIN_FREE_SLOTS), 12),
-            spaceAutoOpen1 = ns.OptionsSpacer(13),
+            spaceAutoOpen0 = ns.OptionsSpacer(20),
+            headerAutoOpen = ns.OptionsHeader(L["AUTO_OPENING"], 21),
+            spaceAutoOpen1 = ns.OptionsSpacer(22),
+            descAutoOpen = ns.OptionsDesc(string.format(L["AUTO_OPENING_DESC"], ns.MIN_FREE_SLOTS), 23),
+            spaceAutoOpen2 = ns.OptionsSpacer(24),
             toggleAutoOpen = {
                 type = "toggle",
-                name = L["AUTO_OPENING"],
-                order = 14,
+                name = L["OPTIONS_ENABLE_AUTO_OPENING"],
+                order = 25,
                 width = "full",
                 get = function()
                     return ns.DB.autoOpen
@@ -65,16 +75,32 @@ function ns.BuildGeneralOptions()
                     ns.UpdateMinimapIcon()
                 end
             },
+            toggleLockboxNotifications = {
+                type = "toggle",
+                name = L["OPTIONS_ENABLE_LOCKBOX_NOTIFICATIONS"],
+                order = 26,
+                width = "full",
+                hidden = function()
+                    return not ns.DB.autoOpen
+                end,
+                get = function()
+                    return ns.DB.lockboxNotifications
+                end,
+                set = function(_, value)
+                    ns.DB.lockboxNotifications = value
+                end
+            },
             -- Speedy Loot
 
-            spaceSpeedyLoot0 = ns.OptionsSpacer(20),
-            headerSpeedyLoot = ns.OptionsHeader(L["SPEEDY_LOOT"], 21),
-            descSpeedyLoot = ns.OptionsDesc(L["SPEEDY_LOOT_DESC"], 22),
-            spaceSpeedyLoot1 = ns.OptionsSpacer(23),
+            spaceSpeedyLoot0 = ns.OptionsSpacer(30),
+            headerSpeedyLoot = ns.OptionsHeader(L["SPEEDY_LOOT"], 31),
+            spaceSpeedyLoot1 = ns.OptionsSpacer(32),
+            descSpeedyLoot = ns.OptionsDesc(L["SPEEDY_LOOT_DESC"], 33),
+            spaceSpeedyLoot2 = ns.OptionsSpacer(34),
             toggleSpeedyLoot = {
                 type = "toggle",
-                name = L["SPEEDY_LOOT"],
-                order = 24,
+                name = L["OPTIONS_ENABLE_SPEEDY_LOOT"],
+                order = 35,
                 width = "full",
                 get = function()
                     return ns.DB.speedyLoot
@@ -90,14 +116,15 @@ function ns.BuildGeneralOptions()
             },
             -- Loot Sounds
 
-            spaceLootSounds0 = ns.OptionsSpacer(30),
-            headerLootSounds = ns.OptionsHeader(L["LOOT_SOUNDS"], 31),
-            descLootSounds = ns.OptionsDesc(L["LOOT_SOUNDS_DESC"], 32),
-            spaceLootSounds1 = ns.OptionsSpacer(33),
+            spaceLootSounds0 = ns.OptionsSpacer(40),
+            headerLootSounds = ns.OptionsHeader(L["LOOT_SOUNDS"], 41),
+            spaceLootSounds1 = ns.OptionsSpacer(42),
+            descLootSounds = ns.OptionsDesc(L["LOOT_SOUNDS_DESC"], 43),
+            spaceLootSounds2 = ns.OptionsSpacer(44),
             toggleLootSounds = {
                 type = "toggle",
-                name = L["LOOT_SOUNDS"],
-                order = 34,
+                name = L["OPTIONS_ENABLE_LOOT_SOUNDS"],
+                order = 45,
                 width = "full",
                 get = function()
                     return ns.DB.lootSounds
@@ -110,12 +137,13 @@ function ns.BuildGeneralOptions()
 
             spaceReset0 = ns.OptionsSpacer(80),
             headerReset = ns.OptionsHeader(L["OPTIONS_RESET"], 81),
-            descReset = ns.OptionsDesc(L["OPTIONS_RESET_DESC"], 82),
-            spaceReset1 = ns.OptionsSpacer(83),
+            spaceReset1 = ns.OptionsSpacer(82),
+            descReset = ns.OptionsDesc(L["OPTIONS_RESET_DESC"], 83),
+            spaceReset2 = ns.OptionsSpacer(84),
             buttonReset = {
                 type = "execute",
                 name = L["OPTIONS_RESET_BUTTON"],
-                order = 84,
+                order = 85,
                 width = "full",
                 confirm = true,
                 confirmText = L["OPTIONS_RESET_CONFIRM"],

@@ -9,5 +9,6 @@ ns.DEFAULT_CONFIGURATION = {
     speedyLoot = true,
     lootSounds = false,
     showWelcome = true,
-    showMinimap = true
+    showMinimap = true,
+    lockboxNotifications = true
 }
