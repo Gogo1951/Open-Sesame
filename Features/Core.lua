@@ -56,7 +56,7 @@ ns.state = {
     lastBagFullAt = 0,
     lastFreeSlots = 0,
     lastLootAt = 0,
-    lastLootWindowAt = 0,
+    lastWorldLootAt = 0,
     lastStatusAt = 0,
     lastStatusMsg = nil,
     openTimerLive = false,
@@ -85,10 +85,10 @@ local function PrintWelcome()
 end
 
 local function PlayBagFullSound()
-    local _, raceEn = UnitRace("player")
+    local _, raceEnglish = UnitRace("player")
     local gender = UnitSex("player")
-    if raceEn and ns.RACE_SOUNDS[raceEn] and ns.RACE_SOUNDS[raceEn][gender] then
-        PlaySound(ns.RACE_SOUNDS[raceEn][gender], "Master")
+    if raceEnglish and ns.RACE_SOUNDS[raceEnglish] and ns.RACE_SOUNDS[raceEnglish][gender] then
+        PlaySound(ns.RACE_SOUNDS[raceEnglish][gender], "Master")
     else
         PlaySound(ns.BAG_FULL_SOUND_FALLBACK, "Master")
     end
@@ -175,7 +175,13 @@ local function AnnounceStatus()
         return
     end
     if ns.isPaused then
-        ns.StatusPrint(L["PAUSED_BAG_SLOTS"], ns.MIN_FREE_SLOTS)
+        --[[
+            Resume only fires once free slots reach MIN_FREE_SLOTS + 1 (the
+            ShouldPause hysteresis). This message promises the resume count, so it
+            must format with + 1 — using MIN_FREE_SLOTS itself tells the player
+            they need 4 free slots when 4 still leaves them paused.
+        ]]
+        ns.StatusPrint(L["PAUSED_BAG_SLOTS"], ns.MIN_FREE_SLOTS + 1)
     else
         ns.StatusPrint(L["RESUMED"])
     end
@@ -473,12 +479,61 @@ local function OnLoadEnd()
     ns.SetQuiet(3)
 end
 
+--[[
+    Distinguishes genuine corpse/chest looting from item-produced loot. A loot
+    window alone is not enough: disenchanting, prospecting/milling, opening a
+    container, and the server's white-into-green item merge all deliver their
+    results through the same LOOT_OPENED + CHAT_MSG_LOOT path a corpse does. They
+    differ only in the loot source GUID — an item carries an "Item-..." source,
+    a corpse is "Creature-..."/"Vehicle-...", and a chest/node is "GameObject-...".
+
+    Returns true when at least one open loot slot is sourced from a world corpse
+    or object, false when the window holds only item-sourced loot, and nil when
+    GetLootSourceInfo is unavailable (older client) so the caller can fall back
+    to treating any loot window as soundworthy.
+]]
+local function CurrentLootFromWorldSource()
+    if type(GetLootSourceInfo) ~= "function" then
+        return nil
+    end
+    local numItems = (GetNumLootItems and GetNumLootItems()) or 0
+    for slot = 1, numItems do
+        local guid = GetLootSourceInfo(slot)
+        local guidType = guid and guid:match("^(%a+)")
+        if guidType == "Creature" or guidType == "Vehicle" or guidType == "GameObject" then
+            return true
+        end
+    end
+    return false
+end
+
+--[[
+    Stamp the corpse/chest timestamp that gates the loot sound, but only when the
+    loot is world-sourced (or the source API is unavailable). Item-sourced loot
+    deliberately leaves lastWorldLootAt untouched so disenchants and merges stay
+    silent. Handled on both LOOT_READY and LOOT_OPENED because source info can be
+    populated on either depending on client and Speedy Loot's instant looting.
+]]
+local function StampWorldLoot()
+    if CurrentLootFromWorldSource() ~= false then
+        ns.state.lastWorldLootAt = GetTime()
+    end
+end
+
+--[[
+    One registration owns LOOT_READY. Stamp world-loot state first so the source
+    GUIDs are read while the slots are still populated, then run Speedy Loot,
+    which empties them via LootSlot. This is the order the two former event
+    frames relied on; making it explicit also removes their non-deterministic
+    dispatch order.
+]]
 function EventHandlers:LOOT_READY()
-    ns.state.lastLootWindowAt = GetTime()
+    StampWorldLoot()
+    ns.HandleSpeedyLoot()
 end
 
 function EventHandlers:LOOT_OPENED()
-    ns.state.lastLootWindowAt = GetTime()
+    StampWorldLoot()
 end
 
 EventHandlers.BAG_UPDATE_DELAYED = OnScanRequest
@@ -507,17 +562,18 @@ function EventHandlers:CHAT_MSG_LOOT(msg)
         ns.PrintMessage(string.format(L["ITEM_WILL_AUTO_OPEN"], link))
     end
 
-    if ns.DB.lootSounds then
-        local lootWindowOpen = (LootFrame and LootFrame:IsShown())
-        local lootWindowRecentlyOpen = (GetTime() - ns.state.lastLootWindowAt) < 2
-
-        if lootWindowOpen or lootWindowRecentlyOpen then
-            local colorSequence = link:match("|c(%x+)|H")
-            if colorSequence and #colorSequence == 8 then
-                local hex = string.lower(string.sub(colorSequence, 3, 8))
-                if hex ~= "9d9d9d" and hex ~= "ffffff" then
-                    PlaySound(ns.LOOT_SOUND_ID, "Master")
-                end
+    --[[
+        Only sound off for loot that came from a corpse or chest within the last
+        ns.LOOT_SOUND_WINDOW seconds. Item-produced loot (disenchant, prospect,
+        merge, container opens) never stamps lastWorldLootAt, so it stays silent
+        even though it travels the same loot + CHAT_MSG_LOOT path.
+    ]]
+    if ns.DB.lootSounds and (GetTime() - ns.state.lastWorldLootAt) < ns.LOOT_SOUND_WINDOW then
+        local colorSequence = link:match("|c(%x+)|H")
+        if colorSequence and #colorSequence == 8 then
+            local hex = string.lower(string.sub(colorSequence, 3, 8))
+            if hex ~= "9d9d9d" and hex ~= "ffffff" then
+                PlaySound(ns.LOOT_SOUND_ID, "Master")
             end
         end
     end

@@ -15,11 +15,20 @@ ns.Version = version
 -- C_Container API
 --------------------------------------------------------------------------------
 
-ns.GetContainerNumSlots = C_Container.GetContainerNumSlots
-ns.UseContainerItem = C_Container.UseContainerItem
-ns.GetContainerItemLink = C_Container.GetContainerItemLink
-ns.GetContainerItemID = C_Container.GetContainerItemID
-ns.GetContainerNumFreeSlots = C_Container.GetContainerNumFreeSlots
+--[[
+    Pick each container call by availability: C_Container on modern builds, the
+    identically-named legacy global where the namespace (or a member) is absent.
+    The (C_Container and ...) guard is what makes the fallback reachable —
+    indexing a nil C_Container would error before `or` reached the legacy global,
+    which is the very client the fallback is for. These select a function
+    reference rather than calling it, so the `or` is free of the truthy-
+    fallthrough trap that bans `or` between call results.
+]]
+ns.GetContainerNumSlots = (C_Container and C_Container.GetContainerNumSlots) or GetContainerNumSlots
+ns.UseContainerItem = (C_Container and C_Container.UseContainerItem) or UseContainerItem
+ns.GetContainerItemLink = (C_Container and C_Container.GetContainerItemLink) or GetContainerItemLink
+ns.GetContainerItemID = (C_Container and C_Container.GetContainerItemID) or GetContainerItemID
+ns.GetContainerNumFreeSlots = (C_Container and C_Container.GetContainerNumFreeSlots) or GetContainerNumFreeSlots
 
 --------------------------------------------------------------------------------
 -- Colors

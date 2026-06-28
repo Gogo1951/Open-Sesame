@@ -1,4 +1,4 @@
-local ADDON_NAME, ns = ...
+local _, ns = ...
 
 --------------------------------------------------------------------------------
 -- Diagnostic Tools
@@ -45,7 +45,7 @@ ns.DiagnosticsStrings = {
     EVENT_LOG_START = "Start Event Log",
     EVENT_LOG_STOP = "Stop Event Log",
     EVENT_LOG_SHOW = "Show Captured Events",
-    EVENT_LOG_HINT = "Captures events the add-on registered for, with arguments, in order fired. May include loot chat text — review before sharing. Note: LOOT_READY from the Speedy-Loot module is not captured (private frame).",
+    EVENT_LOG_HINT = "Captures events the add-on registered for, with arguments, in order fired. May include loot chat text — review before sharing.",
     EVENTS_TITLE = "Event Registration",
     EVENTS_BUTTON = "Test Event Registration",
     API_TITLE = "API Endpoints",
@@ -109,18 +109,18 @@ local EVENT_LOG_MAX_ARGS = 8
 local EVENT_LOG_MAX_ARG_LENGTH = 255
 
 --[[
-    Firehose events flood the log in milliseconds and bury the signal, so the
-    logger skips them. Tailor this set to the add-on; entries below are the
-    usual offenders. Note: LOOT_READY from Speedy-Loot.lua's private frame is
-    not captured here regardless — the log only sees events routed through
-    Core's central dispatcher.
+    Events ns:LogEvent drops before recording — deliberately empty. The
+    dispatcher only ever hands LogEvent the events Open Sesame registers (Core's
+    EventHandlers), and none of those is a sustained firehose worth dropping: the
+    addon listens on the coalesced BAG_UPDATE_DELAYED rather than raw BAG_UPDATE,
+    and every registered event is potential signal in a bug report — including
+    the all-unit UNIT_SPELLCAST_SUCCEEDED, whose rare player Pick Lock cast
+    drives the lockbox rescan. The lookup in LogEvent stays so a genuine
+    no-signal firehose can be excluded here if one is ever registered. Generic
+    offenders (COMBAT_LOG_EVENT_UNFILTERED, UNIT_AURA, ...) do not belong here
+    unless registered — the log never sees an event the addon didn't register.
 ]]
-ns.DIAGNOSTIC_EVENT_EXCLUDE = {
-    COMBAT_LOG_EVENT_UNFILTERED = true,
-    UPDATE_MOUSEOVER_UNIT = true,
-    BAG_UPDATE = true,
-    UNIT_AURA = true
-}
+ns.DIAGNOSTIC_EVENT_EXCLUDE = {}
 
 function ns:StartEventLog()
     ns.diagnostics.log = {}
@@ -237,10 +237,15 @@ ns.DIAGNOSTIC_API_CHECKS = {
     {"C_AddOns.GetAddOnMetadata", function() return type(C_AddOns) == "table" and type(C_AddOns.GetAddOnMetadata) == "function" end},
     {"GetAddOnMetadata (legacy)", function() return type(GetAddOnMetadata) == "function" end},
     {"C_Container.GetContainerNumSlots", function() return type(C_Container) == "table" and type(C_Container.GetContainerNumSlots) == "function" end},
+    {"GetContainerNumSlots (legacy)", function() return type(GetContainerNumSlots) == "function" end},
     {"C_Container.GetContainerNumFreeSlots", function() return type(C_Container) == "table" and type(C_Container.GetContainerNumFreeSlots) == "function" end},
+    {"GetContainerNumFreeSlots (legacy)", function() return type(GetContainerNumFreeSlots) == "function" end},
     {"C_Container.GetContainerItemID", function() return type(C_Container) == "table" and type(C_Container.GetContainerItemID) == "function" end},
+    {"GetContainerItemID (legacy)", function() return type(GetContainerItemID) == "function" end},
     {"C_Container.GetContainerItemLink", function() return type(C_Container) == "table" and type(C_Container.GetContainerItemLink) == "function" end},
+    {"GetContainerItemLink (legacy)", function() return type(GetContainerItemLink) == "function" end},
     {"C_Container.UseContainerItem", function() return type(C_Container) == "table" and type(C_Container.UseContainerItem) == "function" end},
+    {"UseContainerItem (legacy)", function() return type(UseContainerItem) == "function" end},
     {"GetNumLootItems", function() return type(GetNumLootItems) == "function" end},
     {"GetLootSlotType", function() return type(GetLootSlotType) == "function" end},
     {"GetLootSlotLink", function() return type(GetLootSlotLink) == "function" end},
@@ -302,7 +307,7 @@ function ns:BuildLootMethodReport()
             Comparing values[1] directly to "master" would always report
             isMasterLooter=false even when the player is the master looter.
         ]]
-        local methodEnum, mlPartyID = values[1], values[2]
+        local methodEnum, masterLooterPartyID = values[1], values[2]
         local convertedMethod
         if (Enum and Enum.LootMethod and methodEnum == Enum.LootMethod.MasterLoot) or methodEnum == 2 then
             convertedMethod = "master"
@@ -310,9 +315,9 @@ function ns:BuildLootMethodReport()
             convertedMethod = methodEnum
         end
         lines[#lines + 1] = string.format(
-            "Speedy Loot reads lootMethod=%s, mlPartyID=%s -> isMasterLooter=%s",
-            tostring(convertedMethod), tostring(mlPartyID),
-            tostring(convertedMethod == "master" and mlPartyID == 0)
+            "Speedy Loot reads lootMethod=%s, masterLooterPartyID=%s -> isMasterLooter=%s",
+            tostring(convertedMethod), tostring(masterLooterPartyID),
+            tostring(convertedMethod == "master" and masterLooterPartyID == 0)
         )
     else
         lines[#lines + 1] = "C_PartyInfo.GetLootMethod: not available"

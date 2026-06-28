@@ -16,7 +16,7 @@ Open-Sesame/
 │   ├── Core.lua                    Event loop, SavedVariables lifecycle, state, scan/queue/open pipeline
 │   ├── Utilities.lua               Version, C_Container shims, COLORS table + GetColor, GetFreeSlots
 │   ├── Announcements.lua           PrintMessage, deduped StatusPrint, quiet window (all player-facing output)
-│   ├── Speedy-Loot.lua             Self-contained LOOT_READY handler: auto-loots and hides LootFrame
+│   ├── Speedy-Loot.lua             ns.HandleSpeedyLoot — auto-loots and hides LootFrame (run by Core's LOOT_READY)
 │   ├── Diagnostics.lua             Report builders, event log, API/event probes for the Diagnostic Tools panel
 │   └── Minimap-Button.lua          LDB launcher, tooltip, click handlers
 ├── Options/
@@ -50,8 +50,8 @@ Events the addon listens for:
 - **`PLAYER_LOGIN`** — initialize `OpenSesameDB`, merge defaults, mirror `autoOpen`/`speedyLoot` into the runtime flags, derive `minimap.hide` from `showMinimap`, init the minimap button, print the welcome message.
 - **`PLAYER_ENTERING_WORLD`** — on initial login or `/reload`, wait `ns.WORLD_LOAD_DELAY` (8s) for bag/loot APIs to settle, then run a forced scan and ensure Auto Loot is on (whenever Auto-Opening *or* Speedy Loot is enabled). On zone changes, just enter a 2s "quiet" window to suppress chat noise.
 - **`BAG_UPDATE_DELAYED`** / **`BAG_NEW_ITEMS_UPDATED`** — debounced `ScheduleScan()` (the soft form). Fires often; debouncing collapses bursts.
-- **`LOOT_READY`** / **`LOOT_OPENED`** — record the loot-window timestamp that gates the loot sound in `CHAT_MSG_LOOT`.
-- **`CHAT_MSG_LOOT`** — match the localized self-loot prefixes (derived from `LOOT_ITEM_SELF` / `LOOT_ITEM_PUSHED_SELF`). If the looted item is in `AllowedItems` with value `false` (a lockbox), announce it'll auto-open on unlock — gated on both `autoOpen` and `lockboxNotifications`, see Lockbox Notifications; optionally play the rare-loot sound. Always requests a debounced rescan.
+- **`LOOT_READY`** / **`LOOT_OPENED`** — inspect the open loot slots' source GUIDs (`GetLootSourceInfo`) and, when the loot comes from a world corpse/chest/object (`Creature-`/`Vehicle-`/`GameObject-`) rather than an item, stamp `lastWorldLootAt` — the timestamp that gates the loot sound in `CHAT_MSG_LOOT`. Item-sourced loot (disenchant, prospect/mill, container opens, item merges) carries an `Item-` source and is deliberately not stamped, so it stays silent even though it shares the loot path. Falls back to stamping any loot window when `GetLootSourceInfo` is unavailable. `LOOT_READY` then also calls `ns.HandleSpeedyLoot()` (Speedy-Loot.lua); the stamp runs first so the source GUIDs are read before Speedy Loot empties the slots — see Speedy Loot.
+- **`CHAT_MSG_LOOT`** — match the localized self-loot prefixes (derived from `LOOT_ITEM_SELF` / `LOOT_ITEM_PUSHED_SELF`). If the looted item is in `AllowedItems` with value `false` (a lockbox), announce it'll auto-open on unlock — gated on both `autoOpen` and `lockboxNotifications`, see Lockbox Notifications; optionally play the rare-loot sound, but only for Uncommon+ items looted from a world corpse/chest within `ns.LOOT_SOUND_WINDOW` (1s) of the `lastWorldLootAt` stamp. Always requests a debounced rescan.
 - **`PLAYER_REGEN_ENABLED`** / **`UPDATE_STEALTH`** — re-scan once combat ends or stealth drops.
 - **`UNIT_SPELLCAST_SUCCEEDED`** — when the player casts Pick Lock (spell ID 1804), schedule a forced scan after `ns.PICK_LOCK_RESCAN_DELAY` (0.5s) so the newly-unlocked container queues.
 - **`UI_ERROR_MESSAGE`** — detect "inventory full" (plain-text match against `ERR_INV_FULL`, or numeric error code), pause the addon, play the race/gender bag-full sound, and rate-limit re-triggers via `ns.BAG_FULL_COOLDOWN` (10s).
@@ -98,13 +98,13 @@ All player-facing text routes through Announcements.lua. `ns.PrintMessage` prepe
 
 ### Speedy Loot
 
-Speedy-Loot.lua is a self-contained module with its own event frame on `LOOT_READY`. On fire:
+Speedy-Loot.lua exposes `ns.HandleSpeedyLoot()`, called from Core's `EventHandlers:LOOT_READY` so a single registration owns the event — Core stamps world-loot state first, then runs this. On call:
 
 1. Bail if `ns.isSpeedyLoot` is false.
 2. Compute `shouldAutoLoot = autoLoot ~= IsModifiedClick("AUTOLOOTTOGGLE")` — respects the auto-loot CVar and any in-progress modifier override (Shift to invert); bail if false.
 3. Rate-limit via `ns.LOOT_DELAY` (0.25s) against rapid duplicate fires.
 4. Bail if `GetNumLootItems()` is zero.
-5. **Stand down entirely as master looter** (`lootMethod == "master" and mlPartyID == 0`) — see Common Pitfalls.
+5. **Stand down entirely as master looter** (`lootMethod == "master" and masterLooterPartyID == 0`) — see Common Pitfalls.
 6. Read general-bag free slots via `ns.GetFreeSlots()`; if bags are full and real item slots are waiting, leave the window visible and loot nothing.
 7. Hide `LootFrame`, then iterate slots in reverse calling `LootSlot()`: money/currency always loot (no bag cost); item slots loot while free slots remain, decrementing as they go.
 
@@ -163,15 +163,15 @@ The panel exposes eight tools:
 - **Library Versions** — `LibStub:IterateLibraries()` with minor versions.
 - **Taint Log** — toggles the `taintLog` CVar (0/2). This is the **only** state any probe writes; the External Tools section below it just points at `/console scriptErrors 1` and `/etrace`.
 
-**Event Log internals.** `ns:StartEventLog()` sets `ns.diagnostics.logging = true`; Core's dispatcher then calls `ns:LogEvent` for every event it routes. Each entry is a `GetTime()`-stamped string snapshotted immediately — references are never retained, since some events carry frames or tables that would leak or go stale. Bounds: a ring buffer of `EVENT_LOG_SIZE` (500) entries, up to `EVENT_LOG_MAX_ARGS` (8) args each, each capped at `EVENT_LOG_MAX_ARG_LENGTH` (255 bytes — sized to hold a full loot line with its item link). Firehose events in `ns.DIAGNOSTIC_EVENT_EXCLUDE` (`COMBAT_LOG_EVENT_UNFILTERED`, `UPDATE_MOUSEOVER_UNIT`, `BAG_UPDATE`, `UNIT_AURA`) are dropped. Pipes are escaped (`|` → `||`) *after* the length cut so links render as literal text in the report editbox instead of as a clickable swatch, and so a mid-link cut can't leave a dangling pipe that eats the next separator. The log only sees events routed through Core's dispatcher — Speedy-Loot.lua's private `LOOT_READY` frame is never captured.
+**Event Log internals.** `ns:StartEventLog()` sets `ns.diagnostics.logging = true`; Core's dispatcher then calls `ns:LogEvent` for every event it routes. Each entry is a `GetTime()`-stamped string snapshotted immediately — references are never retained, since some events carry frames or tables that would leak or go stale. Bounds: a ring buffer of `EVENT_LOG_SIZE` (500) entries, up to `EVENT_LOG_MAX_ARGS` (8) args each, each capped at `EVENT_LOG_MAX_ARG_LENGTH` (255 bytes — sized to hold a full loot line with its item link). `ns.DIAGNOSTIC_EVENT_EXCLUDE` is the drop list `ns:LogEvent` consults before recording; it is empty because the dispatcher only ever feeds it events the addon registers and none of those is a sustained firehose (the addon listens on the coalesced `BAG_UPDATE_DELAYED`, not raw `BAG_UPDATE`). The lookup stays so a genuine firehose could be excluded later. Pipes are escaped (`|` → `||`) *after* the length cut so links render as literal text in the report editbox instead of as a clickable swatch, and so a mid-link cut can't leave a dangling pipe that eats the next separator.
 
 ## Saved Variables
 
 `OpenSesameDB` (account-wide) holds:
 
 - `autoOpen` (boolean, default `true`) — master switch for the auto-open pipeline. Mirrored to `ns.isEnabled` at runtime.
-- `speedyLoot` (boolean, default `true`) — toggles the `LOOT_READY` handler in Speedy-Loot.lua. Mirrored to `ns.isSpeedyLoot`.
-- `lootSounds` (boolean, default `false`) — plays a distinct sound on Uncommon+ loot in `CHAT_MSG_LOOT`.
+- `speedyLoot` (boolean, default `true`) — gates `ns.HandleSpeedyLoot` (Speedy-Loot.lua), the auto-loot response Core runs on `LOOT_READY`. Mirrored to `ns.isSpeedyLoot`.
+- `lootSounds` (boolean, default `false`) — plays a distinct sound on Uncommon+ loot in `CHAT_MSG_LOOT`, but only when the item came from a looted corpse/chest (not from disenchanting, prospecting, or item merges — see the `LOOT_OPENED` source check).
 - `lockboxNotifications` (boolean, default `true`) — gates the two lockbox chat notices in Core.lua (`CHAT_MSG_LOOT`) and Speedy-Loot.lua, *in addition to* `autoOpen`. See Lockbox Notifications.
 - `showWelcome` (boolean, default `true`) — toggles the login welcome message.
 - `showMinimap` (boolean, default `true`) — source of truth for the minimap button's visibility. Mirrored (inverted) onto `minimap.hide` so LibDBIcon obeys it; see Minimap Button.
@@ -201,7 +201,7 @@ Every locale is an independent file in this format. Spanish is no exception: `es
 
 ## Common Pitfalls
 
-- **Master-looter crash in Speedy Loot**: calling `LootSlot()` on an at-or-above-threshold item while the player is the master looter pops `MasterLooterFrame_Show` with no `selectedLootButton` and crashes on a nil `colorInfo`. Speedy-Loot.lua avoids this by standing down entirely when the player is the master looter — the `lootMethod == "master" and mlPartyID == 0` check returns before any `LootSlot()`. Don't remove it.
+- **Master-looter crash in Speedy Loot**: calling `LootSlot()` on an at-or-above-threshold item while the player is the master looter pops `MasterLooterFrame_Show` with no `selectedLootButton` and crashes on a nil `colorInfo`. Speedy-Loot.lua avoids this by standing down entirely when the player is the master looter — the `lootMethod == "master" and masterLooterPartyID == 0` check returns before any `LootSlot()`. Don't remove it.
 
 - **Truthy-fallthrough on availability-picked APIs**: `(C_CVar.GetCVarBool("autoLootDefault")) or (GetCVar(...) == "1")` looks reasonable but falls through to the legacy call whenever the modern API returns `false` (auto-loot off), so the wrong result wins. Pick by availability (`if C_CVar then … else …`), then call exactly one. Same applies to `GetLootMethod` vs `C_PartyInfo.GetLootMethod`.
 
