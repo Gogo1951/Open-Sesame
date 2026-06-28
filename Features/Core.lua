@@ -487,36 +487,56 @@ end
     differ only in the loot source GUID — an item carries an "Item-..." source,
     a corpse is "Creature-..."/"Vehicle-...", and a chest/node is "GameObject-...".
 
-    Returns true when at least one open loot slot is sourced from a world corpse
-    or object, false when the window holds only item-sourced loot, and nil when
-    GetLootSourceInfo is unavailable (older client) so the caller can fall back
-    to treating any loot window as soundworthy.
+    Returns one of three states so StampWorldLoot can treat each differently:
+    "world" when at least one open slot is a corpse/chest/node
+    (Creature-/Vehicle-/GameObject-); "item" when every resolved source is an
+    item (Item-) — disenchant, prospect/mill, container open, or the
+    white-into-green merge; and "unknown" when there is nothing to go on yet,
+    i.e. GetLootSourceInfo is missing, the window is empty, or the GUIDs have not
+    populated. "unknown" is kept distinct from "item" on purpose: source info can
+    arrive late (and Speedy Loot may loot instantly), so a not-yet-populated
+    corpse must not be mistaken for item loot.
 ]]
 local function CurrentLootFromWorldSource()
     if type(GetLootSourceInfo) ~= "function" then
-        return nil
+        return "unknown"
     end
     local numItems = (GetNumLootItems and GetNumLootItems()) or 0
+    local sawItem = false
     for slot = 1, numItems do
         local guid = GetLootSourceInfo(slot)
         local guidType = guid and guid:match("^(%a+)")
         if guidType == "Creature" or guidType == "Vehicle" or guidType == "GameObject" then
-            return true
+            return "world"
+        elseif guidType == "Item" then
+            sawItem = true
         end
     end
-    return false
+    if sawItem then
+        return "item"
+    end
+    return "unknown"
 end
 
 --[[
-    Stamp the corpse/chest timestamp that gates the loot sound, but only when the
-    loot is world-sourced (or the source API is unavailable). Item-sourced loot
-    deliberately leaves lastWorldLootAt untouched so disenchants and merges stay
-    silent. Handled on both LOOT_READY and LOOT_OPENED because source info can be
-    populated on either depending on client and Speedy Loot's instant looting.
+    Drive lastWorldLootAt, the timestamp that gates the loot sound in
+    CHAT_MSG_LOOT, from the classified source:
+
+      world   - stamp now. Run on both LOOT_READY and LOOT_OPENED because the
+                source GUID can populate on either and Speedy Loot may empty the
+                slots between them; whichever event sees the world GUID records it.
+      item    - clear the stamp so a disenchant or merge within LOOT_SOUND_WINDOW
+                of a real corpse loot can't reuse that window and play the sound.
+      unknown - leave it alone: a late-arriving world GUID on a later event must
+                still be able to stamp, and a stamp just set for this same corpse
+                must survive an empty or not-yet-populated re-read.
 ]]
 local function StampWorldLoot()
-    if CurrentLootFromWorldSource() ~= false then
+    local source = CurrentLootFromWorldSource()
+    if source == "world" then
         ns.state.lastWorldLootAt = GetTime()
+    elseif source == "item" then
+        ns.state.lastWorldLootAt = 0
     end
 end
 
