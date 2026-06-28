@@ -1,6 +1,5 @@
-local ADDON_NAME, ns = ...
+local _, ns = ...
 
-local L = ns.L
 local D = ns.DiagnosticsStrings
 local GetColor = ns.GetColor
 local AceConfigRegistry = LibStub("AceConfigRegistry-3.0")

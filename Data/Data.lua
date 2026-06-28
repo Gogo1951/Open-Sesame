@@ -38,6 +38,7 @@ ns.BAG_FULL_COOLDOWN = 10
 ns.LOOT_SOUND_ID = 2847 -- SoundKitID; play with PlaySound
 ns.BAG_FULL_SOUND_FALLBACK = 846 -- SoundKitID; play with PlaySound
 ns.LOOT_DELAY = 0.25
+ns.LOOT_SOUND_WINDOW = 1 -- Seconds after a corpse/chest loot during which CHAT_MSG_LOOT may play the rare-loot sound
 
 ns.SPELLS = {
     PICK_LOCK = 1804,
