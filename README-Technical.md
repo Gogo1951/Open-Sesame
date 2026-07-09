@@ -4,7 +4,7 @@ This document combines architecture notes and contribution guidance for develope
 
 ## File Map
 
-```
+```text
 Open-Sesame/
 ├── Open-Sesame.toc              Load order, metadata, SavedVariables declaration
 ├── README.md                    Player-facing documentation

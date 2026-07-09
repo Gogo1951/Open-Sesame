@@ -360,7 +360,7 @@ local function ApplyProfile()
 	if ns.SetMinimapShown then
 		ns.SetMinimapShown(ns.db.profile.showMinimap)
 	end
-	if ns.isEnabled then
+	if ns.isEnabled or ns.isSpeedyLoot then
 		ns.EnsureAutoLoot()
 	end
 	ns.ScheduleScan(true)
