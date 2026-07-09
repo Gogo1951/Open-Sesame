@@ -1,5 +1,7 @@
 local L = LibStub("AceLocale-3.0"):NewLocale("Open-Sesame", "deDE")
-if not L then return end
+if not L then
+	return
+end
 
 --------------------------------------------------------------------------------
 -- General
@@ -17,9 +19,8 @@ L["STATUS_PAUSED"] = "Pausiert"
 -- System
 L["AUTO_LOOT_ENABLED"] = "Automatisches Plündern ist erforderlich, damit Open Sesame richtig funktioniert. Automatisches Plündern wurde aktiviert."
 L["CHAT_LOADED"] = "Version %s. Einstellungen (einschließlich der Option, diese Nachricht zu deaktivieren) finden Sie unter Optionen > AddOns > Open Sesame. Gefällt dir das Addon? Erzähl einem Freund davon! (="
-L["MESSAGE_RESET"] = "Alle Einstellungen wurden auf die Standardwerte zurückgesetzt."
 
--- Auto-Open
+-- Auto-Opening
 L["PAUSED_BAG_SLOTS"] = "Das automatische Öffnen ist pausiert, bis mindestens %d Taschenplätze frei sind."
 L["RESUMED"] = "Das automatische Öffnen wurde fortgesetzt."
 L["INVENTORY_FULL"] = "Inventar ist voll!"
@@ -44,14 +45,16 @@ L["LOOT_SOUNDS_DESC"] = "Spielt einen besonderen Ton ab, wenn ein Gegenstand ung
 L["KEYBIND_LEFT_CLICK"] = "Linksklick"
 L["KEYBIND_RIGHT_CLICK"] = "Rechtsklick"
 L["KEYBIND_MIDDLE_CLICK"] = "Mittelklick"
+L["KEYBIND_SHIFT_MIDDLE_CLICK"] = "Shift + Mittelklick"
 L["ACTION_TOGGLE"] = "Umschalten"
-L["TOOLTIP_HINT"] = "Weitere Einstellungen finden Sie unter Optionen > AddOns > Open Sesame."
+L["TOOLTIP_OPTIONS_TITLE"] = "Open Sesame Optionen"
 
 --------------------------------------------------------------------------------
 -- Options
 --------------------------------------------------------------------------------
 
 L["OPTIONS_INTRO"] = "Öffnet automatisch Muscheln, Schließfächer und entsperrte Behälter im Inventar. Mit Schnelle Beute für schnelleres Aufsammeln."
+L["TAB_PROFILES"] = "Profile"
 L["OPTIONS_ENABLE_WELCOME"] = "Willkommensnachricht aktivieren"
 L["OPTIONS_ENABLE_MINIMAP"] = "Minikarten-Schaltfläche aktivieren"
 L["OPTIONS_ENABLE_LOCKBOX_NOTIFICATIONS"] = "Schließfach-Benachrichtigungen aktivieren"
@@ -61,11 +64,8 @@ L["OPTIONS_ENABLE_LOOT_SOUNDS"] = "Beutegeräusche aktivieren"
 L["OPTIONS_COMMANDS_HEADER"] = "/Befehle"
 L["OPTIONS_CMD_OS"] = "/os"
 L["OPTIONS_CMD_OS_DESCRIPTION"] = "Öffnet die Open Sesame Optionen."
-L["OPTIONS_RESET"] = "Zurücksetzen"
-L["OPTIONS_RESET_DESC"] = "Stellt jede Einstellung von Open Sesame auf den Standardwert zurück."
-L["OPTIONS_RESET_BUTTON"] = "Alle Open Sesame Optionen zurücksetzen"
-L["OPTIONS_RESET_CONFIRM"] = "Alle Open Sesame Einstellungen auf die Standardwerte zurücksetzen?"
 L["OPTIONS_FEEDBACK"] = "Feedback & Support"
 L["OPTIONS_CURSEFORGE"] = "CurseForge"
 L["OPTIONS_GITHUB"] = "GitHub"
 L["OPTIONS_DISCORD"] = "Discord"
+L["OPTIONS_WAGO"] = "Wago"

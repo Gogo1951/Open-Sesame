@@ -1,5 +1,7 @@
 local L = LibStub("AceLocale-3.0"):NewLocale("Open-Sesame", "frFR")
-if not L then return end
+if not L then
+	return
+end
 
 --------------------------------------------------------------------------------
 -- General
@@ -17,9 +19,8 @@ L["STATUS_PAUSED"] = "En pause"
 -- System
 L["AUTO_LOOT_ENABLED"] = "La Fouille automatique est requise pour qu'Open Sesame fonctionne correctement. La Fouille automatique a été activée."
 L["CHAT_LOADED"] = "Version %s. Les paramètres (y compris l'option pour désactiver ce message) se trouvent dans Options > AddOns > Open Sesame. Vous aimez l'addon ? Parlez-en à un ami ! (="
-L["MESSAGE_RESET"] = "Tous les paramètres ont été réinitialisés à leurs valeurs par défaut."
 
--- Auto-Open
+-- Auto-Opening
 L["PAUSED_BAG_SLOTS"] = "L'ouverture automatique est en pause jusqu'à ce que vous ayez au moins %d emplacements de sac libres."
 L["RESUMED"] = "L'ouverture automatique a repris."
 L["INVENTORY_FULL"] = "L'inventaire est plein !"
@@ -44,14 +45,16 @@ L["LOOT_SOUNDS_DESC"] = "Joue un son distinct quand vous ramassez un objet de qu
 L["KEYBIND_LEFT_CLICK"] = "Clic gauche"
 L["KEYBIND_RIGHT_CLICK"] = "Clic droit"
 L["KEYBIND_MIDDLE_CLICK"] = "Clic molette"
+L["KEYBIND_SHIFT_MIDDLE_CLICK"] = "Shift + Clic molette"
 L["ACTION_TOGGLE"] = "Basculer"
-L["TOOLTIP_HINT"] = "Des paramètres supplémentaires se trouvent dans Options > AddOns > Open Sesame."
+L["TOOLTIP_OPTIONS_TITLE"] = "Options d'Open Sesame"
 
 --------------------------------------------------------------------------------
 -- Options
 --------------------------------------------------------------------------------
 
 L["OPTIONS_INTRO"] = "Ouvre automatiquement les palourdes, les coffres-forts et les conteneurs déverrouillés dans votre inventaire. Propose Butin rapide pour un ramassage plus rapide."
+L["TAB_PROFILES"] = "Profils"
 L["OPTIONS_ENABLE_WELCOME"] = "Activer le message de bienvenue"
 L["OPTIONS_ENABLE_MINIMAP"] = "Activer le bouton de la mini-carte"
 L["OPTIONS_ENABLE_LOCKBOX_NOTIFICATIONS"] = "Activer les notifications de coffres-forts"
@@ -61,11 +64,8 @@ L["OPTIONS_ENABLE_LOOT_SOUNDS"] = "Activer les sons de butin"
 L["OPTIONS_COMMANDS_HEADER"] = "/Commandes"
 L["OPTIONS_CMD_OS"] = "/os"
 L["OPTIONS_CMD_OS_DESCRIPTION"] = "Ouvre l'interface des options d'Open Sesame."
-L["OPTIONS_RESET"] = "Réinitialiser"
-L["OPTIONS_RESET_DESC"] = "Restaure tous les paramètres d'Open Sesame à leurs valeurs par défaut."
-L["OPTIONS_RESET_BUTTON"] = "Réinitialiser toutes les options d'Open Sesame"
-L["OPTIONS_RESET_CONFIRM"] = "Réinitialiser tous les paramètres d'Open Sesame à leurs valeurs par défaut ?"
 L["OPTIONS_FEEDBACK"] = "Commentaires & Support"
 L["OPTIONS_CURSEFORGE"] = "CurseForge"
 L["OPTIONS_GITHUB"] = "GitHub"
 L["OPTIONS_DISCORD"] = "Discord"
+L["OPTIONS_WAGO"] = "Wago"

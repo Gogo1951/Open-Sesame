@@ -1,5 +1,7 @@
 local L = LibStub("AceLocale-3.0"):NewLocale("Open-Sesame", "enUS", true)
-if not L then return end
+if not L then
+	return
+end
 
 --------------------------------------------------------------------------------
 -- General
@@ -16,12 +18,11 @@ L["STATUS_PAUSED"] = "Paused"
 
 -- System
 L["AUTO_LOOT_ENABLED"] = "Auto Loot is required for Open Sesame to function properly. Auto Loot has been enabled."
-L["CHAT_LOADED"] = "Version %s. Settings (including the option to disable this message) can be found under Options > AddOns > Open Sesame. Enjoying the addon? Tell a friend about it! (="
-L["MESSAGE_RESET"] = "All settings have been reset to defaults."
+L["CHAT_LOADED"] = "Version %s. Settings (including the option to disable this message) can be found under Options > AddOns > Open Sesame. Enjoying the add-on? Tell a friend about it! (="
 
--- Auto-Open
-L["PAUSED_BAG_SLOTS"] = "Auto-Open is Paused until you have at least %d empty bag slots."
-L["RESUMED"] = "Auto-Open has Resumed."
+-- Auto-Opening
+L["PAUSED_BAG_SLOTS"] = "Auto-Opening is Paused until you have at least %d empty bag slots."
+L["RESUMED"] = "Auto-Opening has Resumed."
 L["INVENTORY_FULL"] = "Inventory is full!"
 L["ITEM_WILL_AUTO_OPEN"] = "%s will be automatically opened once it's unlocked."
 L["ITEM_OPEN_MANUALLY"] = "%s needs to be opened manually. It may contain a Unique, Bind on Pickup, or Temporary item; or it was dropped by a raid boss."
@@ -44,14 +45,16 @@ L["LOOT_SOUNDS_DESC"] = "Plays a distinct sound when you loot an Uncommon or hig
 L["KEYBIND_LEFT_CLICK"] = "Left-Click"
 L["KEYBIND_RIGHT_CLICK"] = "Right-Click"
 L["KEYBIND_MIDDLE_CLICK"] = "Middle-Click"
+L["KEYBIND_SHIFT_MIDDLE_CLICK"] = "Shift + Middle-Click"
 L["ACTION_TOGGLE"] = "Toggle"
-L["TOOLTIP_HINT"] = "Additional settings can be found under Options > AddOns > Open Sesame."
+L["TOOLTIP_OPTIONS_TITLE"] = "Open Sesame Options"
 
 --------------------------------------------------------------------------------
 -- Options
 --------------------------------------------------------------------------------
 
 L["OPTIONS_INTRO"] = "Open Sesame automatically opens clams, lockboxes, and unlocked containers in your bags. Built-in Speedy Loot hides the loot window for near-instant looting. Less time clicking, more time playing."
+L["TAB_PROFILES"] = "Profiles"
 L["OPTIONS_ENABLE_WELCOME"] = "Enable Welcome Message"
 L["OPTIONS_ENABLE_MINIMAP"] = "Enable Mini-map Button"
 L["OPTIONS_ENABLE_LOCKBOX_NOTIFICATIONS"] = "Enable Lockbox Notifications"
@@ -61,11 +64,8 @@ L["OPTIONS_ENABLE_LOOT_SOUNDS"] = "Enable Loot Sounds"
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_CMD_OS"] = "/os"
 L["OPTIONS_CMD_OS_DESCRIPTION"] = "Opens the Open Sesame options interface."
-L["OPTIONS_RESET"] = "Reset"
-L["OPTIONS_RESET_DESC"] = "Restore every Open Sesame setting to its default value."
-L["OPTIONS_RESET_BUTTON"] = "Reset All Open Sesame Options"
-L["OPTIONS_RESET_CONFIRM"] = "Reset all Open Sesame settings to their default values?"
 L["OPTIONS_FEEDBACK"] = "Feedback & Support"
 L["OPTIONS_CURSEFORGE"] = "CurseForge"
 L["OPTIONS_GITHUB"] = "GitHub"
 L["OPTIONS_DISCORD"] = "Discord"
+L["OPTIONS_WAGO"] = "Wago"

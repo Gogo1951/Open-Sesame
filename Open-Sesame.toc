@@ -3,12 +3,24 @@
 ## Author: Gogo1951
 
 ## IconTexture: Interface/AddOns/Open-Sesame/Includes/Images/Open-Sesame.tga
-## Category-enUS: Bags & Inventory
 ## X-License: MIT
+
+## Category-enUS: Inventory
+## Category-deDE: Inventar
+## Category-esES: Inventario
+## Category-esMX: Inventario
+## Category-frFR: Inventaire
+## Category-itIT: Inventario
+## Category-koKR: 소지품
+## Category-ptBR: Inventário
+## Category-ruRU: Инвентарь
+## Category-zhCN: 物品栏
+## Category-zhTW: 物品欄
 
 ## Interface: 11508, 20506
 ## Version: @project-version@
 ## X-Curse-Project-ID: 830638
+## X-Wago-ID: b6mvgDKP
 
 ## SavedVariables: OpenSesameDB
 
@@ -16,11 +28,13 @@
 Includes/Libraries/LibStub/LibStub.lua
 Includes/Libraries/CallbackHandler-1.0/CallbackHandler-1.0.lua
 Includes/Libraries/AceLocale-3.0/AceLocale-3.0.lua
+Includes/Libraries/AceDB-3.0/AceDB-3.0.lua
 Includes/Libraries/AceGUI-3.0/AceGUI-3.0.xml
 Includes/Libraries/AceConfig-3.0/AceConfigRegistry-3.0/AceConfigRegistry-3.0.lua
 Includes/Libraries/AceConfig-3.0/AceConfigCmd-3.0/AceConfigCmd-3.0.lua
 Includes/Libraries/AceConfig-3.0/AceConfigDialog-3.0/AceConfigDialog-3.0.lua
 Includes/Libraries/AceConfig-3.0/AceConfig-3.0.lua
+Includes/Libraries/AceDBOptions-3.0/AceDBOptions-3.0.lua
 Includes/Libraries/LibDataBroker-1.1/LibDataBroker-1.1.lua
 Includes/Libraries/LibDBIcon-1.0/LibDBIcon-1.0.lua
 
@@ -52,10 +66,10 @@ Features/Minimap-Button.lua
 # Options
 Options/Options-Utilities.lua
 Options/Options-General.lua
+Options/Options-Profiles.lua
 Options/Options-Diagnostics.lua
 Options/Options.lua
 
 # Feedback Welcome! (=
-# Open Sesame on CurseForge // https://www.curseforge.com/wow/addons/open-sesame
 # Open Sesame on GitHub // https://github.com/Gogo1951/Open-Sesame
 # Open Sesame on Discord // https://discord.gg/eh8hKq992Q
