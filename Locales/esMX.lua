@@ -1,5 +1,7 @@
 local L = LibStub("AceLocale-3.0"):NewLocale("Open-Sesame", "esMX")
-if not L then return end
+if not L then
+	return
+end
 
 --------------------------------------------------------------------------------
 -- General
@@ -17,9 +19,8 @@ L["STATUS_PAUSED"] = "En pausa"
 -- System
 L["AUTO_LOOT_ENABLED"] = "Despojo automático es necesario para que Open Sesame funcione correctamente. Despojo automático ha sido activado."
 L["CHAT_LOADED"] = "Versión %s. La configuración (incluida la opción para desactivar este mensaje) se puede encontrar en Opciones > AddOns > Open Sesame. ¿Te gusta el addon? ¡Cuéntaselo a un amigo! (="
-L["MESSAGE_RESET"] = "Todos los ajustes se han restablecido a sus valores predeterminados."
 
--- Auto-Open
+-- Auto-Opening
 L["PAUSED_BAG_SLOTS"] = "La apertura automática está en pausa hasta tener al menos %d espacios libres en las bolsas."
 L["RESUMED"] = "La apertura automática se ha reanudado."
 L["INVENTORY_FULL"] = "¡El inventario está lleno!"
@@ -44,14 +45,16 @@ L["LOOT_SOUNDS_DESC"] = "Reproduce un sonido especial al obtener un objeto de ca
 L["KEYBIND_LEFT_CLICK"] = "Clic izquierdo"
 L["KEYBIND_RIGHT_CLICK"] = "Clic derecho"
 L["KEYBIND_MIDDLE_CLICK"] = "Clic central"
+L["KEYBIND_SHIFT_MIDDLE_CLICK"] = "Shift + Clic central"
 L["ACTION_TOGGLE"] = "Alternar"
-L["TOOLTIP_HINT"] = "La configuración adicional se puede encontrar en Opciones > AddOns > Open Sesame."
+L["TOOLTIP_OPTIONS_TITLE"] = "Opciones de Open Sesame"
 
 --------------------------------------------------------------------------------
 -- Options
 --------------------------------------------------------------------------------
 
 L["OPTIONS_INTRO"] = "Abre automáticamente almejas, cajas con cerradura y contenedores desbloqueados en tu inventario. Cuenta con Despojo rápido para obtener botín más rápidamente."
+L["TAB_PROFILES"] = "Perfiles"
 L["OPTIONS_ENABLE_WELCOME"] = "Activar mensaje de bienvenida"
 L["OPTIONS_ENABLE_MINIMAP"] = "Activar botón del minimapa"
 L["OPTIONS_ENABLE_LOCKBOX_NOTIFICATIONS"] = "Activar notificaciones de cajas con cerradura"
@@ -61,11 +64,8 @@ L["OPTIONS_ENABLE_LOOT_SOUNDS"] = "Activar sonidos de botín"
 L["OPTIONS_COMMANDS_HEADER"] = "/Comandos"
 L["OPTIONS_CMD_OS"] = "/os"
 L["OPTIONS_CMD_OS_DESCRIPTION"] = "Abre la interfaz de opciones de Open Sesame."
-L["OPTIONS_RESET"] = "Restablecer"
-L["OPTIONS_RESET_DESC"] = "Restaura todos los ajustes de Open Sesame a sus valores predeterminados."
-L["OPTIONS_RESET_BUTTON"] = "Restablecer todas las opciones de Open Sesame"
-L["OPTIONS_RESET_CONFIRM"] = "¿Restablecer todos los ajustes de Open Sesame a sus valores predeterminados?"
 L["OPTIONS_FEEDBACK"] = "Comentarios & Soporte"
 L["OPTIONS_CURSEFORGE"] = "CurseForge"
 L["OPTIONS_GITHUB"] = "GitHub"
 L["OPTIONS_DISCORD"] = "Discord"
+L["OPTIONS_WAGO"] = "Wago"

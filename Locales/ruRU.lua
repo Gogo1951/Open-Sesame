@@ -1,5 +1,7 @@
 local L = LibStub("AceLocale-3.0"):NewLocale("Open-Sesame", "ruRU")
-if not L then return end
+if not L then
+	return
+end
 
 --------------------------------------------------------------------------------
 -- General
@@ -17,9 +19,8 @@ L["STATUS_PAUSED"] = "Пауза"
 -- System
 L["AUTO_LOOT_ENABLED"] = "Для правильной работы Open Sesame требуется Автосбор добычи. Автосбор добычи был включен."
 L["CHAT_LOADED"] = "Версия %s. Настройки (включая возможность отключить это сообщение) можно найти в Настройки > Аддоны > Open Sesame. Нравится аддон? Расскажите о нем друзьям! (="
-L["MESSAGE_RESET"] = "Все настройки сброшены до значений по умолчанию."
 
--- Auto-Open
+-- Auto-Opening
 L["PAUSED_BAG_SLOTS"] = "Автоматическое открытие на паузе, пока не освободится хотя бы %d ячеек в сумках."
 L["RESUMED"] = "Автоматическое открытие возобновлено."
 L["INVENTORY_FULL"] = "Инвентарь заполнен!"
@@ -44,14 +45,16 @@ L["LOOT_SOUNDS_DESC"] = "Воспроизводит особый звук при
 L["KEYBIND_LEFT_CLICK"] = "Левый клик"
 L["KEYBIND_RIGHT_CLICK"] = "Правый клик"
 L["KEYBIND_MIDDLE_CLICK"] = "Средний клик"
+L["KEYBIND_SHIFT_MIDDLE_CLICK"] = "Shift + Средний клик"
 L["ACTION_TOGGLE"] = "Переключить"
-L["TOOLTIP_HINT"] = "Дополнительные настройки можно найти в Настройки > Аддоны > Open Sesame."
+L["TOOLTIP_OPTIONS_TITLE"] = "Настройки Open Sesame"
 
 --------------------------------------------------------------------------------
 -- Options
 --------------------------------------------------------------------------------
 
 L["OPTIONS_INTRO"] = "Автоматически открывает моллюсков, запертые ящики и разблокированные контейнеры в инвентаре. Включает функцию быстрого сбора добычи для более быстрого сбора."
+L["TAB_PROFILES"] = "Профили"
 L["OPTIONS_ENABLE_WELCOME"] = "Включить приветственное сообщение"
 L["OPTIONS_ENABLE_MINIMAP"] = "Включить кнопку мини-карты"
 L["OPTIONS_ENABLE_LOCKBOX_NOTIFICATIONS"] = "Включить уведомления о запертых ящиках"
@@ -61,11 +64,8 @@ L["OPTIONS_ENABLE_LOOT_SOUNDS"] = "Включить звуки добычи"
 L["OPTIONS_COMMANDS_HEADER"] = "/Команды"
 L["OPTIONS_CMD_OS"] = "/os"
 L["OPTIONS_CMD_OS_DESCRIPTION"] = "Открывает интерфейс настроек Open Sesame."
-L["OPTIONS_RESET"] = "Сброс"
-L["OPTIONS_RESET_DESC"] = "Восстановить все настройки Open Sesame по умолчанию."
-L["OPTIONS_RESET_BUTTON"] = "Сбросить все настройки Open Sesame"
-L["OPTIONS_RESET_CONFIRM"] = "Сбросить все настройки Open Sesame по умолчанию?"
 L["OPTIONS_FEEDBACK"] = "Обратная связь & Поддержка"
 L["OPTIONS_CURSEFORGE"] = "CurseForge"
 L["OPTIONS_GITHUB"] = "GitHub"
 L["OPTIONS_DISCORD"] = "Discord"
+L["OPTIONS_WAGO"] = "Wago"

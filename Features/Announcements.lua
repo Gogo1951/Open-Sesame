@@ -5,6 +5,7 @@ local _, ns = ...
 --------------------------------------------------------------------------------
 
 local L = ns.L
+local GetColor = ns.GetColor
 
 --------------------------------------------------------------------------------
 -- Messaging
@@ -12,19 +13,19 @@ local L = ns.L
 
 --[[
     All player-facing output lives here per the style guide. BRAND_PREFIX depends
-    on ns.COLORS (Features/Utilities.lua) and ns.L (Data/Data.lua); both load
+    on ns.GetColor (Features/Utilities.lua) and ns.L (Data/Data.lua); both load
     before this file, so building it at file-load time is safe.
 ]]
-ns.BRAND_PREFIX = string.format("%s%s|r %s//|r ", ns.COLORS.INFO, L["ADDON_TITLE"], ns.COLORS.SEPARATOR)
+ns.BRAND_PREFIX = string.format("%s%s|r %s//|r ", GetColor("INFO"), L["ADDON_TITLE"], GetColor("SEPARATOR"))
 
 function ns.PrintMessage(msg, ...)
-    local text = select("#", ...) > 0 and string.format(msg, ...) or msg
-    local output = ns.BRAND_PREFIX .. ns.COLORS.TEXT .. text .. "|r"
-    if DEFAULT_CHAT_FRAME then
-        DEFAULT_CHAT_FRAME:AddMessage(output)
-    else
-        print(output)
-    end
+	local text = select("#", ...) > 0 and string.format(msg, ...) or msg
+	local output = ns.BRAND_PREFIX .. GetColor("TEXT") .. text .. "|r"
+	if DEFAULT_CHAT_FRAME then
+		DEFAULT_CHAT_FRAME:AddMessage(output)
+	else
+		print(output)
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -37,25 +38,25 @@ end
     logic; ns.StatusPrint is the deduped status channel layered on PrintMessage.
 ]]
 local function IsQuiet()
-    return GetTime() < ns.state.quietUntil
+	return GetTime() < ns.state.quietUntil
 end
 
 function ns.SetQuiet(seconds)
-    local untilTimestamp = GetTime() + (seconds or 0)
-    if untilTimestamp > ns.state.quietUntil then
-        ns.state.quietUntil = untilTimestamp
-    end
+	local untilTimestamp = GetTime() + (seconds or 0)
+	if untilTimestamp > ns.state.quietUntil then
+		ns.state.quietUntil = untilTimestamp
+	end
 end
 
 function ns.StatusPrint(msg, ...)
-    if IsQuiet() then
-        return
-    end
-    local text = select("#", ...) > 0 and string.format(msg, ...) or msg
-    local now = GetTime()
-    if text == ns.state.lastStatusMsg and (now - ns.state.lastStatusAt) < 5 then
-        return
-    end
-    ns.state.lastStatusMsg, ns.state.lastStatusAt = text, now
-    ns.PrintMessage(text)
+	if IsQuiet() then
+		return
+	end
+	local text = select("#", ...) > 0 and string.format(msg, ...) or msg
+	local now = GetTime()
+	if text == ns.state.lastStatusMsg and (now - ns.state.lastStatusAt) < 5 then
+		return
+	end
+	ns.state.lastStatusMsg, ns.state.lastStatusAt = text, now
+	ns.PrintMessage(text)
 end

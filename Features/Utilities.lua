@@ -1,15 +1,4 @@
-local ADDON_NAME, ns = ...
-
---------------------------------------------------------------------------------
--- Metadata
---------------------------------------------------------------------------------
-
-local GetMetadata = (C_AddOns and C_AddOns.GetAddOnMetadata) or GetAddOnMetadata
-local version = GetMetadata and GetMetadata(ADDON_NAME, "Version") or "Dev"
-if version:find("@") then
-    version = "Dev"
-end
-ns.Version = version
+local _, ns = ...
 
 --------------------------------------------------------------------------------
 -- C_Container API
@@ -43,7 +32,7 @@ local COLOR_PREFIX = "|cff"
 
 ns.COLORS = {}
 for key, hex in pairs(ns.HEX) do
-    ns.COLORS[key] = COLOR_PREFIX .. hex
+	ns.COLORS[key] = COLOR_PREFIX .. hex
 end
 
 --------------------------------------------------------------------------------
@@ -51,16 +40,16 @@ end
 --------------------------------------------------------------------------------
 
 function ns.GetColor(key)
-    return ns.COLORS[key] or ns.COLORS.TEXT
+	return ns.COLORS[key] or ns.COLORS.TEXT
 end
 
 function ns.GetFreeSlots()
-    local free = 0
-    for bag = 0, 4 do
-        local slotCount, family = ns.GetContainerNumFreeSlots(bag)
-        if (family == nil or family == 0) and slotCount then
-            free = free + slotCount
-        end
-    end
-    return free
+	local free = 0
+	for bag = 0, 4 do
+		local slotCount, family = ns.GetContainerNumFreeSlots(bag)
+		if (family == nil or family == 0) and slotCount then
+			free = free + slotCount
+		end
+	end
+	return free
 end
