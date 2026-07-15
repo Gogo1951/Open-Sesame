@@ -110,7 +110,7 @@ The rare-loot sound must fire only for loot pulled from a corpse, chest, or node
 
 - `CurrentLootFromWorldSource()` classifies the open loot window as `"world"` (a `Creature-`/`Vehicle-`/`GameObject-` source), `"item"` (every source is `Item-`), or `"unknown"` (source info not yet populated).
 - `StampWorldLoot()` — run on both `LOOT_READY` and `LOOT_OPENED`, because the GUID can populate on either and Speedy Loot may empty the slots between them — records `lastWorldLootAt` on `"world"`, clears it on `"item"`, and leaves it alone on `"unknown"` (a late-arriving world GUID must still be able to stamp, and a just-set stamp must survive an empty re-read).
-- `CHAT_MSG_LOOT` plays `ns.LOOT_SOUND_ID` (2847) only if loot sounds are enabled, the stamp is within `ns.LOOT_SOUND_WINDOW` (1s), and the item link's color code is not gray (`9d9d9d`, poor) or white (`ffffff`, common).
+- `CHAT_MSG_LOOT` plays `ns.LOOT_SOUND_FILE` (`Includes/Sounds/Coin.ogg`, via `PlaySoundFile`) only if loot sounds are enabled, the stamp is within `ns.LOOT_SOUND_WINDOW` (1s), and the item link's color maps through `ns.QUALITY_COLORS` to a quality `>= ns.db.profile.lootSoundThreshold` (default `2`, Uncommon).
 
 ## Pause / Resume & the Status Channel
 

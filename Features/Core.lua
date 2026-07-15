@@ -48,9 +48,9 @@ local lootPushedPrefix = LOOT_ITEM_PUSHED_SELF and LOOT_ITEM_PUSHED_SELF:gsub("%
 --------------------------------------------------------------------------------
 
 --[[
-    Add-on identity. Read from TOC metadata; the @project-version@ token is only
-    replaced at build time, so an unreplaced token (the @ is the signal) means a
-    local dev copy and displays as "Dev".
+    Add-on identity. Read from TOC metadata; the TOC Version field carries the
+    @project-version@ token, replaced only at build time, so an unreplaced token
+    (the @ is the signal) means a local dev copy and displays as "Dev".
 ]]
 local GetMetadata = (C_AddOns and C_AddOns.GetAddOnMetadata) or GetAddOnMetadata
 local version = GetMetadata and GetMetadata(ADDON_NAME, "Version") or "Dev"
@@ -93,7 +93,7 @@ ns.state = {
 function ns.EnsureAutoLoot()
 	if not GetCVarBool("autoLootDefault") then
 		SetCVar("autoLootDefault", "1")
-		ns.PrintMessage(L["AUTO_LOOT_ENABLED"])
+		ns:PrintMessage(L["AUTO_LOOT_ENABLED"])
 	end
 end
 
@@ -101,7 +101,7 @@ local function PrintWelcome()
 	if not ns.db.profile.showWelcome then
 		return
 	end
-	ns.PrintMessage(L["CHAT_LOADED"]:format(ns.Version))
+	ns:PrintMessage(L["CHAT_LOADED"]:format(ns.Version))
 end
 
 local function PlayBagFullSound()
@@ -181,7 +181,7 @@ local function IsSafeToOpen()
 end
 
 local function ShouldPause(free)
-	return ns.isPaused and free < (ns.MIN_FREE_SLOTS + 1) or free < ns.MIN_FREE_SLOTS
+	return free < ns.MIN_FREE_SLOTS
 end
 
 --[[
@@ -197,14 +197,14 @@ local function AnnounceStatus()
 	end
 	if ns.isPaused then
 		--[[
-            Resume only fires once free slots reach MIN_FREE_SLOTS + 1 (the
-            ShouldPause hysteresis). This message promises the resume count, so it
-            must format with + 1 — using MIN_FREE_SLOTS itself tells the player
-            they need 4 free slots when 4 still leaves them paused.
+            Pause and resume share a single threshold: MIN_FREE_SLOTS. The player
+            is paused below it and resumes on reaching it, so the message reports
+            MIN_FREE_SLOTS directly — the count it promises is the count that
+            actually resumes opening.
         ]]
-		ns.StatusPrint(L["PAUSED_BAG_SLOTS"], ns.MIN_FREE_SLOTS + 1)
+		ns:StatusPrint(L["PAUSED_BAG_SLOTS"], ns.MIN_FREE_SLOTS)
 	else
-		ns.StatusPrint(L["RESUMED"])
+		ns:StatusPrint(L["RESUMED"])
 	end
 	ns.state.announcedPaused = ns.isPaused
 end
@@ -309,7 +309,7 @@ local function ScheduleScan(force)
 					ns.state.openTimerLive = false
 				end
 				if ns.UpdateMinimapIcon then
-					ns.UpdateMinimapIcon()
+					ns:UpdateMinimapIcon()
 				end
 			end
 			AnnounceStatus()
@@ -357,14 +357,11 @@ local function ApplyProfile()
 	ns.isEnabled = ns.db.profile.autoOpen
 	ns.isSpeedyLoot = ns.db.profile.speedyLoot
 
-	if ns.SetMinimapShown then
-		ns.SetMinimapShown(ns.db.profile.showMinimap)
-	end
 	if ns.isEnabled or ns.isSpeedyLoot then
 		ns.EnsureAutoLoot()
 	end
 	ns.ScheduleScan(true)
-	ns.UpdateMinimapIcon()
+	ns:UpdateMinimapIcon()
 	LibStub("AceConfigRegistry-3.0"):NotifyChange(ns.OPTIONS_REGISTRY.General)
 end
 
@@ -383,14 +380,15 @@ function EventHandlers:PLAYER_LOGIN()
         OpenSesameDB and the minimap position at OpenSesameDB.minimap. AceDB
         leaves unknown top-level keys untouched, so lift them into the profile
         (and the minimap table into global) once, then clear them so the leftover
-        state can't shadow future edits.
+        state can't shadow future edits. The flat showMinimap maps to the global
+        minimap `hide` flag rather than a profile key — button visibility is
+        account-wide, not profile-driven.
     ]]
 	for _, key in ipairs({
 		"autoOpen",
 		"speedyLoot",
 		"lootSounds",
 		"showWelcome",
-		"showMinimap",
 		"lockboxNotifications",
 	}) do
 		if OpenSesameDB[key] ~= nil then
@@ -406,21 +404,35 @@ function EventHandlers:PLAYER_LOGIN()
 		end
 		OpenSesameDB.minimap = nil
 	end
+	if OpenSesameDB.showMinimap ~= nil then
+		ns.db.global.minimap.hide = not OpenSesameDB.showMinimap
+		OpenSesameDB.showMinimap = nil
+	end
+
+	--[[
+        MIGRATION (remove after 2026-10-14): move profile.showMinimap into global.minimap.hide
+        Release 2026.07.08.A shipped showMinimap as a profile key. Button
+        visibility is account-wide now, so fold any saved profile value into the
+        global `hide` flag and clear the profile key.
+    ]]
+	if ns.db.profile.showMinimap ~= nil then
+		ns.db.global.minimap.hide = not ns.db.profile.showMinimap
+		ns.db.profile.showMinimap = nil
+	end
 
 	ns.isEnabled = ns.db.profile.autoOpen
 	ns.isSpeedyLoot = ns.db.profile.speedyLoot
 
-	-- Re-derive the LibDBIcon hide flag from showMinimap so a profile reset restores the button to on.
-	ns.db.global.minimap.hide = not ns.db.profile.showMinimap
+	ns:RegisterOptionsPanels()
 
 	ns.db.RegisterCallback(ns, "OnProfileChanged", ApplyProfile)
 	ns.db.RegisterCallback(ns, "OnProfileReset", ApplyProfile)
 	ns.db.RegisterCallback(ns, "OnProfileCopied", ApplyProfile)
 
 	if ns.InitMinimap then
-		ns.InitMinimap()
+		ns:InitMinimap()
 	end
-	ns.UpdateMinimapIcon()
+	ns:UpdateMinimapIcon()
 	PrintWelcome()
 end
 
@@ -436,10 +448,10 @@ function EventHandlers:PLAYER_ENTERING_WORLD(isInitialLogin, isReloadingUi)
 			if ns.isEnabled or ns.isSpeedyLoot then
 				ns.EnsureAutoLoot()
 			end
-			ns.UpdateMinimapIcon()
+			ns:UpdateMinimapIcon()
 		end)
 	else
-		ns.SetQuiet(2)
+		ns:SetQuiet(2)
 	end
 end
 
@@ -484,8 +496,8 @@ function EventHandlers:UI_ERROR_MESSAGE(errTypeOrID, msg)
 			ns.isPaused = true
 			ns.state.announcedPaused = true
 			ns.state.openTimerLive = false
-			ns.UpdateMinimapIcon()
-			ns.StatusPrint(L["INVENTORY_FULL"])
+			ns:UpdateMinimapIcon()
+			ns:StatusPrint(L["INVENTORY_FULL"])
 			PlayBagFullSound()
 		end
 	end
@@ -503,10 +515,10 @@ local function OnInteractionClosed()
 	C_Timer.After(ns.STATUS_FLUSH_DELAY, AnnounceStatus)
 end
 local function OnLoadStart()
-	ns.SetQuiet(10)
+	ns:SetQuiet(10)
 end
 local function OnLoadEnd()
-	ns.SetQuiet(3)
+	ns:SetQuiet(3)
 end
 
 --[[
@@ -632,7 +644,7 @@ function EventHandlers:CHAT_MSG_LOOT(msg)
 		and ns.db.profile.autoOpen
 		and ns.db.profile.lockboxNotifications
 	then
-		ns.PrintMessage(string.format(L["ITEM_WILL_AUTO_OPEN"], link))
+		ns:PrintMessage(string.format(L["ITEM_WILL_AUTO_OPEN"], link))
 	end
 
 	--[[
@@ -645,8 +657,9 @@ function EventHandlers:CHAT_MSG_LOOT(msg)
 		local colorSequence = link:match("|c(%x+)|H")
 		if colorSequence and #colorSequence == 8 then
 			local hex = string.lower(string.sub(colorSequence, 3, 8))
-			if hex ~= "9d9d9d" and hex ~= "ffffff" then
-				PlaySound(ns.LOOT_SOUND_ID, "Master")
+			local q = ns.QUALITY_COLORS[hex]
+			if q and q >= ns.db.profile.lootSoundThreshold then
+				PlaySoundFile(ns.LOOT_SOUND_FILE, "Master")
 			end
 		end
 	end
@@ -707,15 +720,29 @@ table.sort(ns.EVENT_NAMES)
 
 --[[
     Register only events valid on the running client. Harmless on current
-    builds (every event is valid on 11508/20505); guards future builds where
-    an event name may not exist, so one bad name can't abort the whole loop.
+    builds (every event in the list is valid on the current target clients);
+    guards future builds where an event name may not exist, so one bad name
+    can't abort the whole loop.
 ]]
 local IsEventValid = C_EventUtils and C_EventUtils.IsEventValid
 for event in pairs(EventHandlers) do
+	--[[
+        UNIT_SPELLCAST_SUCCEEDED fires for every unit; only the player's own Pick
+        Lock matters here, so filter it to "player" at registration to avoid
+        waking on every group member's cast. The handler keeps its unit ==
+        "player" guard as a belt-and-suspenders check.
+    ]]
+	local isPlayerUnitEvent = event == "UNIT_SPELLCAST_SUCCEEDED"
 	if IsEventValid then
 		if IsEventValid(event) then
-			eventFrame:RegisterEvent(event)
+			if isPlayerUnitEvent then
+				eventFrame:RegisterUnitEvent(event, "player")
+			else
+				eventFrame:RegisterEvent(event)
+			end
 		end
+	elseif isPlayerUnitEvent then
+		pcall(eventFrame.RegisterUnitEvent, eventFrame, event, "player")
 	else
 		pcall(eventFrame.RegisterEvent, eventFrame, event)
 	end

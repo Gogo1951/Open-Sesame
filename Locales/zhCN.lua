@@ -17,15 +17,17 @@ L["STATUS_PAUSED"] = "已暂停"
 --------------------------------------------------------------------------------
 
 -- System
-L["AUTO_LOOT_ENABLED"] = "Open Sesame 需要启用自动拾取才能正常工作。自动拾取已启用。"
-L["CHAT_LOADED"] = "版本 %s。设置（包括禁用此消息的选项）可以在 选项 > 插件 > Open Sesame 中找到。喜欢这个插件吗？告诉你的朋友吧！(="
+L["AUTO_LOOT_ENABLED"] = "自动拾取已启用。Open Sesame 需要它才能正常工作。"
+L["CHAT_LOADED"] =
+	"版本 %s。设置（包括禁用此消息的选项）可以在 选项 > 插件 > Open Sesame 中找到。喜欢这个插件吗？告诉你的朋友吧！(="
 
 -- Auto-Opening
 L["PAUSED_BAG_SLOTS"] = "自动开启已暂停，直到背包有至少 %d 个空位。"
 L["RESUMED"] = "自动开启已恢复。"
 L["INVENTORY_FULL"] = "背包已满！"
 L["ITEM_WILL_AUTO_OPEN"] = "%s 将在解锁后自动打开。"
-L["ITEM_OPEN_MANUALLY"] = "%s 需要手动打开。它可能包含唯一、拾取绑定或临时物品，或者是从团队首领处获得的。"
+L["ITEM_OPEN_MANUALLY"] =
+	"%s 需要手动打开。它可能包含唯一、拾取绑定或临时物品，或者是从团队首领处获得的。"
 
 --------------------------------------------------------------------------------
 -- Features
@@ -53,18 +55,20 @@ L["TOOLTIP_OPTIONS_TITLE"] = "Open Sesame 选项"
 -- Options
 --------------------------------------------------------------------------------
 
-L["OPTIONS_INTRO"] = "自动打开背包中的蛤蜊、保险箱和已解锁的容器。具有快速拾取功能，让拾取更加迅速。"
-L["TAB_PROFILES"] = "配置文件"
+L["OPTIONS_INTRO"] =
+	"Open Sesame 自动打开背包中的蛤蜊、保险箱和已解锁的容器。内置的快速拾取功能会隐藏拾取窗口，实现近乎即时的拾取。少点点击，多点游戏。"
 L["OPTIONS_ENABLE_WELCOME"] = "启用欢迎消息"
 L["OPTIONS_ENABLE_MINIMAP"] = "启用小地图按钮"
 L["OPTIONS_ENABLE_LOCKBOX_NOTIFICATIONS"] = "启用保险箱通知"
 L["OPTIONS_ENABLE_AUTO_OPENING"] = "启用自动开启"
 L["OPTIONS_ENABLE_SPEEDY_LOOT"] = "启用快速拾取"
 L["OPTIONS_ENABLE_LOOT_SOUNDS"] = "启用拾取音效"
+L["OPTIONS_LOOT_SOUND_THRESHOLD"] = "拾取音效的最低品质"
+L["OPTIONS_TEST_LOOT_SOUND"] = "播放拾取音效。"
 L["OPTIONS_COMMANDS_HEADER"] = "/命令"
 L["OPTIONS_CMD_OS"] = "/os"
 L["OPTIONS_CMD_OS_DESCRIPTION"] = "打开 Open Sesame 选项界面。"
-L["OPTIONS_FEEDBACK"] = "反馈 & 支持"
+L["OPTIONS_FEEDBACK"] = "反馈与支持"
 L["OPTIONS_CURSEFORGE"] = "CurseForge"
 L["OPTIONS_GITHUB"] = "GitHub"
 L["OPTIONS_DISCORD"] = "Discord"

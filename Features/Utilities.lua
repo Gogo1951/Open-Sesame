@@ -24,15 +24,15 @@ ns.GetContainerNumFreeSlots = (C_Container and C_Container.GetContainerNumFreeSl
 --------------------------------------------------------------------------------
 
 --[[
-    The raw hex palette lives in Data/Data.lua (ns.HEX). Per the style guide,
+    The raw hex palette lives in Data/Data.lua (ns.PALETTE). Per the style guide,
     data files hold no logic, so deriving the usable color-escape table from the
     palette happens here.
 ]]
 local COLOR_PREFIX = "|cff"
 
-ns.COLORS = {}
-for key, hex in pairs(ns.HEX) do
-	ns.COLORS[key] = COLOR_PREFIX .. hex
+local COLORS = {}
+for key, hex in pairs(ns.PALETTE) do
+	COLORS[key] = COLOR_PREFIX .. hex
 end
 
 --------------------------------------------------------------------------------
@@ -40,7 +40,7 @@ end
 --------------------------------------------------------------------------------
 
 function ns.GetColor(key)
-	return ns.COLORS[key] or ns.COLORS.TEXT
+	return COLORS[key] or COLORS.TEXT
 end
 
 function ns.GetFreeSlots()

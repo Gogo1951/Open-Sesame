@@ -12,7 +12,7 @@ Automatically open clams, lockboxes, and unlocked containers in your bags, no cl
 
 ⚡ **Speedy Loot** // Hides the loot window so you can pick up loot near-instantly.
 
-🔊 **Loot Sounds** // Plays a distinct sound when you loot an Uncommon or higher quality item. Off by default.
+🔊 **Loot Sounds** // Plays a distinct sound when you loot an Uncommon or higher quality item. Can be turned off.
 
 🦺 **Safety First** // Combat, casting, low bag space, Bind on Pickup, Unique, and raid-boss items are all skipped automatically — your bags stay protected.
 

@@ -18,7 +18,7 @@ local GetColor = ns.GetColor
 ]]
 ns.BRAND_PREFIX = string.format("%s%s|r %s//|r ", GetColor("INFO"), L["ADDON_TITLE"], GetColor("SEPARATOR"))
 
-function ns.PrintMessage(msg, ...)
+function ns:PrintMessage(msg, ...)
 	local text = select("#", ...) > 0 and string.format(msg, ...) or msg
 	local output = ns.BRAND_PREFIX .. GetColor("TEXT") .. text .. "|r"
 	if DEFAULT_CHAT_FRAME then
@@ -34,21 +34,21 @@ end
 
 --[[
     Quiet window: suppresses transient status spam during load and rapid state
-    changes. IsQuiet is internal; ns.SetQuiet is driven by Core's load/pause
-    logic; ns.StatusPrint is the deduped status channel layered on PrintMessage.
+    changes. IsQuiet is internal; ns:SetQuiet is driven by Core's load/pause
+    logic; ns:StatusPrint is the deduped status channel layered on PrintMessage.
 ]]
 local function IsQuiet()
 	return GetTime() < ns.state.quietUntil
 end
 
-function ns.SetQuiet(seconds)
+function ns:SetQuiet(seconds)
 	local untilTimestamp = GetTime() + (seconds or 0)
 	if untilTimestamp > ns.state.quietUntil then
 		ns.state.quietUntil = untilTimestamp
 	end
 end
 
-function ns.StatusPrint(msg, ...)
+function ns:StatusPrint(msg, ...)
 	if IsQuiet() then
 		return
 	end
@@ -58,5 +58,5 @@ function ns.StatusPrint(msg, ...)
 		return
 	end
 	ns.state.lastStatusMsg, ns.state.lastStatusAt = text, now
-	ns.PrintMessage(text)
+	ns:PrintMessage(text)
 end

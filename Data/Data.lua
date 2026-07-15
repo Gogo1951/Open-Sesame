@@ -37,10 +37,30 @@ ns.OPEN_RECHECK_DELAY = 0.25 -- Delay before re-checking a slot after opening
 ns.PICK_LOCK_RESCAN_DELAY = 0.5 -- Delay after Pick Lock before rescanning bags
 ns.STATUS_FLUSH_DELAY = 0.25 -- Delay after closing an interaction window before flushing a held status message
 ns.BAG_FULL_COOLDOWN = 10
-ns.LOOT_SOUND_ID = 2847 -- SoundKitID; play with PlaySound
+ns.LOOT_SOUND_FILE = "Interface\\AddOns\\Open-Sesame\\Includes\\Sounds\\item-pick-up.ogg" -- Rare-loot chime; play with PlaySoundFile
 ns.BAG_FULL_SOUND_FALLBACK = 846 -- SoundKitID; play with PlaySound
 ns.LOOT_DELAY = 0.25
 ns.LOOT_SOUND_WINDOW = 1 -- Seconds after a corpse/chest loot during which CHAT_MSG_LOOT may play the rare-loot sound
+
+--------------------------------------------------------------------------------
+-- Item Quality
+--------------------------------------------------------------------------------
+
+--[[
+    Maps an item link's lowercase color hex to its WoW item-quality number, used
+    by the loot-sound gate to compare against the player's threshold. Heirloom
+    (e6cc80) shares Legendary's 5 so it always plays at any threshold. Codes not
+    listed here (e.g. quest yellow) are treated as unmapped and play no sound.
+]]
+ns.QUALITY_COLORS = {
+	["9d9d9d"] = 0, -- Poor
+	["ffffff"] = 1, -- Common
+	["1eff00"] = 2, -- Uncommon
+	["0070dd"] = 3, -- Rare
+	["a335ee"] = 4, -- Epic
+	["ff8000"] = 5, -- Legendary
+	["e6cc80"] = 5, -- Heirloom / Artifact
+}
 
 ns.SPELLS = {
 	PICK_LOCK = 1804,
@@ -66,12 +86,12 @@ ns.RACE_SOUNDS = {
 --------------------------------------------------------------------------------
 
 --[[
-    Raw hex palette only. The derived ns.COLORS table (with the |cff escape
+    Raw hex palette only. The derived COLORS table (with the |cff escape
     prefix) and the ns.GetColor accessor live in Features/Utilities.lua, because
     data files hold no logic.
 ]]
 
-ns.HEX = {
+ns.PALETTE = {
 	TITLE = "FFD100", -- Gold: Titles, Headers, Section Names
 	INFO = "00BBFF", -- Blue: Interactions, Toggles, Links, Keybinds, Slash Commands
 	BODY = "CCCCCC", -- Silver: Descriptions, Help Text
