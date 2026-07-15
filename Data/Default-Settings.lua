@@ -14,9 +14,9 @@ ns.DATABASE_DEFAULTS = {
 	profile = {
 		autoOpen = true,
 		speedyLoot = true,
-		lootSounds = false,
+		lootSounds = true,
+		lootSoundThreshold = 2,
 		showWelcome = true,
-		showMinimap = true,
 		lockboxNotifications = true,
 	},
 	global = {

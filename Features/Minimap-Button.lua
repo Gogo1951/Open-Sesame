@@ -7,6 +7,7 @@ local ADDON_NAME, ns = ...
 local L = ns.L
 local LDB = LibStub("LibDataBroker-1.1")
 local LDBIcon = LibStub("LibDBIcon-1.0")
+local AceConfigRegistry = LibStub("AceConfigRegistry-3.0")
 local GetColor = ns.GetColor
 
 local brokerObj
@@ -15,7 +16,7 @@ local brokerObj
 -- Icon State
 --------------------------------------------------------------------------------
 
-function ns.UpdateMinimapIcon()
+function ns:UpdateMinimapIcon()
 	if not brokerObj then
 		return
 	end
@@ -34,15 +35,12 @@ function ns.UpdateMinimapIcon()
 end
 
 --[[
-    showMinimap (a profile setting) is the source of truth, so a profile reset
-    restores the button to on. The LibDBIcon subtable's `hide` field is kept in
-    sync (inverted) so the button library obeys it; PLAYER_LOGIN re-derives hide
-    from showMinimap at load. The minimap subtable lives in ns.db.global (account-
-    wide, profile-independent), so the button's saved position survives a profile
-    reset or switch.
+    ns.db.global.minimap holds both the button's saved position and its `hide`
+    flag. It is account-wide and profile-independent, so switching, resetting, or
+    deleting a profile never affects the button's visibility or position. The
+    subtable is passed directly to LibDBIcon, which reads `hide` to show or hide.
 ]]
-function ns.SetMinimapShown(shown)
-	ns.db.profile.showMinimap = shown
+function ns:SetMinimapShown(shown)
 	ns.db.global.minimap.hide = not shown
 	if shown then
 		LDBIcon:Show(ADDON_NAME)
@@ -76,7 +74,8 @@ local function ToggleAutoOpen()
 		ns.EnsureAutoLoot()
 	end
 	ns.ScheduleScan(true)
-	ns.UpdateMinimapIcon()
+	ns:UpdateMinimapIcon()
+	AceConfigRegistry:NotifyChange(ns.OPTIONS_REGISTRY.General)
 end
 
 local function ToggleSpeedyLoot()
@@ -85,11 +84,13 @@ local function ToggleSpeedyLoot()
 	if ns.isSpeedyLoot then
 		ns.EnsureAutoLoot()
 	end
-	ns.UpdateMinimapIcon()
+	ns:UpdateMinimapIcon()
+	AceConfigRegistry:NotifyChange(ns.OPTIONS_REGISTRY.General)
 end
 
 local function ToggleLootSounds()
 	ns.db.profile.lootSounds = not ns.db.profile.lootSounds
+	AceConfigRegistry:NotifyChange(ns.OPTIONS_REGISTRY.General)
 end
 
 --------------------------------------------------------------------------------
@@ -149,7 +150,7 @@ end
 -- Initialization
 --------------------------------------------------------------------------------
 
-function ns.InitMinimap()
+function ns:InitMinimap()
 	brokerObj = LDB:NewDataObject(ADDON_NAME, {
 		type = "launcher",
 		label = L["ADDON_TITLE"],
@@ -157,7 +158,7 @@ function ns.InitMinimap()
 		OnClick = function(self, button)
 			-- Shift + Middle-Click always opens the options panel; checked first.
 			if button == "MiddleButton" and IsShiftKeyDown() then
-				ns.OpenOptionsPanel()
+				ns:OpenOptionsPanel()
 				return
 			end
 

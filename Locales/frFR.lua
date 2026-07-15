@@ -17,25 +17,29 @@ L["STATUS_PAUSED"] = "En pause"
 --------------------------------------------------------------------------------
 
 -- System
-L["AUTO_LOOT_ENABLED"] = "La Fouille automatique est requise pour qu'Open Sesame fonctionne correctement. La Fouille automatique a été activée."
-L["CHAT_LOADED"] = "Version %s. Les paramètres (y compris l'option pour désactiver ce message) se trouvent dans Options > AddOns > Open Sesame. Vous aimez l'addon ? Parlez-en à un ami ! (="
+L["AUTO_LOOT_ENABLED"] = "La Fouille automatique a été activée. Open Sesame en a besoin pour fonctionner."
+L["CHAT_LOADED"] =
+	"Version %s. Les paramètres (y compris l'option pour désactiver ce message) se trouvent dans Options > AddOns > Open Sesame. Vous aimez l'addon ? Parlez-en à un ami ! (="
 
 -- Auto-Opening
-L["PAUSED_BAG_SLOTS"] = "L'ouverture automatique est en pause jusqu'à ce que vous ayez au moins %d emplacements de sac libres."
+L["PAUSED_BAG_SLOTS"] =
+	"L'ouverture automatique est en pause jusqu'à ce que vous ayez au moins %d emplacements de sac libres."
 L["RESUMED"] = "L'ouverture automatique a repris."
 L["INVENTORY_FULL"] = "L'inventaire est plein !"
 L["ITEM_WILL_AUTO_OPEN"] = "%s sera automatiquement ouvert une fois déverrouillé."
-L["ITEM_OPEN_MANUALLY"] = "%s doit être ouvert manuellement. Il peut contenir un objet unique, lié quand ramassé ou temporaire, ou a été lâché par un boss de raid."
+L["ITEM_OPEN_MANUALLY"] =
+	"%s doit être ouvert manuellement. Il peut contenir un objet unique, lié quand ramassé ou temporaire, ou a été lâché par un boss de raid."
 
 --------------------------------------------------------------------------------
 -- Features
 --------------------------------------------------------------------------------
 
 L["AUTO_OPENING"] = "Ouverture automatique"
-L["AUTO_OPENING_DESC"] = "Ouvre automatiquement les palourdes et les conteneurs déverrouillés quand vous avez au moins %d emplacements de sac libres."
+L["AUTO_OPENING_DESC"] =
+	"Ouvre automatiquement les palourdes et les conteneurs déverrouillés quand vous avez au moins %d emplacements de sac libres."
 L["SPEEDY_LOOT"] = "Butin rapide"
 L["SPEEDY_LOOT_DESC"] = "Masque la fenêtre de butin pour un ramassage quasi instantané."
-L["LOOT_SOUNDS"] = "Sons de butin"
+L["LOOT_SOUNDS"] = "Son de butin"
 L["LOOT_SOUNDS_DESC"] = "Joue un son distinct quand vous ramassez un objet de qualité Inhabituelle ou supérieure."
 
 --------------------------------------------------------------------------------
@@ -53,18 +57,20 @@ L["TOOLTIP_OPTIONS_TITLE"] = "Options d'Open Sesame"
 -- Options
 --------------------------------------------------------------------------------
 
-L["OPTIONS_INTRO"] = "Ouvre automatiquement les palourdes, les coffres-forts et les conteneurs déverrouillés dans votre inventaire. Propose Butin rapide pour un ramassage plus rapide."
-L["TAB_PROFILES"] = "Profils"
+L["OPTIONS_INTRO"] =
+	"Open Sesame ouvre automatiquement les palourdes, les coffres-forts et les conteneurs déverrouillés dans vos sacs. Le Butin rapide intégré masque la fenêtre de butin pour un ramassage quasi instantané. Moins de clics, plus de jeu."
 L["OPTIONS_ENABLE_WELCOME"] = "Activer le message de bienvenue"
 L["OPTIONS_ENABLE_MINIMAP"] = "Activer le bouton de la mini-carte"
 L["OPTIONS_ENABLE_LOCKBOX_NOTIFICATIONS"] = "Activer les notifications de coffres-forts"
 L["OPTIONS_ENABLE_AUTO_OPENING"] = "Activer l'ouverture automatique"
 L["OPTIONS_ENABLE_SPEEDY_LOOT"] = "Activer le butin rapide"
-L["OPTIONS_ENABLE_LOOT_SOUNDS"] = "Activer les sons de butin"
+L["OPTIONS_ENABLE_LOOT_SOUNDS"] = "Activer le son de butin"
+L["OPTIONS_LOOT_SOUND_THRESHOLD"] = "Qualité minimale pour le son de butin"
+L["OPTIONS_TEST_LOOT_SOUND"] = "Écouter le son de butin."
 L["OPTIONS_COMMANDS_HEADER"] = "/Commandes"
 L["OPTIONS_CMD_OS"] = "/os"
 L["OPTIONS_CMD_OS_DESCRIPTION"] = "Ouvre l'interface des options d'Open Sesame."
-L["OPTIONS_FEEDBACK"] = "Commentaires & Support"
+L["OPTIONS_FEEDBACK"] = "Commentaires et support"
 L["OPTIONS_CURSEFORGE"] = "CurseForge"
 L["OPTIONS_GITHUB"] = "GitHub"
 L["OPTIONS_DISCORD"] = "Discord"

@@ -34,10 +34,10 @@ function ns.BuildGeneralOptions()
 				order = 7,
 				width = "full",
 				get = function()
-					return ns.db.profile.showMinimap
+					return ns.db and not ns.db.global.minimap.hide
 				end,
 				set = function(_, value)
-					ns.SetMinimapShown(value)
+					ns:SetMinimapShown(value)
 				end,
 			},
 			-- /Commands
@@ -71,7 +71,7 @@ function ns.BuildGeneralOptions()
 						ns.EnsureAutoLoot()
 					end
 					ns.ScheduleScan(true)
-					ns.UpdateMinimapIcon()
+					ns:UpdateMinimapIcon()
 				end,
 			},
 			toggleLockboxNotifications = {
@@ -110,7 +110,7 @@ function ns.BuildGeneralOptions()
 					if value then
 						ns.EnsureAutoLoot()
 					end
-					ns.UpdateMinimapIcon()
+					ns:UpdateMinimapIcon()
 				end,
 			},
 			-- Loot Sounds
@@ -124,12 +124,63 @@ function ns.BuildGeneralOptions()
 				type = "toggle",
 				name = L["OPTIONS_ENABLE_LOOT_SOUNDS"],
 				order = 45,
-				width = "full",
+				width = "normal",
 				get = function()
 					return ns.db.profile.lootSounds
 				end,
 				set = function(_, value)
 					ns.db.profile.lootSounds = value
+				end,
+			},
+			--[[
+				    The quality dropdown and the preview speaker share the loot sound row
+				    with the toggle: toggle (45), dropdown (47), speaker (48). Tier labels
+				    use the client-localized ITEM_QUALITYn_DESC globals wrapped in the
+				    game's own item-quality colors, so the dropdown reads green/blue/purple
+				    like the items themselves — no locale keys needed for the tier names.
+				    sorting forces numeric 2/3/4 order.
+				]]
+			selectLootSoundThreshold = {
+				type = "select",
+				name = L["OPTIONS_LOOT_SOUND_THRESHOLD"],
+				order = 47,
+				width = "normal",
+				values = {
+					[2] = ITEM_QUALITY_COLORS[2].hex .. ITEM_QUALITY2_DESC .. "|r",
+					[3] = ITEM_QUALITY_COLORS[3].hex .. ITEM_QUALITY3_DESC .. "|r",
+					[4] = ITEM_QUALITY_COLORS[4].hex .. ITEM_QUALITY4_DESC .. "|r",
+				},
+				sorting = { 2, 3, 4 },
+				disabled = function()
+					return not ns.db.profile.lootSounds
+				end,
+				get = function()
+					return ns.db.profile.lootSoundThreshold
+				end,
+				set = function(_, value)
+					ns.db.profile.lootSoundThreshold = value
+				end,
+			},
+			--[[
+				    Speaker icon just right of the dropdown that previews the actual loot
+				    sound (ns.LOOT_SOUND_FILE, the same file Core plays on a rare drop) so
+				    the player can hear it before enabling. The Icon widget centers its
+				    image in the control, so a narrow width (0.2 grid units) keeps the
+				    speaker tight against the dropdown instead of floating in a wide cell.
+				    order 48 places it right after the dropdown (47). Always clickable — a
+				    preview, independent of whether Loot Sound is on.
+				]]
+			playLootSound = {
+				type = "execute",
+				name = "",
+				desc = L["OPTIONS_TEST_LOOT_SOUND"],
+				order = 48,
+				width = 0.2,
+				image = "Interface\\COMMON\\VoiceChat-Speaker",
+				imageWidth = 24,
+				imageHeight = 24,
+				func = function()
+					PlaySoundFile(ns.LOOT_SOUND_FILE, "Master")
 				end,
 			},
 			-- Feedback & Support

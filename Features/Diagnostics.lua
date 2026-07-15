@@ -119,8 +119,8 @@ local EVENT_LOG_MAX_ARG_LENGTH = 255
     EventHandlers), and none of those is a sustained firehose worth dropping: the
     addon listens on the coalesced BAG_UPDATE_DELAYED rather than raw BAG_UPDATE,
     and every registered event is potential signal in a bug report — including
-    the all-unit UNIT_SPELLCAST_SUCCEEDED, whose rare player Pick Lock cast
-    drives the lockbox rescan. The lookup in LogEvent stays so a genuine
+    UNIT_SPELLCAST_SUCCEEDED, player-filtered at registration, whose rare Pick
+    Lock cast drives the lockbox rescan. The lookup in LogEvent stays so a genuine
     no-signal firehose can be excluded here if one is ever registered. Generic
     offenders (COMBAT_LOG_EVENT_UNFILTERED, UNIT_AURA, ...) do not belong here
     unless registered — the log never sees an event the addon didn't register.
@@ -322,6 +322,12 @@ ns.DIAGNOSTIC_API_CHECKS = {
 		end,
 	},
 	{
+		"GetLootSourceInfo",
+		function()
+			return type(GetLootSourceInfo) == "function"
+		end,
+	},
+	{
 		"GetLootSlotType",
 		function()
 			return type(GetLootSlotType) == "function"
@@ -355,6 +361,12 @@ ns.DIAGNOSTIC_API_CHECKS = {
 		"C_PartyInfo.GetLootMethod",
 		function()
 			return type(C_PartyInfo) == "table" and type(C_PartyInfo.GetLootMethod) == "function"
+		end,
+	},
+	{
+		"GetLootMethod (legacy)",
+		function()
+			return type(GetLootMethod) == "function"
 		end,
 	},
 	{
