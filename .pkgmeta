@@ -6,6 +6,8 @@ externals:
     url: https://repos.curseforge.com/wow/libstub/trunk/
   Includes/Libraries/CallbackHandler-1.0:
     url: https://repos.curseforge.com/wow/callbackhandler/trunk/CallbackHandler-1.0/
+  Includes/Libraries/LibSharedMedia-3.0:
+    url: https://repos.curseforge.com/wow/libsharedmedia-3-0/trunk/LibSharedMedia-3.0/
   Includes/Libraries/AceLocale-3.0:
     url: https://repos.curseforge.com/wow/ace3/trunk/AceLocale-3.0/
   Includes/Libraries/AceDB-3.0:
@@ -27,6 +29,7 @@ ignore:
   - .github
   - .gitignore
   - .idea
+  - .luacheckrc
   - .pkgmeta
   - .vscode
   - LICENSE
