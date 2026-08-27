@@ -4,8 +4,6 @@ Automatically open clams and unlocked containers in your bags, no clicking requi
 
 TL;DR: Kill stuff. Loot stuff. Skip the clicking. Keep killing. Loot more, faster.
 
-<img width="360" src="https://github.com/user-attachments/assets/48e86839-798f-4086-82d1-bcf9c23dc1eb" />
-
 ## Features
 
 📦 **Auto-Opening** // Opens clams, sacks, crates, and unlocked containers in the background, no clicks required, and always respects your Ignore List.
@@ -17,6 +15,8 @@ TL;DR: Kill stuff. Loot stuff. Skip the clicking. Keep killing. Loot more, faste
 🔊 **Loot Notifications** // On-screen toasts log every pickup, and a distinct sound plays for the good stuff. Both are yours to tune, or turn off.
 
 🦺 **Safety First** // Combat, casting, low bag space, Bind on Pickup, and raid-boss containers are all skipped automatically. Your bags stay protected.
+
+<img width="200" src="https://github.com/user-attachments/assets/63d2047f-ff62-4b26-ba9d-69ced1865903" />
 
 ## Setup
 
@@ -37,6 +37,12 @@ TL;DR: Kill stuff. Loot stuff. Skip the clicking. Keep killing. Loot more, faste
 - **Skips your Ignore List** // Seeded with the containers usually worth more sealed, like raid gem sacks and crates holding Bind on Pickup gear.
 - **Stands down** // In combat, mid-cast, stealthed, or at a vendor, mailbox, bank, auction house, or trade window. Speedy Loot also steps aside under master loot.
 
+### Loot Toasts
+
+Loot Toasts replace the need to keep the loot window open. They briefly show everything you pick up and can be positioned and customized with settings for font, size, outline, duration, row count, and stacking direction.
+
+<img width="400" src="https://github.com/user-attachments/assets/7e3dc009-ba1e-42bd-98e4-9fe3f65a57c3" />
+
 ### Mini-Map Button
 
 | Action | Effect |
@@ -46,6 +52,8 @@ TL;DR: Kill stuff. Loot stuff. Skip the clicking. Keep killing. Loot more, faste
 | Right-click | Toggle Speedy Loot on or off |
 | Middle-click | Toggle Loot Sounds on or off |
 | Shift + Middle-click | Open the Options Interface |
+
+<img width="260" src="https://github.com/user-attachments/assets/d5a4ac09-c5e8-425f-8215-49550c7308b9" />
 
 ### Slash Commands
 
@@ -61,6 +69,8 @@ TL;DR: Kill stuff. Loot stuff. Skip the clicking. Keep killing. Loot more, faste
 - **Ignore List** // Drag in an item, or paste a link or item ID, to leave it alone for good. Shared across your characters, with one-click restore of the defaults.
 - **Profiles** // The standard profile controls.
 - **Diagnostic Tools** // Everything a bug report needs, ready to copy.
+
+<img width="800" src="https://github.com/user-attachments/assets/da6e49ac-783a-4fc7-98c4-31340329eef4" />
 
 ## Testing & Localization Status
 
