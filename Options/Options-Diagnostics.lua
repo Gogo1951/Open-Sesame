@@ -10,9 +10,10 @@ local AceConfigRegistry = LibStub("AceConfigRegistry-3.0")
 
 --[[
     A single runtime toggle gates the whole panel. When off, only the warning
-    text and the enable toggle are visible; everything below is hidden. The
-    OptionsHeader / OptionsSpacer helpers do not support `hidden`, so the
-    gated sections inline their header widgets with `hidden` functions.
+    text and the enable toggle are visible; everything below is hidden. Every
+    gated section hides on that one condition, so the panel defines local
+    SectionHeader / ReportOutput builders that bake it in alongside the shared
+    Hidden and Refresh locals, rather than repeating the predicate per widget.
 ]]
 
 local function DiagnosticsOn()
@@ -102,7 +103,7 @@ function ns.BuildDiagnosticsOptions()
 			outputEventLog = ReportOutput("eventLogReport", 9),
 			descEventLogHint = {
 				type = "description",
-				name = GetColor("BODY") .. D.EVENT_LOG_HINT .. "|r",
+				name = GetColor("HELP") .. D.EVENT_LOG_HINT .. "|r",
 				fontSize = "medium",
 				order = 10,
 				hidden = Hidden,
@@ -163,6 +164,34 @@ function ns.BuildDiagnosticsOptions()
 				end,
 			},
 			outputAddons = ReportOutput("addOnReport", 32),
+
+			-- Relevant CVars
+			headerCVars = SectionHeader(D.CVARS_TITLE, 33),
+			buttonCVars = {
+				type = "execute",
+				name = D.CVARS_BUTTON,
+				order = 34,
+				hidden = Hidden,
+				func = function()
+					ns.diagnostics.cvarReport = ns:BuildCVarReport()
+					Refresh()
+				end,
+			},
+			outputCVars = ReportOutput("cvarReport", 35),
+
+			-- Display Context
+			headerDisplay = SectionHeader(D.DISPLAY_TITLE, 36),
+			buttonDisplay = {
+				type = "execute",
+				name = D.DISPLAY_BUTTON,
+				order = 37,
+				hidden = Hidden,
+				func = function()
+					ns.diagnostics.displayReport = ns:BuildDisplayReport()
+					Refresh()
+				end,
+			},
+			outputDisplay = ReportOutput("displayReport", 38),
 
 			-- Saved Variables
 			headerSaved = SectionHeader(D.SAVED_TITLE, 40),
@@ -225,7 +254,7 @@ function ns.BuildDiagnosticsOptions()
 			},
 			descTaintHint = {
 				type = "description",
-				name = GetColor("BODY") .. D.TAINT_HINT .. "|r",
+				name = GetColor("HELP") .. D.TAINT_HINT .. "|r",
 				fontSize = "medium",
 				order = 64,
 				hidden = Hidden,
