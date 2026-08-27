@@ -2,9 +2,7 @@
 std = "lua51"
 max_line_length = false -- StyLua owns formatting
 ignore = { "212/self", "611", "612", "613", "614", "621" } -- implicit self (house ns: methods) + whitespace — StyLua owns the latter
--- Includes/ is vendored and Examples/ is other people's add-ons, kept for
--- reference; neither is ours to lint or to ship.
-exclude_files = { "Includes/", "Examples/" }
+exclude_files = { "Includes/" } -- vendored, never linted
 read_globals = {
 	-- Libraries
 	"LibStub",
@@ -17,7 +15,6 @@ read_globals = {
 	"C_PartyInfo",
 	"C_Timer",
 	"C_UnitAuras",
-	"Enum",
 	"Settings",
 
 	-- Client info, timing, and add-on metadata
@@ -35,6 +32,7 @@ read_globals = {
 	"DEFAULT_CHAT_FRAME",
 	"GameFontNormal",
 	"GameTooltip",
+	"GetPhysicalScreenSize",
 	"GossipFrame",
 	"GuildBankFrame",
 	"LootFrame",
@@ -69,9 +67,7 @@ read_globals = {
 	"InCombatLockdown",
 	"IsInGroup",
 	"IsInInstance",
-	"IsAltKeyDown",
 	"IsModifiedClick",
-	"IsPlayerSpell",
 	"IsShiftKeyDown",
 	"IsStealthed",
 	"UnitAffectingCombat",
@@ -86,7 +82,6 @@ read_globals = {
 	"PlaySoundFile",
 
 	-- Tooltips
-	"TooltipDataProcessor",
 	"hooksecurefunc",
 
 	-- Localized client strings and enums
