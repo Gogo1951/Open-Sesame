@@ -16,8 +16,6 @@ TL;DR: Kill stuff. Loot stuff. Skip the clicking. Keep killing. Loot more, faste
 
 🦺 **Safety First** // Combat, casting, low bag space, Bind on Pickup, and raid-boss containers are all skipped automatically. Your bags stay protected.
 
-<img width="200" src="https://github.com/user-attachments/assets/63d2047f-ff62-4b26-ba9d-69ced1865903" />
-
 ## Setup
 
 1. Install the add-on, ideally using [CurseForge](https://www.curseforge.com/wow/addons/open-sesame) or [Wago](https://addons.wago.io/addons/open-sesame).
