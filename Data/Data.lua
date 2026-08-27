@@ -21,9 +21,34 @@ ns.WAGO_URL = "https://addons.wago.io/addons/open-sesame"
 ]]
 ns.OPTIONS_REGISTRY = {
 	General = ADDON_NAME,
+	Notifications = ADDON_NAME .. "_Notifications",
+	Lockboxes = ADDON_NAME .. "_Lockboxes",
+	IgnoreList = ADDON_NAME .. "_IgnoreList",
 	Profiles = ADDON_NAME .. "_Profiles",
 	Diagnostics = ADDON_NAME .. "_Diagnostics",
 }
+
+--------------------------------------------------------------------------------
+-- Expansion
+--------------------------------------------------------------------------------
+
+--[[
+    Which expansion this client is. Item data is tagged with the expansion that
+    introduced it, so anything newer than the running client can be filtered out
+    before the add-on ever asks the client about it: those ids resolve to nothing
+    here, and a row built from one would sit as a bare number forever.
+]]
+ns.VANILLA = 1
+ns.TBC = 2
+ns.WRATH = 3
+
+if WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
+	ns.currentExpansion = ns.VANILLA
+elseif WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC then
+	ns.currentExpansion = ns.TBC
+else
+	ns.currentExpansion = ns.WRATH
+end
 
 --------------------------------------------------------------------------------
 -- Constants
@@ -37,10 +62,72 @@ ns.OPEN_RECHECK_DELAY = 0.25 -- Delay before re-checking a slot after opening
 ns.PICK_LOCK_RESCAN_DELAY = 0.5 -- Delay after Pick Lock before rescanning bags
 ns.STATUS_FLUSH_DELAY = 0.25 -- Delay after closing an interaction window before flushing a held status message
 ns.BAG_FULL_COOLDOWN = 10
+ns.ITEM_ANNOUNCE_COOLDOWN = 5 -- Seconds before the same item may be announced again
+ns.STATUS_REPEAT_COOLDOWN = 5 -- Seconds before an identical status message may print again
+
+--[[
+    The client's own red "pass" icon, reused as a blocked marker on the Ignore
+    List's tooltip line so the row reads as refused at a glance. Texture escapes
+    are the one kind of picture sanctioned in game text.
+]]
+ns.ICON_IGNORED = "|TInterface\\Buttons\\UI-GroupLoot-Pass-Up:14|t"
 ns.LOOT_SOUND_FILE = "Interface\\AddOns\\Open-Sesame\\Includes\\Sounds\\item-pick-up.ogg" -- Rare-loot chime; play with PlaySoundFile
 ns.BAG_FULL_SOUND_FALLBACK = 846 -- SoundKitID; play with PlaySound
 ns.LOOT_DELAY = 0.25
 ns.LOOT_SOUND_WINDOW = 1 -- Seconds after a corpse/chest loot during which CHAT_MSG_LOOT may play the rare-loot sound
+ns.LOOT_TOAST_FADE_DURATION = 0.5 -- Seconds the fade itself takes, once ns.LOOT_TOAST_DURATIONS' dwell has elapsed
+
+-- Seconds a toast stays up. Offered as a dropdown, so the steps widen as they grow.
+ns.LOOT_TOAST_DURATIONS = { 1, 2, 3, 5, 8, 13, 21 }
+
+--[[
+    Most rows on screen at once. Same widening steps as the durations above, so
+    the two dropdowns read as a pair. The list is joined by an Unlimited choice
+    stored as 0 - a sentinel, not a count, and the one value the cap code has to
+    special-case, since a literal cap of zero would retire every row on sight.
+]]
+ns.LOOT_TOAST_COUNTS = { 1, 2, 3, 5, 8, 13, 21 }
+ns.LOOT_TOAST_UNLIMITED = 0
+
+-- The face list itself comes from LibSharedMedia; only the bounds are ours.
+ns.LOOT_TOAST_FONT_SIZE_MIN = 8
+ns.LOOT_TOAST_FONT_SIZE_MAX = 24
+
+--[[
+    The client's own SetFont flag strings, in the order the dropdown offers them:
+    the weight ladder first, then the two monochrome variants. "NONE" is our
+    sentinel for the empty flag string, which SetFont wants instead of a name.
+]]
+ns.LOOT_TOAST_FONT_FLAGS = { "NONE", "OUTLINE", "THICKOUTLINE", "MONOCHROME", "MONOCHROMEOUTLINE" }
+
+--[[
+    One potion icon per item quality, colour-matched to the quality it stands
+    for, so a sample toast reads as that quality at a glance. Used only by the
+    unlock preview in Features/Loot-Toasts.lua; real toasts always draw the
+    looted item's own icon.
+]]
+
+-- { [quality] = iconPath }
+ns.LOOT_TOAST_SAMPLE_ICONS = {
+	[0] = "Interface\\Icons\\inv_potion_132", -- Poor (gray)
+	[1] = "Interface\\Icons\\inv_potion_133", -- Common (white)
+	[2] = "Interface\\Icons\\inv_potion_138", -- Uncommon (green)
+	[3] = "Interface\\Icons\\inv_potion_137", -- Rare (blue)
+	[4] = "Interface\\Icons\\inv_potion_134", -- Epic (purple)
+	[5] = "Interface\\Icons\\inv_potion_135", -- Legendary (orange)
+}
+
+--------------------------------------------------------------------------------
+-- Options Layout
+--------------------------------------------------------------------------------
+
+ns.OPTIONS_ROW_WIDTH = 2.6
+ns.OPTIONS_LABEL_WIDTH = 1.3
+ns.OPTIONS_CONTROL_WIDTH = ns.OPTIONS_ROW_WIDTH - ns.OPTIONS_LABEL_WIDTH
+ns.OPTIONS_REMOVE_ICON_WIDTH = 0.25 -- the item lists' remove column, sized to its icon
+ns.OPTIONS_SUB_INDENT_WIDTH = 0.115 -- the blank cell a sub-option row leads with
+ns.OPTIONS_SUB_LABEL_WIDTH = 1 -- a sub-row caption, sized to the caption not the grid
+ns.OPTIONS_SUB_CONTROL_WIDTH = 1.3 -- its control, with slack so the row never wraps
 
 --------------------------------------------------------------------------------
 -- Item Quality
@@ -62,9 +149,90 @@ ns.QUALITY_COLORS = {
 	["e6cc80"] = 5, -- Heirloom / Artifact
 }
 
+--[[
+    LOCKPICKING is the skill spell behind skill line 633, not something a player
+    casts. It is here because its NAME is the localized name of the Lockpicking
+    skill line, which is the only handle Features/Lockbox-Tooltips.lua has for
+    finding the player's rank in GetSkillLineInfo -- see the note there.
+]]
 ns.SPELLS = {
 	PICK_LOCK = 1804,
+	LOCKPICKING = 1809,
+	PICK_POCKET = 921,
 	SHADOWMELD = 20580,
+}
+
+--[[
+    PickupBag, the client's own bag-grab sound, for a Pick Pocket that actually
+    took something: https://www.wowhead.com/classic/sound=1183/pickupbag
+
+    Seconds a loot window may follow that cast and still be counted as its haul.
+    Pick Pocket's window opens immediately, so this only has to be long enough to
+    span the cast-to-loot gap, not to bridge anything the player did next.
+]]
+ns.PICK_POCKET_SOUND = 1183 -- SoundKitID; play with PlaySound
+ns.PICK_POCKET_LOOT_WINDOW = 1
+
+--[[
+    The item kinds Loot Toasts can show regardless of the quality threshold. All
+    but the last are read from GetItemInfoInstant, which answers from the client's
+    own database with no cold-cache nil, so the kind is recognised the first time
+    the item is looted. Class and subclass numbers are stable across every client
+    we target.
+
+    ITEM_BIND_ON_PICKUP is the odd one out: bindType comes from the full
+    GetItemInfo, which CAN answer nil on a cold cache. See the note in
+    Features/Loot-Toasts.lua for why that is acceptable there, and the
+    "GetItemInfo bindType" row in the Diagnostics API report, which proves the
+    return position on each client rather than trusting it.
+]]
+--[[
+    Class 1 is the client's "Container", which is a BAG - the thing loot goes in,
+    not the lockbox Open Sesame opens. The add-on's own openable containers are
+    ns.AllowedItems and are matched by id, never by class.
+
+    Quivers and ammo pouches are their OWN class rather than bags, which is a
+    distinction the client's item database makes and a hunter does not: both are
+    the bag you were hoping would drop. The Bags toggle covers the pair.
+]]
+ns.ITEM_CLASS_BAG = 1
+ns.ITEM_CLASS_QUIVER = 11
+ns.ITEM_CLASS_RECIPE = 9
+ns.ITEM_CLASS_QUEST = 12
+ns.ITEM_CLASS_KEY = 13
+ns.ITEM_CLASS_MISCELLANEOUS = 15
+ns.ITEM_SUBCLASS_COMPANION_PET = 2 -- of Miscellaneous
+ns.ITEM_SUBCLASS_MOUNT = 5 -- of Miscellaneous
+ns.ITEM_BIND_ON_PICKUP = 1 -- GetItemInfo's bindType, 14th return
+ns.ITEM_BIND_PROBE_ID = 6948 -- Hearthstone: Bind on Pickup, and in every bag
+
+--------------------------------------------------------------------------------
+-- Money
+--------------------------------------------------------------------------------
+
+--[[
+    Coin piles for the money toast, one per magnitude, so the icon says roughly how
+    much before the digits are read. Written as texture paths rather than the file
+    ids the same art is also known by, matching every other icon in the add-on.
+]]
+ns.MONEY_ICON_GOLD = "Interface\\Icons\\INV_Misc_Coin_02" -- 133785
+ns.MONEY_ICON_SILVER = "Interface\\Icons\\INV_Misc_Coin_04" -- 133787
+ns.MONEY_ICON_COPPER = "Interface\\Icons\\INV_Misc_Coin_06" -- 133789
+
+ns.COPPER_PER_SILVER = 100
+ns.COPPER_PER_GOLD = 10000
+
+--[[
+    One colour per coin, for the g/s/c suffixes while the numbers stay body white.
+    These are the CLIENT'S conventions rather than the add-on's, which is why they
+    sit apart from ns.PALETTE: gold, silver and copper look the way they look in
+    every money display in the game, and a player reads the unit off the colour
+    before they read the letter.
+]]
+ns.MONEY_PALETTE = {
+	GOLD = "FFD700",
+	SILVER = "C7C7CF",
+	COPPER = "EDA55F",
 }
 
 -- { [raceKey] = { [genderId] = soundId } }
@@ -82,6 +250,93 @@ ns.RACE_SOUNDS = {
 }
 
 --------------------------------------------------------------------------------
+-- Lockbox Skill Levels
+--------------------------------------------------------------------------------
+
+--[[
+    Required Lockpicking skill per locked container, for the tooltip line in
+    Features/Lockbox-Tooltips.lua. Covers the ns.AllowedItems entries whose value
+    is false, minus four with no number to give:
+
+      Thieven' Kit (7868)        Flagged Locked, publishes no skill number.
+      Floral Foundations (39014) Requires Inscription (50), not Lockpicking.
+      Dark Iron Lockbox (208838) Unknown.
+      Scarlet Junkbox (239248)   Unknown.
+
+    The two Unknowns are Season of Discovery rows that reach ns.AllowedItems
+    through the name-guess merge rule rather than from a source that carries a
+    skill number. A missing row means no tooltip line for that box, which is the
+    deliberate trade: none of the four gets a line rather than being given a
+    guessed one.
+
+    Values here are numbers and the tooltip formats them with %d, so a placeholder
+    string in this table would error on hover. An unknown box is absent from the
+    table, never present with a stand-in value.
+
+    The skill number is NOT in the world DB: item_template.lockid points into
+    Lock.dbc, which is client data, so these values were read off each item's own
+    warcraft.wiki.gg page. The four 225s in the classic tier are real, each
+    confirmed on its own page.
+
+    -- TODO: Add SQL Query
+
+    This lists the items that need a value, so the table can be checked for gaps
+    after regenerating ns.AllowedItems:
+
+    SELECT it.entry, it.name, it.lockid
+    FROM item_template it
+    WHERE it.lockid > 0
+      AND EXISTS (SELECT 1 FROM item_loot_template ilt WHERE ilt.entry = it.entry)
+    ORDER BY it.name;
+]]
+
+-- { [itemId] = requiredLockpickingSkill }
+
+ns.LOCKBOX_SKILL_LEVELS = {
+
+	--------------------------------------------------------------------------------
+	-- 01. World of Warcraft
+	--------------------------------------------------------------------------------
+
+	[16882] = 1, -- Battered Junkbox
+	[5760] = 225, -- Eternium Lockbox
+	[4633] = 25, -- Heavy Bronze Lockbox
+	[16885] = 250, -- Heavy Junkbox
+	[4634] = 70, -- Iron Lockbox
+	[13875] = 175, -- Ironbound Locked Chest
+	[5758] = 225, -- Mithril Lockbox
+	[4632] = 1, -- Ornate Bronze Lockbox
+	[13918] = 250, -- Reinforced Locked Chest
+	[4638] = 225, -- Reinforced Steel Lockbox
+	[6354] = 1, -- Small Locked Chest
+	[4637] = 175, -- Steel Lockbox
+	[4636] = 125, -- Strong Iron Lockbox
+	[16884] = 175, -- Sturdy Junkbox
+	[6355] = 70, -- Sturdy Locked Chest
+	[7209] = 1, -- Tazan's Satchel
+	[12033] = 275, -- Thaurissan Family Jewels
+	[5759] = 225, -- Thorium Lockbox
+	[16883] = 70, -- Worn Junkbox
+
+	--------------------------------------------------------------------------------
+	-- 02. World of Warcraft : The Burning Crusade
+	--------------------------------------------------------------------------------
+
+	[31952] = 325, -- Khorium Lockbox
+	[29569] = 300, -- Strong Junkbox
+
+	--------------------------------------------------------------------------------
+	-- 03. World of Warcraft : Wrath of the Lich King
+	--------------------------------------------------------------------------------
+
+	[43622] = 375, -- Froststeel Lockbox
+	[43575] = 350, -- Reinforced Junkbox
+	[42953] = 400, -- Strange Envelope
+	[45986] = 400, -- Tiny Titanium Lockbox
+	[43624] = 400, -- Titanium Lockbox
+}
+
+--------------------------------------------------------------------------------
 -- Colors
 --------------------------------------------------------------------------------
 
@@ -92,12 +347,13 @@ ns.RACE_SOUNDS = {
 ]]
 
 ns.PALETTE = {
-	TITLE = "FFD100", -- Gold: Titles, Headers, Section Names
+	TITLE = "FFD100", -- Gold: Titles, Headers, Section Names, Field Titles
 	INFO = "00BBFF", -- Blue: Interactions, Toggles, Links, Keybinds, Slash Commands
-	BODY = "CCCCCC", -- Silver: Descriptions, Help Text
+	BODY = "FFFFFF", -- White: Descriptions, Options Body Text
+	HELP = "CCCCCC", -- Silver: Pro Tips, Helper Text
 	TEXT = "FFFFFF", -- White: Messages, Values, Spell Names
-	ON = "33CC33", -- Green: Enabled / On
-	OFF = "CC3333", -- Red: Disabled / Off
+	ON = "33CC33", -- Green: On
+	OFF = "CC3333", -- Red: Off
 	SEPARATOR = "AAAAAA", -- Gray: Separators, Dividers
 	MUTED = "808080", -- Dark Gray: Meta-data, Version Numbers
 }
@@ -110,407 +366,4 @@ ns.ICONS = {
 	on = "Interface\\Icons\\inv_misc_bag_09_green",
 	paused = "Interface\\Icons\\inv_misc_bag_09_black",
 	off = "Interface\\Icons\\inv_misc_bag_09_red",
-}
-
---------------------------------------------------------------------------------
--- Item Database
---------------------------------------------------------------------------------
-
--- { [itemId] = canOpenImmediately (true) or requiresUnlock (false) }
--- Hand-curated by item ID; no source query.
-
-ns.AllowedItems = {
-
-	--------------------------------------------------------------------------------
-	-- 01. World of Warcraft
-	--------------------------------------------------------------------------------
-
-	[10456] = true, -- A Bulging Coin Purse
-	[15902] = true, -- A Crazy Grab Bag
-	[11883] = true, -- A Dingy Fanny Pack
-	[5335] = true, -- A Sack of Coins
-	[6755] = true, -- A Small Container of Gems
-	[11107] = true, -- A Small Pack
-	[21509] = true, -- Ahn'Qiraj War Effort Supplies
-	[21510] = true, -- Ahn'Qiraj War Effort Supplies
-	[21511] = true, -- Ahn'Qiraj War Effort Supplies
-	[21512] = true, -- Ahn'Qiraj War Effort Supplies
-	[21513] = true, -- Ahn'Qiraj War Effort Supplies
-	[22152] = true, -- Anthion's Pouch
-	[20231] = true, -- Arathor Advanced Care Package
-	[20233] = true, -- Arathor Basic Care Package
-	[20236] = true, -- Arathor Standard Care Package
-	[11955] = true, -- Bag of Empty Ooze Containers
-	[20603] = true, -- Bag of Spoils
-	[6356] = true, -- Battered Chest
-	[16882] = false, -- Battered Junkbox
-	[7973] = true, -- Big-mouth Clam
-	[6646] = true, -- Bloated Albacore
-	[6647] = true, -- Bloated Catfish
-	[21163] = true, -- Bloated Firefin
-	[6644] = true, -- Bloated Mackerel
-	[21243] = true, -- Bloated Mightfish
-	[6645] = true, -- Bloated Mud Snapper
-	[21162] = true, -- Bloated Oily Blackmouth
-	[13881] = true, -- Bloated Redgill
-	[21164] = true, -- Bloated Rockscale Cod
-	[13891] = true, -- Bloated Salmon
-	[6643] = true, -- Bloated Smallfish
-	[8366] = true, -- Bloated Trout
-	[10695] = true, -- Box of Empty Vials
-	[9541] = true, -- Box of Goodies
-	[9539] = true, -- Box of Rations
-	[9540] = true, -- Box of Spells
-	[6827] = true, -- Box of Supplies
-	[8502] = true, -- Bronze Lotterybox
-	[22746] = true, -- Buccaneer's Uniform
-	[16783] = true, -- Bundle of Reports
-	[21191] = true, -- Carefully Wrapped Present
-	[11887] = true, -- Cenarion Circle Cache
-	[20602] = true, -- Chest of Spoils
-	[21741] = true, -- Cluster Rocket Recipes
-	[21528] = true, -- Colossal Bag of Loot
-	[20808] = true, -- Combat Assignment
-	[5738] = true, -- Covert Ops Pack
-	[9265] = true, -- Cuergo's Hidden Treasure
-	[23022] = true, -- Curmudgeon's Payoff
-	[19422] = true, -- Darkmoon Faire Fortune
-	[20469] = true, -- Decoded True Believer Clippings
-	[20228] = true, -- Defiler's Advanced Care Package
-	[20229] = true, -- Defiler's Basic Care Package
-	[20230] = true, -- Defiler's Standard Care Package
-	[12849] = true, -- Demon Kissed Sack
-	[6351] = true, -- Dented Crate
-	[8647] = true, -- Egg Crate
-	[10752] = true, -- Emerald Encrusted Chest
-	[11617] = true, -- Eridan's Supplies
-	[5760] = false, -- Eternium Lockbox
-	[11024] = true, -- Evergreen Herb Casing
-	[11937] = true, -- Fat Sack of Coins
-	[10834] = true, -- Felhound Tracker Kit
-	[21363] = true, -- Festive Gift
-	[21131] = true, -- Followup Combat Assignment
-	[20805] = true, -- Followup Logistics Assignment
-	[21386] = true, -- Followup Logistics Assignment
-	[21133] = true, -- Followup Tactical Assignment
-	[8484] = true, -- Gadgetzan Water Co. Care Package
-	[21310] = true, -- Gaily Wrapped Present
-	[21270] = true, -- Gently Shaken Gift
-	[21271] = true, -- Gently Shaken Gift
-	[21979] = true, -- Gift of Adoration: Darnassus
-	[21980] = true, -- Gift of Adoration: Ironforge
-	[22164] = true, -- Gift of Adoration: Orgrimmar
-	[21981] = true, -- Gift of Adoration: Stormwind
-	[22165] = true, -- Gift of Adoration: Thunder Bluff
-	[22166] = true, -- Gift of Adoration: Undercity
-	[22167] = true, -- Gift of Friendship: Darnassus
-	[22168] = true, -- Gift of Friendship: Ironforge
-	[22169] = true, -- Gift of Friendship: Orgrimmar
-	[22170] = true, -- Gift of Friendship: Stormwind
-	[22171] = true, -- Gift of Friendship: Thunder Bluff
-	[22172] = true, -- Gift of Friendship: Undercity
-	[11423] = true, -- Gnome Engineer's Renewal Gift
-	[5857] = true, -- Gnome Prize Box
-	[11422] = true, -- Goblin Engineer's Renewal Gift
-	[5858] = true, -- Goblin Prize Box
-	[19296] = true, -- Greater Darkmoon Prize
-	[10773] = true, -- Hakkari Urn
-	[4633] = false, -- Heavy Bronze Lockbox
-	[8503] = true, -- Heavy Bronze Lotterybox
-	[13874] = true, -- Heavy Crate
-	[8505] = true, -- Heavy Iron Lotterybox
-	[16885] = false, -- Heavy Junkbox
-	[8507] = true, -- Heavy Mithril Lotterybox
-	[22648] = true, -- Hive'Ashi Dossier
-	[22649] = true, -- Hive'Regal Dossier
-	[22650] = true, -- Hive'Zora Dossier
-	[10569] = true, -- Hoard of the Black Dragonflight
-	[20367] = true, -- Hunting Gear
-	[9529] = true, -- Internal Warrior Equipment Kit L25
-	[9532] = true, -- Internal Warrior Equipment Kit L30
-	[21150] = true, -- Iron Bound Trunk
-	[4634] = false, -- Iron Lockbox
-	[8504] = true, -- Iron Lotterybox
-	[13875] = false, -- Ironbound Locked Chest
-	[10479] = true, -- Kovic's Trading Satchel
-	[10595] = true, -- Kum'isha's Junk
-	[12122] = true, -- Kum'isha's Junk
-	[19035] = true, -- Lard's Special Picnic Basket
-	[21743] = true, -- Large Cluster Rocket Recipes
-	[21742] = true, -- Large Rocket Recipes
-	[19297] = true, -- Lesser Darkmoon Prize
-	[21132] = true, -- Logistics Assignment
-	[21266] = true, -- Logistics Assignment
-	[18804] = true, -- Lord Grayson's Satchel
-	[21746] = true, -- Lucky Red Envelope
-	[21640] = true, -- Lunar Festival Fireworks Pack
-	[6307] = true, -- Message in a Bottle
-	[19298] = true, -- Minor Darkmoon Prize
-	[21228] = true, -- Mithril Bound Trunk
-	[5758] = false, -- Mithril Lockbox
-	[8506] = true, -- Mithril Lotterybox
-	[22320] = true, -- Mux's Quality Goods
-	[19425] = true, -- Mysterious Lockbox
-	[21042] = true, -- Narain's Special Kit
-	[15876] = true, -- Nathanos' Chest
-	[9537] = true, -- Neatly Wrapped Box
-	[20768] = true, -- Oozing Bag
-	[4632] = false, -- Ornate Bronze Lockbox
-	[19153] = true, -- Outrider Advanced Care Package
-	[19154] = true, -- Outrider Basic Care Package
-	[19155] = true, -- Outrider Standard Care Package
-	[11912] = true, -- Package of Empty Ooze Containers
-	[22155] = true, -- Pledge of Adoration: Darnassus
-	[22154] = true, -- Pledge of Adoration: Ironforge
-	[22156] = true, -- Pledge of Adoration: Orgrimmar
-	[21975] = true, -- Pledge of Adoration: Stormwind
-	[22158] = true, -- Pledge of Adoration: Thunder Bluff
-	[22157] = true, -- Pledge of Adoration: Undercity
-	[22159] = true, -- Pledge of Friendship: Darnassus
-	[22160] = true, -- Pledge of Friendship: Ironforge
-	[22161] = true, -- Pledge of Friendship: Orgrimmar
-	[22178] = true, -- Pledge of Friendship: Stormwind
-	[22162] = true, -- Pledge of Friendship: Thunder Bluff
-	[22163] = true, -- Pledge of Friendship: Undercity
-	[13247] = true, -- Quartermaster Zigris' Footlocker
-	[13918] = false, -- Reinforced Locked Chest
-	[4638] = false, -- Reinforced Steel Lockbox
-	[6715] = true, -- Ruined Jumper Cables
-	[18636] = true, -- Ruined Jumper Cables XL
-	[11938] = true, -- Sack of Gems
-	[20601] = true, -- Sack of Spoils
-	[21156] = true, -- Scarab Bag
-	[7190] = true, -- Scorched Rocket Boots
-	[20767] = true, -- Scum Covered Bag
-	[22568] = true, -- Sealed Craftsman's Writ
-	[6357] = true, -- Sealed Crate
-	[19152] = true, -- Sentinel Advanced Care Package
-	[19150] = true, -- Sentinel Basic Care Package
-	[19151] = true, -- Sentinel Standard Care Package
-	[20766] = true, -- Slimy Bag
-	[5523] = true, -- Small Barnacled Clam
-	[15699] = true, -- Small Brown-wrapped Package
-	[6353] = true, -- Small Chest
-	[6354] = false, -- Small Locked Chest
-	[21740] = true, -- Small Rocket Recipes
-	[11966] = true, -- Small Sack of Coins
-	[21216] = true, -- Smokywood Pastures Extra-Special Gift
-	[17727] = true, -- Smokywood Pastures Gift Pack
-	[17685] = true, -- Smokywood Pastures Sampler
-	[17726] = true, -- Smokywood Pastures Special Gift
-	[21315] = true, -- Smokywood Satchel
-	[15874] = true, -- Soft-shelled Clam
-	[9363] = true, -- Sparklematic-Wrapped Box
-	[4637] = false, -- Steel Lockbox
-	[11442] = true, -- Stormwind Deputy Kit
-	[4636] = false, -- Strong Iron Lockbox
-	[16884] = false, -- Sturdy Junkbox
-	[6355] = false, -- Sturdy Locked Chest
-	[23224] = true, -- Summer Gift Package
-	[20809] = true, -- Tactical Assignment
-	[7209] = false, -- Tazan's Satchel
-	[7870] = true, -- Thaumaturgy Vessel Lockbox
-	[12033] = false, -- Thaurissan Family Jewels
-	[5524] = true, -- Thick-shelled Clam
-	[7868] = false, -- Thieven' Kit
-	[5759] = false, -- Thorium Lockbox
-	[21327] = true, -- Ticking Present
-	[20708] = true, -- Tightly Sealed Trunk
-	[11568] = true, -- Torwa's Pouch
-	[20393] = true, -- Treat Bag
-	[12339] = true, -- Vaelan's Gift
-	[6352] = true, -- Waterlogged Crate
-	[21113] = true, -- Watertight Trunk
-	[16883] = false, -- Worn Junkbox
-	[22137] = true, -- Ysida's Satchel
-	[22233] = true, -- Zigris' Footlocker
-
-	--------------------------------------------------------------------------------
-	-- 02. World of Warcraft: The Burning Crusade
-	--------------------------------------------------------------------------------
-
-	[34583] = true, -- Aldor Supplies Package
-	[34587] = true, -- Aldor Supplies Package
-	[34592] = true, -- Aldor Supplies Package
-	[34595] = true, -- Aldor Supplies Package
-	[28499] = true, -- Arakkoa Hunter's Supplies
-	[31955] = true, -- Arelion's Knapsack
-	[34863] = true, -- Bag of Fishing Treasures
-	[35348] = true, -- Bag of Fishing Treasures
-	[25423] = true, -- Bag of Premium Gems
-	[33844] = true, -- Barrel of Fish
-	[35313] = true, -- Bloated Barbed Gill Trout
-	[35286] = true, -- Bloated Giant Sunfish
-	[28135] = true, -- Bomb Crate
-	[34503] = true, -- Box of Adamantite Shells
-	[191061] = true, -- Brilliant Glass
-	[35945] = true, -- Brilliant Glass
-	[25422] = true, -- Bulging Sack of Gems
-	[23921] = true, -- Bulging Sack of Silver
-	[30320] = true, -- Bundle of Nether Spikes
-	[34548] = true, -- Cache of the Shattered Sun
-	[33857] = true, -- Crate of Meat
-	[34077] = true, -- Crudely Wrapped Gift
-	[27513] = true, -- Curious Crate
-	[30650] = true, -- Dertrok's Wand Case
-	[187714] = true, -- Enlistment Bonus
-	[187799] = true, -- Enlistment Bonus
-	[24336] = true, -- Fireproof Satchel
-	[25424] = true, -- Gem-Stuffed Envelope
-	[262788] = true, -- Grand Gift
-	[37586] = true, -- Handful of Candy
-	[27481] = true, -- Heavy Supply Crate
-	[33928] = true, -- Hollowed Bone Decanter
-	[27511] = true, -- Inscribed Scrollcase
-	[24476] = true, -- Jaggal Clam
-	[31952] = false, -- Khorium Lockbox
-	[32777] = true, -- Kronk's Grab Bag
-	[32626] = true, -- Large Copper Metamorphosis Geode
-	[32629] = true, -- Large Gold Metamorphosis Geode
-	[32624] = true, -- Large Iron Metamorphosis Geode
-	[32628] = true, -- Large Silver Metamorphosis Geode
-	[32462] = true, -- Morthis' Materials
-	[27446] = true, -- Mr. Pinchy's Gift
-	[23895] = true, -- Netted Goods
-	[23846] = true, -- Nolkai's Box
-	[31408] = true, -- Offering of the Sha'tar
-	[32835] = true, -- Ogri'la Care Package
-	[31800] = true, -- Outcast's Cache
-	[24402] = true, -- Package of Identified Plants
-	[35512] = true, -- Pocket Full of Snow
-	[37605] = true, -- Pouch of Pennies
-	[31522] = true, -- Primal Mooncloth Supplies
-	[32064] = true, -- Protectorate Treasure Cache
-	[33045] = true, -- Renn's Supplies
-	[34584] = true, -- Scryer Supplies Package
-	[34585] = true, -- Scryer Supplies Package
-	[34593] = true, -- Scryer Supplies Package
-	[34594] = true, -- Scryer Supplies Package
-	[33926] = true, -- Sealed Scroll Case
-	[35232] = true, -- Shattered Sun Supplies
-	[32724] = true, -- Sludge-covered Object
-	[32627] = true, -- Small Copper Metamorphosis Geode
-	[32630] = true, -- Small Gold Metamorphosis Geode
-	[32625] = true, -- Small Iron Metamorphosis Geode
-	[32631] = true, -- Small Silver Metamorphosis Geode
-	[29569] = false, -- Strong Junkbox
-	[32561] = true, -- Tier 5 Arrow Box
-	[25419] = true, -- Unmarked Bag of Gems
-	[30260] = true, -- Voren'thal's Package
-	[34426] = true, -- Winter Veil Gift
-
-	--------------------------------------------------------------------------------
-	-- 03. World of Warcraft: Wrath of the Lich King
-	--------------------------------------------------------------------------------
-
-	[44663] = true, -- Abandoned Adventurer's Satchel
-	[44161] = true, -- Arcane Tarot
-	[39903] = true, -- Argent Crusade Gratuity
-	[39904] = true, -- Argent Crusade Gratuity
-	[46007] = true, -- Bag of Fishing Treasures
-	[52274] = true, -- Bag of Shaman Stuff
-	[52344] = true, -- Bag of Shaman Stuff
-	[34119] = true, -- Black Conrad's Treasure
-	[45328] = true, -- Bloated Slippery Eel
-	[40308] = true, -- Bonework Soul Jar
-	[46809] = true, -- Bountiful Cookbook
-	[46810] = true, -- Bountiful Cookbook
-	[202269] = true, -- Bounty Satchel
-	[208157] = true, -- Bounty Satchel
-	[44951] = true, -- Box of Bombs
-	[49909] = true, -- Box of Chocolates
-	[35745] = true, -- Box of Treasure
-	[49926] = true, -- Brazie's Black Book of Secrets
-	[45072] = true, -- Brightly Colored Egg
-	[44700] = true, -- Brooding Darkwater Clam
-	[52676] = true, -- Cache of the Ley-Guardian
-	[45724] = true, -- Champion's Purse
-	[39883] = true, -- Cracked Egg
-	[34871] = true, -- Crafty's Sack
-	[50161] = true, -- Dinner Suit Box
-	[39014] = false, -- Floral Foundations
-	[43622] = false, -- Froststeel Lockbox
-	[54537] = true, -- Heart-Shaped Box
-	[44751] = true, -- Hyldnir Spoils
-	[44943] = true, -- Icy Prism
-	[54535] = true, -- Keg-Shaped Treasure Chest
-	[50301] = true, -- Landro's Pet Box
-	[45878] = true, -- Large Sack of Ulduar Spoils
-	[54516] = true, -- Loot-Filled Pumpkin
-	[50160] = true, -- Lovely Dress Box
-	[35792] = true, -- Mage Hunter Personal Effects
-	[41426] = true, -- Magically Wrapped Gift
-	[37168] = true, -- Mysterious Tarot
-	[199210] = true, -- Northrend Adventuring Supplies
-	[200238] = true, -- Northrend Adventuring Supplies
-	[200239] = true, -- Northrend Adventuring Supplies
-	[200240] = true, -- Northrend Adventuring Supplies
-	[46812] = true, -- Northrend Mystery Gem Pouch
-	[39418] = true, -- Ornately Jeweled Box
-	[43556] = true, -- Patroller's Pack
-	[44475] = true, -- Reinforced Crate
-	[43575] = false, -- Reinforced Junkbox
-	[44718] = true, -- Ripe Disgusting Jar
-	[52006] = true, -- Sack of Frosty Treasures
-	[38539] = true, -- Sack of Gold
-	[45875] = true, -- Sack of Ulduar Spoils
-	[54536] = true, -- Satchel of Chilled Goods
-	[51999] = true, -- Satchel of Helpful Goods
-	[52000] = true, -- Satchel of Helpful Goods
-	[52001] = true, -- Satchel of Helpful Goods
-	[52002] = true, -- Satchel of Helpful Goods
-	[52003] = true, -- Satchel of Helpful Goods
-	[52004] = true, -- Satchel of Helpful Goods
-	[52005] = true, -- Satchel of Helpful Goods
-	[44163] = true, -- Shadowy Tarot
-	[44113] = true, -- Small Spice Bag
-	[41888] = true, -- Small Velvet Bag
-	[49631] = true, -- Standard Apothecary Serving Kit
-	[42953] = false, -- Strange Envelope
-	[44142] = true, -- Strange Tarot
-	[54467] = true, -- Tabard Lost & Found
-	[45986] = false, -- Tiny Titanium Lockbox
-	[43624] = false, -- Titanium Lockbox
-	[51316] = true, -- Unsealed Chest
-	[43504] = true, -- Winter Veil Gift
-	[46740] = true, -- Winter Veil Gift
-}
-
---------------------------------------------------------------------------------
--- Ignore List
---------------------------------------------------------------------------------
-
--- { [itemId] = true }
--- Hand-curated by item ID; no source query.
-
-ns.IgnoreItems = {
-
-	--------------------------------------------------------------------------------
-	-- 01. World of Warcraft
-	--------------------------------------------------------------------------------
-
-	[17962] = true, -- Blue Sack of Gems
-	[21812] = true, -- Box of Chocolates
-	[8049] = true, -- Gnarlpine Necklace
-	[17964] = true, -- Gray Sack of Gems
-	[17963] = true, -- Green Sack of Gems
-	[9276] = true, -- Pirate's Footlocker
-	[17969] = true, -- Red Sack of Gems
-	[17965] = true, -- Yellow Sack of Gems
-
-	--------------------------------------------------------------------------------
-	-- 02. World of Warcraft: The Burning Crusade
-	--------------------------------------------------------------------------------
-
-	[191060] = true, -- Black Sack of Gems
-	[34846] = true, -- Black Sack of Gems
-
-	--------------------------------------------------------------------------------
-	-- 03. World of Warcraft: Wrath of the Lich King
-	--------------------------------------------------------------------------------
-
-	[46110] = true, -- Alchemist's Cache
-	[49294] = true, -- Ashen Sack of Gems
-	[43346] = true, -- Large Satchel of Spoils
-	[43347] = true, -- Satchel of Spoils
 }

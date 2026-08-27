@@ -3,6 +3,20 @@ local _, ns = ...
 local L = ns.L
 local GetColor = ns.GetColor
 
+--[[
+    The four link rows split ns.OPTIONS_ROW_WIDTH unevenly: their labels are one
+    short word, while the box beside them holds a full URL the player is meant to
+    select and copy. The label takes 0.6 so the box lands on exactly 2.0, the
+    guide's double width for a read-only URL input, without the row outgrowing
+    every other row on the panel. Same split Magic Eraser uses.
+]]
+local LINK_LABEL_WIDTH = 0.6
+local LINK_URL_WIDTH = ns.OPTIONS_ROW_WIDTH - LINK_LABEL_WIDTH
+
+local function IsAutoOpenDisabled()
+	return not ns.db.profile.autoOpen
+end
+
 --------------------------------------------------------------------------------
 -- Options Table
 --------------------------------------------------------------------------------
@@ -12,7 +26,7 @@ function ns.BuildGeneralOptions()
 		name = L["ADDON_TITLE"],
 		type = "group",
 		args = {
-			descIntro = ns.OptionsDesc(L["OPTIONS_INTRO"], 1),
+			descIntro = ns.OptionsDesc(L["OPTIONS_DESCRIPTION"], 1),
 			-- Welcome Message
 
 			spaceWelcome0 = ns.OptionsSpacer(5),
@@ -34,7 +48,7 @@ function ns.BuildGeneralOptions()
 				order = 7,
 				width = "full",
 				get = function()
-					return ns.db and not ns.db.global.minimap.hide
+					return ns.db and not ns.db.profile.minimap.hide
 				end,
 				set = function(_, value)
 					ns:SetMinimapShown(value)
@@ -46,7 +60,7 @@ function ns.BuildGeneralOptions()
 			headerCommands = ns.OptionsHeader(L["OPTIONS_COMMANDS_HEADER"], 11),
 			spaceCommands1 = ns.OptionsSpacer(12),
 			descCommands = ns.OptionsDesc(
-				GetColor("INFO") .. L["OPTIONS_CMD_OS"] .. "|r" .. "  " .. L["OPTIONS_CMD_OS_DESCRIPTION"],
+				GetColor("INFO") .. L["OPTIONS_COMMAND"] .. "|r" .. "  " .. L["OPTIONS_COMMAND_DESCRIPTION"],
 				13
 			),
 			-- Auto-Opening
@@ -54,7 +68,7 @@ function ns.BuildGeneralOptions()
 			spaceAutoOpen0 = ns.OptionsSpacer(20),
 			headerAutoOpen = ns.OptionsHeader(L["AUTO_OPENING"], 21),
 			spaceAutoOpen1 = ns.OptionsSpacer(22),
-			descAutoOpen = ns.OptionsDesc(string.format(L["AUTO_OPENING_DESC"], ns.MIN_FREE_SLOTS), 23),
+			descAutoOpen = ns.OptionsDesc(string.format(L["AUTO_OPENING_DESCRIPTION"], ns.MIN_FREE_SLOTS), 23),
 			spaceAutoOpen2 = ns.OptionsSpacer(24),
 			toggleAutoOpen = {
 				type = "toggle",
@@ -74,27 +88,42 @@ function ns.BuildGeneralOptions()
 					ns:UpdateMinimapIcon()
 				end,
 			},
-			toggleLockboxNotifications = {
-				type = "toggle",
-				name = L["OPTIONS_ENABLE_LOCKBOX_NOTIFICATIONS"],
-				order = 26,
-				width = "full",
-				hidden = function()
-					return not ns.db.profile.autoOpen
-				end,
+			subAutoOpenWhere = ns.OptionsSubSelectRow(26, IsAutoOpenDisabled, L["OPTIONS_AUTO_OPENING_WHERE"], {
+				type = "select",
+				values = {
+					ALWAYS = L["OPTIONS_ANYWHERE"],
+					OUTSIDE_INSTANCES = L["OPTIONS_OUTSIDE_INSTANCES"],
+				},
+				sorting = { "ALWAYS", "OUTSIDE_INSTANCES" },
 				get = function()
-					return ns.db.profile.lockboxNotifications
+					return ns.db.profile.autoOpenWhere
 				end,
 				set = function(_, value)
-					ns.db.profile.lockboxNotifications = value
+					ns.db.profile.autoOpenWhere = value
+					ns.ScheduleScan(true)
 				end,
-			},
+			}),
+			subAutoOpenGroup = ns.OptionsSubSelectRow(27, IsAutoOpenDisabled, L["OPTIONS_AUTO_OPENING_GROUP"], {
+				type = "select",
+				values = {
+					ALWAYS = L["OPTIONS_SOLO_OR_GROUPED"],
+					SOLO_ONLY = L["OPTIONS_SOLO_ONLY"],
+				},
+				sorting = { "ALWAYS", "SOLO_ONLY" },
+				get = function()
+					return ns.db.profile.autoOpenGroup
+				end,
+				set = function(_, value)
+					ns.db.profile.autoOpenGroup = value
+					ns.ScheduleScan(true)
+				end,
+			}),
 			-- Speedy Loot
 
 			spaceSpeedyLoot0 = ns.OptionsSpacer(30),
 			headerSpeedyLoot = ns.OptionsHeader(L["SPEEDY_LOOT"], 31),
 			spaceSpeedyLoot1 = ns.OptionsSpacer(32),
-			descSpeedyLoot = ns.OptionsDesc(L["SPEEDY_LOOT_DESC"], 33),
+			descSpeedyLoot = ns.OptionsDesc(L["SPEEDY_LOOT_DESCRIPTION"], 33),
 			spaceSpeedyLoot2 = ns.OptionsSpacer(34),
 			toggleSpeedyLoot = {
 				type = "toggle",
@@ -113,123 +142,57 @@ function ns.BuildGeneralOptions()
 					ns:UpdateMinimapIcon()
 				end,
 			},
-			-- Loot Sounds
-
-			spaceLootSounds0 = ns.OptionsSpacer(40),
-			headerLootSounds = ns.OptionsHeader(L["LOOT_SOUNDS"], 41),
-			spaceLootSounds1 = ns.OptionsSpacer(42),
-			descLootSounds = ns.OptionsDesc(L["LOOT_SOUNDS_DESC"], 43),
-			spaceLootSounds2 = ns.OptionsSpacer(44),
-			toggleLootSounds = {
-				type = "toggle",
-				name = L["OPTIONS_ENABLE_LOOT_SOUNDS"],
-				order = 45,
-				width = "normal",
-				get = function()
-					return ns.db.profile.lootSounds
-				end,
-				set = function(_, value)
-					ns.db.profile.lootSounds = value
-				end,
-			},
-			--[[
-				    The quality dropdown and the preview speaker share the loot sound row
-				    with the toggle: toggle (45), dropdown (47), speaker (48). Tier labels
-				    use the client-localized ITEM_QUALITYn_DESC globals wrapped in the
-				    game's own item-quality colors, so the dropdown reads green/blue/purple
-				    like the items themselves — no locale keys needed for the tier names.
-				    sorting forces numeric 2/3/4 order.
-				]]
-			selectLootSoundThreshold = {
-				type = "select",
-				name = L["OPTIONS_LOOT_SOUND_THRESHOLD"],
-				order = 47,
-				width = "normal",
-				values = {
-					[2] = ITEM_QUALITY_COLORS[2].hex .. ITEM_QUALITY2_DESC .. "|r",
-					[3] = ITEM_QUALITY_COLORS[3].hex .. ITEM_QUALITY3_DESC .. "|r",
-					[4] = ITEM_QUALITY_COLORS[4].hex .. ITEM_QUALITY4_DESC .. "|r",
-				},
-				sorting = { 2, 3, 4 },
-				disabled = function()
-					return not ns.db.profile.lootSounds
-				end,
-				get = function()
-					return ns.db.profile.lootSoundThreshold
-				end,
-				set = function(_, value)
-					ns.db.profile.lootSoundThreshold = value
-				end,
-			},
-			--[[
-				    Speaker icon just right of the dropdown that previews the actual loot
-				    sound (ns.LOOT_SOUND_FILE, the same file Core plays on a rare drop) so
-				    the player can hear it before enabling. The Icon widget centers its
-				    image in the control, so a narrow width (0.2 grid units) keeps the
-				    speaker tight against the dropdown instead of floating in a wide cell.
-				    order 48 places it right after the dropdown (47). Always clickable — a
-				    preview, independent of whether Loot Sound is on.
-				]]
-			playLootSound = {
-				type = "execute",
-				name = "",
-				desc = L["OPTIONS_TEST_LOOT_SOUND"],
-				order = 48,
-				width = 0.2,
-				image = "Interface\\COMMON\\VoiceChat-Speaker",
-				imageWidth = 24,
-				imageHeight = 24,
-				func = function()
-					PlaySoundFile(ns.LOOT_SOUND_FILE, "Master")
-				end,
-			},
 			-- Feedback & Support
 
 			spaceCommunity0 = ns.OptionsSpacer(90),
 			headerCommunity = ns.OptionsHeader(L["OPTIONS_FEEDBACK"], 91),
 			spaceCommunity1 = ns.OptionsSpacer(92),
-			discordLabel = ns.OptionsDesc(GetColor("TITLE") .. L["OPTIONS_DISCORD"] .. "|r", 93),
+			discordLabel = ns.OptionsRowLabel(GetColor("TITLE") .. L["OPTIONS_DISCORD"] .. "|r", 93, LINK_LABEL_WIDTH),
 			discordURL = {
 				type = "input",
 				name = "",
 				order = 94,
-				width = "double",
+				width = LINK_URL_WIDTH,
 				get = function()
 					return ns.DISCORD_URL
 				end,
 				set = function() end,
 			},
 			spaceCommunity2 = ns.OptionsSpacer(95),
-			githubLabel = ns.OptionsDesc(GetColor("TITLE") .. L["OPTIONS_GITHUB"] .. "|r", 96),
+			githubLabel = ns.OptionsRowLabel(GetColor("TITLE") .. L["OPTIONS_GITHUB"] .. "|r", 96, LINK_LABEL_WIDTH),
 			githubURL = {
 				type = "input",
 				name = "",
 				order = 97,
-				width = "double",
+				width = LINK_URL_WIDTH,
 				get = function()
 					return ns.GITHUB_URL
 				end,
 				set = function() end,
 			},
 			spaceCommunity3 = ns.OptionsSpacer(98),
-			curseforgeLabel = ns.OptionsDesc(GetColor("TITLE") .. L["OPTIONS_CURSEFORGE"] .. "|r", 99),
+			curseforgeLabel = ns.OptionsRowLabel(
+				GetColor("TITLE") .. L["OPTIONS_CURSEFORGE"] .. "|r",
+				99,
+				LINK_LABEL_WIDTH
+			),
 			curseforgeURL = {
 				type = "input",
 				name = "",
 				order = 100,
-				width = "double",
+				width = LINK_URL_WIDTH,
 				get = function()
 					return ns.CURSEFORGE_URL
 				end,
 				set = function() end,
 			},
 			spaceCommunity4 = ns.OptionsSpacer(101),
-			wagoLabel = ns.OptionsDesc(GetColor("TITLE") .. L["OPTIONS_WAGO"] .. "|r", 102),
+			wagoLabel = ns.OptionsRowLabel(GetColor("TITLE") .. L["OPTIONS_WAGO"] .. "|r", 102, LINK_LABEL_WIDTH),
 			wagoURL = {
 				type = "input",
 				name = "",
 				order = 103,
-				width = "double",
+				width = LINK_URL_WIDTH,
 				get = function()
 					return ns.WAGO_URL
 				end,

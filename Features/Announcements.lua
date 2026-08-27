@@ -48,13 +48,27 @@ function ns:SetQuiet(seconds)
 	end
 end
 
+--[[
+    Announce one item at most once per ns.ITEM_ANNOUNCE_COOLDOWN. Both ignore-list
+    notices share the stamp deliberately: a player who was just told Speedy Loot
+    left an item behind does not also need to be told it will not be opened.
+]]
+function ns:AnnounceItemOnce(formatKey, itemId, link)
+	local now = GetTime()
+	if (now - (ns.state.recentAnnouncements[itemId] or 0)) <= ns.ITEM_ANNOUNCE_COOLDOWN then
+		return
+	end
+	ns.state.recentAnnouncements[itemId] = now
+	ns:PrintMessage(string.format(ns.L[formatKey], link))
+end
+
 function ns:StatusPrint(msg, ...)
 	if IsQuiet() then
 		return
 	end
 	local text = select("#", ...) > 0 and string.format(msg, ...) or msg
 	local now = GetTime()
-	if text == ns.state.lastStatusMsg and (now - ns.state.lastStatusAt) < 5 then
+	if text == ns.state.lastStatusMsg and (now - ns.state.lastStatusAt) < ns.STATUS_REPEAT_COOLDOWN then
 		return
 	end
 	ns.state.lastStatusMsg, ns.state.lastStatusAt = text, now

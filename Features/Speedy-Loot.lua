@@ -1,54 +1,28 @@
 local _, ns = ...
 
 --------------------------------------------------------------------------------
--- Libraries
+-- Loot API
 --------------------------------------------------------------------------------
 
-local L = ns.L
+local GetCVarBool = C_CVar.GetCVarBool
 
---------------------------------------------------------------------------------
--- API Compatibility
---------------------------------------------------------------------------------
-
---[[
-    Pick the auto-loot CVar API by availability, not by truthy result. The
-    previous `(modern call) or (legacy call)` pattern fell through to the
-    legacy check whenever the modern API returned false (auto-loot off).
-]]
-local IsAutoLootEnabled
-if C_CVar and C_CVar.GetCVarBool then
-	IsAutoLootEnabled = function()
-		return C_CVar.GetCVarBool("autoLootDefault")
-	end
-else
-	IsAutoLootEnabled = function()
-		return GetCVar("autoLootDefault") == "1"
-	end
+local function IsAutoLootEnabled()
+	return GetCVarBool("autoLootDefault")
 end
 
 --[[
-    Returns (method, masterLooterPartyID). The legacy GetLootMethod returns the
-    method as a string ("master", ...); C_PartyInfo.GetLootMethod returns it as an
-    enum NUMBER. Enum.LootMethod is nil on some Classic builds (2.5.5), so map the
-    enum to the legacy string form, falling back to its numeric value 2 for master.
+    Loot method comes back as a NUMBER on both target clients — the string-
+    returning GetLootMethod global is gone from Era and TBC alike. Enum.LootMethod
+    is not guaranteed to exist on these builds, so the master-loot value is
+    written out as the literal the API actually returns. Diagnostics' Loot Method
+    report prints the live return values and their types, which is what proves
+    this mapping rather than an existence check.
 ]]
-local GetLootMethodCompat
-if type(GetLootMethod) == "function" then
-	GetLootMethodCompat = function()
-		return GetLootMethod()
-	end
-elseif C_PartyInfo and C_PartyInfo.GetLootMethod then
-	GetLootMethodCompat = function()
-		local methodEnum, masterLooterPartyID = C_PartyInfo.GetLootMethod()
-		if (Enum and Enum.LootMethod and methodEnum == Enum.LootMethod.MasterLoot) or methodEnum == 2 then
-			return "master", masterLooterPartyID
-		end
-		return methodEnum, masterLooterPartyID
-	end
-else
-	GetLootMethodCompat = function()
-		return "freeforall"
-	end
+local LOOT_METHOD_MASTER = 2
+
+local function IsPlayerMasterLooter()
+	local method, masterLooterPartyID = C_PartyInfo.GetLootMethod()
+	return method == LOOT_METHOD_MASTER and masterLooterPartyID == 0
 end
 
 --------------------------------------------------------------------------------
@@ -57,14 +31,10 @@ end
 
 --[[
     Money and currency slots take no bag space, so they must never count against
-    the free-slot budget. When GetLootSlotType is unavailable, treat every slot
-    as an item (conservative: counts against the budget).
+    the free-slot budget.
 ]]
 local function IsItemLootSlot(slot)
-	if type(GetLootSlotType) ~= "function" then
-		return true
-	end
-	return GetLootSlotType(slot) == (LOOT_SLOT_ITEM or 1)
+	return GetLootSlotType(slot) == LOOT_SLOT_ITEM
 end
 
 --------------------------------------------------------------------------------
@@ -129,8 +99,7 @@ function ns.HandleSpeedyLoot()
         threshold item also pops MasterLooterFrame_Show with no
         selectedLootButton, which crashes on a nil colorInfo on some clients.
     ]]
-	local lootMethod, masterLooterPartyID = GetLootMethodCompat()
-	if lootMethod == "master" and masterLooterPartyID == 0 then
+	if IsPlayerMasterLooter() then
 		return
 	end
 
@@ -177,13 +146,11 @@ function ns.HandleSpeedyLoot()
 
 			if link then
 				local itemId = tonumber(link:match("item:(%d+)"))
-				if itemId and ns.IgnoreItems and ns.IgnoreItems[itemId] then
+				if ns:IsIgnored(itemId) then
 					shouldLoot = false
 
-					local lastAnnounced = ns.state.recentAnnouncements[itemId] or 0
-					if (now - lastAnnounced) > 5 and ns.db.profile.autoOpen and ns.db.profile.lockboxNotifications then
-						ns:PrintMessage(string.format(L["ITEM_OPEN_MANUALLY"], link))
-						ns.state.recentAnnouncements[itemId] = now
+					if ns.db.profile.ignoreListNotifications then
+						ns:AnnounceItemOnce("ITEM_OPEN_MANUALLY", itemId, link)
 					end
 
 					--[[
