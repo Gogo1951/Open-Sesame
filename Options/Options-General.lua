@@ -6,9 +6,8 @@ local GetColor = ns.GetColor
 --[[
     The four link rows split ns.OPTIONS_ROW_WIDTH unevenly: their labels are one
     short word, while the box beside them holds a full URL the player is meant to
-    select and copy. The label takes 0.6 so the box lands on exactly 2.0, the
-    guide's double width for a read-only URL input, without the row outgrowing
-    every other row on the panel. Same split Magic Eraser uses.
+    select and copy. The label takes 0.6 and the URL box the rest of the row, so
+    the row ends where every other row on the panel ends.
 ]]
 local LINK_LABEL_WIDTH = 0.6
 local LINK_URL_WIDTH = ns.OPTIONS_ROW_WIDTH - LINK_LABEL_WIDTH
@@ -33,6 +32,7 @@ function ns.BuildGeneralOptions()
 			toggleWelcome = {
 				type = "toggle",
 				name = L["OPTIONS_ENABLE_WELCOME"],
+				desc = L["OPTIONS_ENABLE_WELCOME_DESCRIPTION"],
 				order = 6,
 				width = "full",
 				get = function()
@@ -45,6 +45,7 @@ function ns.BuildGeneralOptions()
 			toggleMinimap = {
 				type = "toggle",
 				name = L["OPTIONS_ENABLE_MINIMAP"],
+				desc = L["OPTIONS_ENABLE_MINIMAP_DESCRIPTION"],
 				order = 7,
 				width = "full",
 				get = function()
@@ -73,6 +74,7 @@ function ns.BuildGeneralOptions()
 			toggleAutoOpen = {
 				type = "toggle",
 				name = L["OPTIONS_ENABLE_AUTO_OPENING"],
+				desc = L["OPTIONS_ENABLE_AUTO_OPENING_DESCRIPTION"],
 				order = 25,
 				width = "full",
 				get = function()
@@ -90,6 +92,7 @@ function ns.BuildGeneralOptions()
 			},
 			subAutoOpenWhere = ns.OptionsSubSelectRow(26, IsAutoOpenDisabled, L["OPTIONS_AUTO_OPENING_WHERE"], {
 				type = "select",
+				desc = L["OPTIONS_AUTO_OPENING_WHERE_DESCRIPTION"],
 				values = {
 					ALWAYS = L["OPTIONS_ANYWHERE"],
 					OUTSIDE_INSTANCES = L["OPTIONS_OUTSIDE_INSTANCES"],
@@ -105,6 +108,7 @@ function ns.BuildGeneralOptions()
 			}),
 			subAutoOpenGroup = ns.OptionsSubSelectRow(27, IsAutoOpenDisabled, L["OPTIONS_AUTO_OPENING_GROUP"], {
 				type = "select",
+				desc = L["OPTIONS_AUTO_OPENING_GROUP_DESCRIPTION"],
 				values = {
 					ALWAYS = L["OPTIONS_SOLO_OR_GROUPED"],
 					SOLO_ONLY = L["OPTIONS_SOLO_ONLY"],
@@ -128,6 +132,7 @@ function ns.BuildGeneralOptions()
 			toggleSpeedyLoot = {
 				type = "toggle",
 				name = L["OPTIONS_ENABLE_SPEEDY_LOOT"],
+				desc = L["OPTIONS_ENABLE_SPEEDY_LOOT_DESCRIPTION"],
 				order = 35,
 				width = "full",
 				get = function()

@@ -12,8 +12,7 @@ local L = ns.L
 
     Both features carry a scope beside their toggle rather than only an on/off,
     because a non-Rogue cannot pick a lock and has little use for either. The
-    predicates behind the scopes live in Features/Utilities.lua, shared with Core
-    and Speedy-Loot.
+    scope rule both features apply lives in Features/Utilities.lua.
 ]]
 
 local function TooltipsOff()
@@ -24,9 +23,10 @@ local function NotificationsOff()
 	return not ns.db.profile.lockboxNotifications
 end
 
-local function ScopeControl(get, set)
+local function ScopeControl(desc, get, set)
 	return {
 		type = "select",
+		desc = desc,
 		values = {
 			ROGUES = L["OPTIONS_FOR_ROGUES"],
 			ALL = L["OPTIONS_FOR_ALL_CHARACTERS"],
@@ -48,6 +48,7 @@ function ns.BuildLockboxesOptions()
 			toggleLockboxTooltips = {
 				type = "toggle",
 				name = L["OPTIONS_ENABLE_LOCKBOX_TOOLTIPS"],
+				desc = L["OPTIONS_ENABLE_LOCKBOX_TOOLTIPS_DESCRIPTION"],
 				order = 10,
 				width = "full",
 				get = function()
@@ -61,7 +62,7 @@ function ns.BuildLockboxesOptions()
 				11,
 				TooltipsOff,
 				L["OPTIONS_SHOW_FOR"],
-				ScopeControl(function()
+				ScopeControl(L["OPTIONS_LOCKBOX_TOOLTIPS_SCOPE_DESCRIPTION"], function()
 					return ns.db.profile.lockboxTooltipsScope
 				end, function(_, value)
 					ns.db.profile.lockboxTooltipsScope = value
@@ -72,6 +73,7 @@ function ns.BuildLockboxesOptions()
 			toggleLockboxNotifications = {
 				type = "toggle",
 				name = L["OPTIONS_ENABLE_LOCKBOX_NOTIFICATIONS"],
+				desc = L["OPTIONS_ENABLE_LOCKBOX_NOTIFICATIONS_DESCRIPTION"],
 				order = 21,
 				width = "full",
 				get = function()
@@ -85,7 +87,7 @@ function ns.BuildLockboxesOptions()
 				22,
 				NotificationsOff,
 				L["OPTIONS_SHOW_FOR"],
-				ScopeControl(function()
+				ScopeControl(L["OPTIONS_LOCKBOX_NOTIFICATIONS_SCOPE_DESCRIPTION"], function()
 					return ns.db.profile.lockboxNotificationsScope
 				end, function(_, value)
 					ns.db.profile.lockboxNotificationsScope = value

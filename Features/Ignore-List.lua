@@ -63,11 +63,11 @@ end
 
 -- The shipped reason for a default entry; nil for anything the player added.
 function ns:GetIgnoreNote(itemId)
-	local entry = itemId and ns.DEFAULT_IGNORE_ITEMS[itemId]
-	if not entry then
+	local reason = itemId and ns.DEFAULT_IGNORE_ITEMS[itemId]
+	if not reason then
 		return nil
 	end
-	return ns.ICON_IGNORED .. " " .. (REASON_TEXT[entry[2]] or REASON_TEXT.ITEM)
+	return ns.ICON_IGNORED .. " " .. (REASON_TEXT[reason] or REASON_TEXT.ITEM)
 end
 
 function ns:AddIgnoredItem(itemId)
@@ -89,16 +89,14 @@ function ns:RemoveIgnoredItem(itemId)
 end
 
 --[[
-    Seeding and Restore Defaults share one rule: only rows this client can
-    actually resolve. An id from a later expansion never answers GetItemInfo
-    here, so it would sit in the panel as a bare number forever and keep the
-    refresh watcher armed waiting for news that never comes.
+    Seeding and Restore Defaults write every row this client loaded. The TOC only
+    loads the flavor files whose rows exist here, so an id from a later
+    expansion, which would never answer C_Item.GetItemInfo and sit in the panel
+    as a bare number forever, is never in the table to begin with.
 ]]
 local function SeedFrom(list)
-	for itemId, entry in pairs(ns.DEFAULT_IGNORE_ITEMS) do
-		if entry[1] <= ns.currentExpansion then
-			list[itemId] = true
-		end
+	for itemId in pairs(ns.DEFAULT_IGNORE_ITEMS) do
+		list[itemId] = true
 	end
 end
 
