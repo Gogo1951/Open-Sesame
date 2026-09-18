@@ -94,7 +94,7 @@ end
 
 local function ToggleLootSounds()
 	ns.db.profile.lootSounds = not ns.db.profile.lootSounds
-	AceConfigRegistry:NotifyChange(ns.OPTIONS_REGISTRY.General)
+	AceConfigRegistry:NotifyChange(ns.OPTIONS_REGISTRY.Notifications)
 end
 
 --------------------------------------------------------------------------------

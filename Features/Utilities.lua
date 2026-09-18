@@ -1,14 +1,16 @@
 local _, ns = ...
 
+local L = ns.L
+
 --------------------------------------------------------------------------------
 -- C_Container API
 --------------------------------------------------------------------------------
 
 --[[
-    Both target clients (Classic Era 1.15.x, TBC Anniversary 2.5.x) ship the
-    C_Container namespace and have already removed the identically-named legacy
-    globals, so there is nothing to select between: these are cached function
-    references, unguarded. Diagnostics' API Endpoints report probes each one, so
+    All three target clients (Classic Era, TBC Anniversary, WoW Forever) ship
+    the C_Container namespace and have already removed the identically-named
+    legacy globals, so there is nothing to select between: these are cached
+    function references, unguarded. Diagnostics' API Endpoints report probes each one, so
     a future client that drops a member shows up as a FAIL row rather than as a
     silently dead fallback.
 ]]
@@ -17,6 +19,134 @@ ns.UseContainerItem = C_Container.UseContainerItem
 ns.GetContainerItemLink = C_Container.GetContainerItemLink
 ns.GetContainerItemID = C_Container.GetContainerItemID
 ns.GetContainerNumFreeSlots = C_Container.GetContainerNumFreeSlots
+
+--------------------------------------------------------------------------------
+-- Auto Loot
+--------------------------------------------------------------------------------
+
+local GetCVarBool, SetCVar = C_CVar.GetCVarBool, C_CVar.SetCVar
+
+function ns.EnsureAutoLoot()
+	if not GetCVarBool("autoLootDefault") then
+		SetCVar("autoLootDefault", "1")
+		ns:PrintMessage(L["AUTO_LOOT_ENABLED"])
+	end
+end
+
+--------------------------------------------------------------------------------
+-- Bag-Full Error
+--------------------------------------------------------------------------------
+
+--[[
+    All three target clients carry the inventory-full message id as the
+    LE_GAME_ERR_INV_FULL global, which the API Endpoints report proves on each.
+    Since that global is a number, comparing a non-number errorID against it is
+    already false, so no type guard is needed. This is the only inventory-full test in the add-on —
+    the handler and Diagnostics' event-log filter both classify UI_ERROR_MESSAGE
+    through it, so a firing can never pause the add-on while the log files it
+    away as uncorrelated noise. Never add a message-text match beside it: the
+    two would disagree exactly when a bug report needs the log line.
+]]
+function ns.IsBagFullErrorID(errorID)
+	return errorID == LE_GAME_ERR_INV_FULL
+end
+
+--------------------------------------------------------------------------------
+-- Scan Tooltip
+--------------------------------------------------------------------------------
+
+local scanTooltip = CreateFrame("GameTooltip", "OpenSesameScanTooltip", nil, "GameTooltipTemplate")
+scanTooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
+
+--[[
+    Does a tooltip carry this exact line? Split out from the two scanners below so
+    the reading and the scanning are separable.
+
+    Matched against the WHOLE line, never as a substring: LOCKED is a short word,
+    and other add-ons write lines that contain it without meaning it.
+]]
+local function TooltipHasLine(tooltip, needle)
+	local tooltipName = tooltip:GetName()
+	if not tooltipName or not needle then
+		return false
+	end
+	for lineIndex = 1, tooltip:NumLines() do
+		local line = _G[tooltipName .. "TextLeft" .. lineIndex]
+		local text = line and line:GetText()
+		if text and text == needle then
+			return true
+		end
+	end
+	return false
+end
+
+--[[
+    The same question asked of a bag slot, for callers with no tooltip to read:
+    the opening queue in Features/Auto-Opening.lua, the mini-map's Locked Items
+    list, and Diagnostics' Locked Boxes probe. One scan tooltip, one
+    implementation — a second copy would drift.
+
+    THE OWNER IS SET ON EVERY CALL, not once at file scope, and that is
+    load-bearing: hiding a tooltip drops its owner, and an unowned tooltip takes a
+    SetBagItem without complaint and populates NOTHING. Every box then reads as
+    unlocked: no Locked Items list on the mini-map and no tooltip line.
+
+    Setting a tooltip also shows it, hence that Hide: this one is anchored nowhere
+    in particular and has no business being on screen. Shown and hidden inside a
+    single frame, it never renders.
+
+    The second return is the tooltip's line count, for Diagnostics' Locked Boxes
+    probe: zero lines means the tooltip read nothing, which also answers "not
+    locked".
+]]
+function ns.IsItemLocked(bag, slot)
+	scanTooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
+	scanTooltip:ClearLines()
+	scanTooltip:SetBagItem(bag, slot)
+	local locked = TooltipHasLine(scanTooltip, LOCKED)
+	local lineCount = scanTooltip:NumLines()
+	scanTooltip:Hide()
+	return locked, lineCount
+end
+
+--[[
+    "Does this item begin a quest", which the client will say in a tooltip and
+    nowhere else: no API on any target client flags it, and the item's CLASS
+    does not give it away either, since quest starters are ordinary weapons,
+    armour and trinkets as often as they are class 12. Read by hyperlink because
+    the caller has an item, not a bag slot -- this is asked of loot, which may
+    never reach the bags at all.
+
+    The scan is the most expensive question Loot Toasts asks, so it is also the
+    last one asked: everything cheaper has already failed by the time it runs, and
+    it only runs for loot the quality threshold would otherwise have hidden.
+]]
+function ns.ItemStartsQuest(itemId)
+	if not itemId then
+		return false
+	end
+	scanTooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
+	scanTooltip:ClearLines()
+	scanTooltip:SetHyperlink("item:" .. itemId)
+	local startsQuest = TooltipHasLine(scanTooltip, ITEM_STARTS_QUEST)
+	scanTooltip:Hide()
+	return startsQuest
+end
+
+--------------------------------------------------------------------------------
+-- Loot Slot Type
+--------------------------------------------------------------------------------
+
+--[[
+    GetLootSlotType's "regular item" value. WoW Forever runs the Retail engine,
+    which dropped the LOOT_SLOT_ITEM global for Enum.LootSlotType.Item. Picked by
+    which table exists, never by what it holds.
+]]
+if type(Enum) == "table" and type(Enum.LootSlotType) == "table" then
+	ns.LOOT_SLOT_TYPE_ITEM = Enum.LootSlotType.Item
+else
+	ns.LOOT_SLOT_TYPE_ITEM = LOOT_SLOT_ITEM
+end
 
 --------------------------------------------------------------------------------
 -- Colors
@@ -53,21 +183,40 @@ function ns.GetColor(key)
 end
 
 --[[
-    GetSpellInfo has two documented shapes - the classic multiple returns with
-    the name first, and a single info table on newer builds. Read both rather
-    than betting on one, and return nil when the client's spell database has
-    nothing to say, which every caller already treats as unknown.
-
-    Lockbox-Tooltips is the caller: the localized name of the Lockpicking skill
-    is the name of the skill spell, and that is the only way to find the player's
-    rank in a client that publishes no LOCKPICKING global.
+    An item's icon from C_Item.GetItemInfoInstant, which answers from the
+    client's own database with no cold-cache nil, so the icon is there the first
+    time an item is drawn.
 ]]
-function ns.GetSpellName(spellID)
-	local info = GetSpellInfo(spellID)
-	if type(info) == "table" then
-		return info.name
+function ns.GetItemIconByID(itemId)
+	if not itemId then
+		return nil
 	end
-	return info
+	local _, _, _, _, icon = C_Item.GetItemInfoInstant(itemId)
+	return icon
+end
+
+--------------------------------------------------------------------------------
+-- Skill Lines
+--------------------------------------------------------------------------------
+
+--[[
+    A skill line's current rank, found by its localized name. WoW Forever has no
+    skill-line API, so there this answers nil, which every caller already treats
+    as unknown.
+]]
+local GetNumSkillLines, GetSkillLineInfo = GetNumSkillLines, GetSkillLineInfo
+
+function ns.GetSkillLineRank(skillName)
+	if not skillName or not GetNumSkillLines or not GetSkillLineInfo then
+		return nil
+	end
+	for index = 1, GetNumSkillLines() do
+		local lineName, isHeader, _, rank = GetSkillLineInfo(index)
+		if not isHeader and lineName == skillName then
+			return rank
+		end
+	end
+	return nil
 end
 
 --------------------------------------------------------------------------------
@@ -79,24 +228,17 @@ end
     them only to a Rogue, "ALL" to everyone. A non-Rogue cannot pick a lock, so
     Rogues-only is the default for both.
 
-    The predicates live here rather than in either feature file because three
-    files ask the question: Core and Speedy-Loot for the notifications,
-    Lockbox-Tooltips for the tooltip line.
+    The scope rule lives here so both features apply the same one:
+    Auto-Opening for the looted-lockbox notice, Lockbox-Tooltips for the
+    tooltip line. Each feature keeps its own on/off predicate beside the code
+    that reads it.
 ]]
 function ns.IsPlayerRogue()
 	return select(2, UnitClass("player")) == "ROGUE"
 end
 
-local function ScopeAllows(scope)
+function ns.LockboxScopeAllows(scope)
 	return scope ~= "ROGUES" or ns.IsPlayerRogue()
-end
-
-function ns.LockboxTooltipsEnabled()
-	return ns.db ~= nil and ns.db.profile.lockboxTooltips and ScopeAllows(ns.db.profile.lockboxTooltipsScope)
-end
-
-function ns.LockboxNotificationsEnabled()
-	return ns.db ~= nil and ns.db.profile.lockboxNotifications and ScopeAllows(ns.db.profile.lockboxNotificationsScope)
 end
 
 --------------------------------------------------------------------------------
@@ -210,7 +352,7 @@ end
 
 --[[
     An item link's colour is the only quality signal available without a
-    GetItemInfo round trip, and ns.QUALITY_COLORS maps it. Returns nil for a
+    C_Item.GetItemInfo round trip, and ns.QUALITY_COLORS maps it. Returns nil for a
     colour the table does not carry (quest yellow, say) - callers decide whether
     unknown means show or stay quiet.
 ]]

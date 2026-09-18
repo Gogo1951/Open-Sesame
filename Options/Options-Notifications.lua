@@ -28,7 +28,7 @@ local SUB_CONTROL_WIDTH = 0.9
 
 --[[
     The bypass checkboxes: sized to their captions, well clear of the wrap
-    boundary. Set by the longest of the six, "Always Show Bind on Pick-up Items",
+    boundary. Set by the longest of the nine, "Always Show Bind on Pickup Items",
     and capped by the grid - a sub-row leads with a blank indent cell, so this
     plus ns.OPTIONS_SUB_INDENT_WIDTH has to stay inside ns.OPTIONS_ROW_WIDTH.
 ]]
@@ -57,11 +57,12 @@ end
     copies would be one chance per row for one to drift away from the rest. The
     money row rides the same shape without being a threshold bypass.
 ]]
-local function BypassRow(order, hidden, caption, key)
+local function BypassRow(order, hidden, caption, desc, key)
 	return ns.OptionsSubRow(order, hidden, {
 		{
 			type = "toggle",
 			name = ns.OptionsSubLabel(caption),
+			desc = desc,
 			width = BYPASS_TOGGLE_WIDTH,
 			get = function()
 				return ns.db.profile[key]
@@ -152,6 +153,7 @@ function ns.BuildNotificationsOptions()
 			toggleLootSounds = {
 				type = "toggle",
 				name = L["OPTIONS_ENABLE_LOOT_SOUNDS"],
+				desc = L["OPTIONS_ENABLE_LOOT_SOUNDS_DESCRIPTION"],
 				order = 14,
 				width = "full",
 				get = function()
@@ -170,6 +172,7 @@ function ns.BuildNotificationsOptions()
 				{
 					type = "select",
 					name = "",
+					desc = L["OPTIONS_LOOT_SOUND_QUALITY_DESCRIPTION"],
 					width = SUB_CONTROL_WIDTH - LOOT_SOUND_PREVIEW_WIDTH,
 					values = SOUND_QUALITY_VALUES,
 					sorting = SOUND_QUALITY_SORTING,
@@ -204,6 +207,7 @@ function ns.BuildNotificationsOptions()
 			togglePickPocketSound = {
 				type = "toggle",
 				name = L["OPTIONS_ENABLE_PICK_POCKET_SOUND"],
+				desc = L["OPTIONS_ENABLE_PICK_POCKET_SOUND_DESCRIPTION"],
 				order = 17,
 				width = "full",
 				get = function()
@@ -223,6 +227,7 @@ function ns.BuildNotificationsOptions()
 			toggleLootToasts = {
 				type = "toggle",
 				name = L["OPTIONS_ENABLE_LOOT_TOASTS"],
+				desc = L["OPTIONS_ENABLE_LOOT_TOASTS_DESCRIPTION"],
 				order = 25,
 				width = "full",
 				get = function()
@@ -234,6 +239,7 @@ function ns.BuildNotificationsOptions()
 			},
 			subToastQuality = SubSelectRow(26, LootToastsOff, L["OPTIONS_MINIMUM_QUALITY"], {
 				type = "select",
+				desc = L["OPTIONS_LOOT_TOAST_QUALITY_DESCRIPTION"],
 				values = TOAST_QUALITY_VALUES,
 				sorting = TOAST_QUALITY_SORTING,
 				get = function()
@@ -268,28 +274,68 @@ function ns.BuildNotificationsOptions()
 				27,
 				LootToastsOff,
 				L["OPTIONS_ALWAYS_SHOW_BIND_ON_PICKUP"],
+				L["OPTIONS_ALWAYS_SHOW_BIND_ON_PICKUP_DESCRIPTION"],
 				"lootToastBindOnPickup"
 			),
 			subToastQuestItems = BypassRow(
 				28,
 				LootToastsOff,
 				L["OPTIONS_ALWAYS_SHOW_QUEST_ITEMS"],
+				L["OPTIONS_ALWAYS_SHOW_QUEST_ITEMS_DESCRIPTION"],
 				"lootToastQuestItems"
 			),
-			subToastRecipes = BypassRow(29, LootToastsOff, L["OPTIONS_ALWAYS_SHOW_RECIPES"], "lootToastRecipes"),
-			subToastMounts = BypassRow(30, LootToastsOff, L["OPTIONS_ALWAYS_SHOW_MOUNTS"], "lootToastMounts"),
-			subToastPets = BypassRow(31, LootToastsOff, L["OPTIONS_ALWAYS_SHOW_PETS"], "lootToastPets"),
-			subToastKeys = BypassRow(32, LootToastsOff, L["OPTIONS_ALWAYS_SHOW_KEYS"], "lootToastKeys"),
-			subToastBags = BypassRow(33, LootToastsOff, L["OPTIONS_ALWAYS_SHOW_BAGS"], "lootToastBags"),
+			subToastRecipes = BypassRow(
+				29,
+				LootToastsOff,
+				L["OPTIONS_ALWAYS_SHOW_RECIPES"],
+				L["OPTIONS_ALWAYS_SHOW_RECIPES_DESCRIPTION"],
+				"lootToastRecipes"
+			),
+			subToastMounts = BypassRow(
+				30,
+				LootToastsOff,
+				L["OPTIONS_ALWAYS_SHOW_MOUNTS"],
+				L["OPTIONS_ALWAYS_SHOW_MOUNTS_DESCRIPTION"],
+				"lootToastMounts"
+			),
+			subToastPets = BypassRow(
+				31,
+				LootToastsOff,
+				L["OPTIONS_ALWAYS_SHOW_PETS"],
+				L["OPTIONS_ALWAYS_SHOW_PETS_DESCRIPTION"],
+				"lootToastPets"
+			),
+			subToastKeys = BypassRow(
+				32,
+				LootToastsOff,
+				L["OPTIONS_ALWAYS_SHOW_KEYS"],
+				L["OPTIONS_ALWAYS_SHOW_KEYS_DESCRIPTION"],
+				"lootToastKeys"
+			),
+			subToastBags = BypassRow(
+				33,
+				LootToastsOff,
+				L["OPTIONS_ALWAYS_SHOW_BAGS"],
+				L["OPTIONS_ALWAYS_SHOW_BAGS_DESCRIPTION"],
+				"lootToastBags"
+			),
 			subToastContainers = BypassRow(
 				34,
 				LootToastsOff,
 				L["OPTIONS_ALWAYS_SHOW_CONTAINERS"],
+				L["OPTIONS_ALWAYS_SHOW_CONTAINERS_DESCRIPTION"],
 				"lootToastContainers"
 			),
-			subToastMoney = BypassRow(35, LootToastsOff, L["OPTIONS_ALWAYS_SHOW_MONEY"], "lootToastMoney"),
+			subToastMoney = BypassRow(
+				35,
+				LootToastsOff,
+				L["OPTIONS_ALWAYS_SHOW_MONEY"],
+				L["OPTIONS_ALWAYS_SHOW_MONEY_DESCRIPTION"],
+				"lootToastMoney"
+			),
 			subToastMaxItems = SubSelectRow(36, LootToastsOff, L["OPTIONS_LOOT_TOAST_MAX_ITEMS"], {
 				type = "select",
+				desc = L["OPTIONS_LOOT_TOAST_MAX_ITEMS_DESCRIPTION"],
 				values = COUNT_VALUES,
 				sorting = COUNT_SORTING,
 				get = function()
@@ -302,6 +348,7 @@ function ns.BuildNotificationsOptions()
 			}),
 			subToastDuration = SubSelectRow(37, LootToastsOff, L["OPTIONS_LOOT_TOAST_DURATION"], {
 				type = "select",
+				desc = L["OPTIONS_LOOT_TOAST_DURATION_DESCRIPTION"],
 				values = DURATION_VALUES,
 				sorting = ns.LOOT_TOAST_DURATIONS,
 				get = function()
@@ -314,6 +361,7 @@ function ns.BuildNotificationsOptions()
 			}),
 			subToastFont = SubSelectRow(40, LootToastsOff, L["OPTIONS_LOOT_TOAST_FONT"], {
 				type = "select",
+				desc = L["OPTIONS_LOOT_TOAST_FONT_DESCRIPTION"],
 				--[[
                     Functions, not tables: the list depends on whether anything
                     on this client has loaded LibSharedMedia, which is not known
@@ -336,6 +384,7 @@ function ns.BuildNotificationsOptions()
 			}),
 			subToastFontSize = SubSelectRow(43, LootToastsOff, L["OPTIONS_LOOT_TOAST_FONT_SIZE"], {
 				type = "range",
+				desc = L["OPTIONS_LOOT_TOAST_FONT_SIZE_DESCRIPTION"],
 				min = ns.LOOT_TOAST_FONT_SIZE_MIN,
 				max = ns.LOOT_TOAST_FONT_SIZE_MAX,
 				step = 1,
@@ -349,6 +398,7 @@ function ns.BuildNotificationsOptions()
 			}),
 			subToastGrowth = SubSelectRow(38, LootToastsOff, L["OPTIONS_LOOT_TOAST_GROWTH"], {
 				type = "select",
+				desc = L["OPTIONS_LOOT_TOAST_GROWTH_DESCRIPTION"],
 				values = {
 					UP = L["OPTIONS_GROW_UP"],
 					DOWN = L["OPTIONS_GROW_DOWN"],
@@ -364,6 +414,7 @@ function ns.BuildNotificationsOptions()
 			}),
 			subToastAlign = SubSelectRow(39, LootToastsOff, L["OPTIONS_LOOT_TOAST_ALIGN"], {
 				type = "select",
+				desc = L["OPTIONS_LOOT_TOAST_ALIGN_DESCRIPTION"],
 				values = {
 					LEFT = L["OPTIONS_ALIGN_LEFT"],
 					RIGHT = L["OPTIONS_ALIGN_RIGHT"],
@@ -379,6 +430,7 @@ function ns.BuildNotificationsOptions()
 			}),
 			subToastFontOutline = SubSelectRow(41, LootToastsOff, L["OPTIONS_LOOT_TOAST_OUTLINE"], {
 				type = "select",
+				desc = L["OPTIONS_LOOT_TOAST_OUTLINE_DESCRIPTION"],
 				values = FONT_FLAG_VALUES,
 				sorting = ns.LOOT_TOAST_FONT_FLAGS,
 				get = function()
@@ -414,6 +466,7 @@ function ns.BuildNotificationsOptions()
 				name = function()
 					return ns.AreLootToastsUnlocked() and L["OPTIONS_TOASTS_LOCK"] or L["OPTIONS_TOASTS_UNLOCK"]
 				end,
+				desc = L["OPTIONS_TOASTS_LOCK_DESCRIPTION"],
 				order = 46,
 				width = TOAST_BUTTON_WIDTH,
 				hidden = LootToastsOff,
@@ -432,6 +485,7 @@ function ns.BuildNotificationsOptions()
 			resetToastPosition = {
 				type = "execute",
 				name = L["OPTIONS_TOASTS_RESET"],
+				desc = L["OPTIONS_TOASTS_RESET_DESCRIPTION"],
 				order = 47,
 				width = TOAST_BUTTON_WIDTH,
 				hidden = LootToastsOff,

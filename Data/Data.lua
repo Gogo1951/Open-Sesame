@@ -29,28 +29,6 @@ ns.OPTIONS_REGISTRY = {
 }
 
 --------------------------------------------------------------------------------
--- Expansion
---------------------------------------------------------------------------------
-
---[[
-    Which expansion this client is. Item data is tagged with the expansion that
-    introduced it, so anything newer than the running client can be filtered out
-    before the add-on ever asks the client about it: those ids resolve to nothing
-    here, and a row built from one would sit as a bare number forever.
-]]
-ns.VANILLA = 1
-ns.TBC = 2
-ns.WRATH = 3
-
-if WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
-	ns.currentExpansion = ns.VANILLA
-elseif WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC then
-	ns.currentExpansion = ns.TBC
-else
-	ns.currentExpansion = ns.WRATH
-end
-
---------------------------------------------------------------------------------
 -- Constants
 --------------------------------------------------------------------------------
 
@@ -175,16 +153,16 @@ ns.PICK_POCKET_LOOT_WINDOW = 1
 
 --[[
     The item kinds Loot Toasts can show regardless of the quality threshold. All
-    but the last are read from GetItemInfoInstant, which answers from the client's
-    own database with no cold-cache nil, so the kind is recognised the first time
-    the item is looted. Class and subclass numbers are stable across every client
-    we target.
+    but the last are read from C_Item.GetItemInfoInstant, which answers from the
+    client's own database with no cold-cache nil, so the kind is recognised the
+    first time the item is looted. Class and subclass numbers are stable across
+    every client we target.
 
     ITEM_BIND_ON_PICKUP is the odd one out: bindType comes from the full
-    GetItemInfo, which CAN answer nil on a cold cache. See the note in
+    C_Item.GetItemInfo, which CAN answer nil on a cold cache. See the note in
     Features/Loot-Toasts.lua for why that is acceptable there, and the
-    "GetItemInfo bindType" row in the Diagnostics API report, which proves the
-    return position on each client rather than trusting it.
+    "C_Item.GetItemInfo bindType" row in the Diagnostics API report, which proves
+    the return position on each client rather than trusting it.
 ]]
 --[[
     Class 1 is the client's "Container", which is a BAG - the thing loot goes in,
@@ -203,7 +181,7 @@ ns.ITEM_CLASS_KEY = 13
 ns.ITEM_CLASS_MISCELLANEOUS = 15
 ns.ITEM_SUBCLASS_COMPANION_PET = 2 -- of Miscellaneous
 ns.ITEM_SUBCLASS_MOUNT = 5 -- of Miscellaneous
-ns.ITEM_BIND_ON_PICKUP = 1 -- GetItemInfo's bindType, 14th return
+ns.ITEM_BIND_ON_PICKUP = 1 -- C_Item.GetItemInfo's bindType, 14th return
 ns.ITEM_BIND_PROBE_ID = 6948 -- Hearthstone: Bind on Pickup, and in every bag
 
 --------------------------------------------------------------------------------
@@ -247,93 +225,6 @@ ns.RACE_SOUNDS = {
 	["Troll"] = { [2] = 1842, [3] = 1952 },
 	["BloodElf"] = { [2] = 9589, [3] = 9590 },
 	["Draenei"] = { [2] = 9504, [3] = 9505 },
-}
-
---------------------------------------------------------------------------------
--- Lockbox Skill Levels
---------------------------------------------------------------------------------
-
---[[
-    Required Lockpicking skill per locked container, for the tooltip line in
-    Features/Lockbox-Tooltips.lua. Covers the ns.AllowedItems entries whose value
-    is false, minus four with no number to give:
-
-      Thieven' Kit (7868)        Flagged Locked, publishes no skill number.
-      Floral Foundations (39014) Requires Inscription (50), not Lockpicking.
-      Dark Iron Lockbox (208838) Unknown.
-      Scarlet Junkbox (239248)   Unknown.
-
-    The two Unknowns are Season of Discovery rows that reach ns.AllowedItems
-    through the name-guess merge rule rather than from a source that carries a
-    skill number. A missing row means no tooltip line for that box, which is the
-    deliberate trade: none of the four gets a line rather than being given a
-    guessed one.
-
-    Values here are numbers and the tooltip formats them with %d, so a placeholder
-    string in this table would error on hover. An unknown box is absent from the
-    table, never present with a stand-in value.
-
-    The skill number is NOT in the world DB: item_template.lockid points into
-    Lock.dbc, which is client data, so these values were read off each item's own
-    warcraft.wiki.gg page. The four 225s in the classic tier are real, each
-    confirmed on its own page.
-
-    -- TODO: Add SQL Query
-
-    This lists the items that need a value, so the table can be checked for gaps
-    after regenerating ns.AllowedItems:
-
-    SELECT it.entry, it.name, it.lockid
-    FROM item_template it
-    WHERE it.lockid > 0
-      AND EXISTS (SELECT 1 FROM item_loot_template ilt WHERE ilt.entry = it.entry)
-    ORDER BY it.name;
-]]
-
--- { [itemId] = requiredLockpickingSkill }
-
-ns.LOCKBOX_SKILL_LEVELS = {
-
-	--------------------------------------------------------------------------------
-	-- 01. World of Warcraft
-	--------------------------------------------------------------------------------
-
-	[16882] = 1, -- Battered Junkbox
-	[5760] = 225, -- Eternium Lockbox
-	[4633] = 25, -- Heavy Bronze Lockbox
-	[16885] = 250, -- Heavy Junkbox
-	[4634] = 70, -- Iron Lockbox
-	[13875] = 175, -- Ironbound Locked Chest
-	[5758] = 225, -- Mithril Lockbox
-	[4632] = 1, -- Ornate Bronze Lockbox
-	[13918] = 250, -- Reinforced Locked Chest
-	[4638] = 225, -- Reinforced Steel Lockbox
-	[6354] = 1, -- Small Locked Chest
-	[4637] = 175, -- Steel Lockbox
-	[4636] = 125, -- Strong Iron Lockbox
-	[16884] = 175, -- Sturdy Junkbox
-	[6355] = 70, -- Sturdy Locked Chest
-	[7209] = 1, -- Tazan's Satchel
-	[12033] = 275, -- Thaurissan Family Jewels
-	[5759] = 225, -- Thorium Lockbox
-	[16883] = 70, -- Worn Junkbox
-
-	--------------------------------------------------------------------------------
-	-- 02. World of Warcraft : The Burning Crusade
-	--------------------------------------------------------------------------------
-
-	[31952] = 325, -- Khorium Lockbox
-	[29569] = 300, -- Strong Junkbox
-
-	--------------------------------------------------------------------------------
-	-- 03. World of Warcraft : Wrath of the Lich King
-	--------------------------------------------------------------------------------
-
-	[43622] = 375, -- Froststeel Lockbox
-	[43575] = 350, -- Reinforced Junkbox
-	[42953] = 400, -- Strange Envelope
-	[45986] = 400, -- Tiny Titanium Lockbox
-	[43624] = 400, -- Titanium Lockbox
 }
 
 --------------------------------------------------------------------------------

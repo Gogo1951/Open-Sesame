@@ -12,18 +12,19 @@ read_globals = {
 	"C_CVar",
 	"C_Container",
 	"C_EventUtils",
+	"C_Item",
 	"C_PartyInfo",
+	"C_Seasons",
+	"C_Spell",
 	"C_Timer",
 	"C_UnitAuras",
+	"Enum",
 	"Settings",
 
 	-- Client info, timing, and add-on metadata
 	"GetBuildInfo",
 	"GetLocale",
 	"GetTime",
-	"WOW_PROJECT_BURNING_CRUSADE_CLASSIC",
-	"WOW_PROJECT_CLASSIC",
-	"WOW_PROJECT_ID",
 
 	-- Frames and UI
 	"AuctionFrame",
@@ -44,14 +45,6 @@ read_globals = {
 	"UIParent",
 	"WorldFrame",
 
-	-- Spells
-	"GetSpellInfo",
-
-	-- Items
-	"GetItemIcon",
-	"GetItemInfo",
-	"GetItemInfoInstant",
-
 	-- Loot
 	"GetLootSlotLink",
 	"GetLootSlotType",
@@ -68,12 +61,15 @@ read_globals = {
 	"IsInGroup",
 	"IsInInstance",
 	"IsModifiedClick",
+	"IsPlayerSpell",
 	"IsShiftKeyDown",
 	"IsStealthed",
+	"IsSpellKnown",
 	"UnitAffectingCombat",
 	"UnitCastingInfo",
 	"UnitChannelInfo",
 	"UnitClass",
+	"UnitLevel",
 	"UnitRace",
 	"UnitSex",
 

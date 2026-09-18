@@ -11,10 +11,11 @@ local function IsAutoLootEnabled()
 end
 
 --[[
-    Loot method comes back as a NUMBER on both target clients — the string-
-    returning GetLootMethod global is gone from Era and TBC alike. Enum.LootMethod
-    is not guaranteed to exist on these builds, so the master-loot value is
-    written out as the literal the API actually returns. Diagnostics' Loot Method
+    Loot method comes back as a NUMBER on all three target clients: the
+    string-returning GetLootMethod global is gone from every one of them.
+    Enum.LootMethod is not guaranteed to exist on Era and TBC, so the master-loot
+    value is written out as the literal the API actually returns, which is also
+    Enum.LootMethod.Masterlooter's value on Forever. Diagnostics' Loot Method
     report prints the live return values and their types, which is what proves
     this mapping rather than an existence check.
 ]]
@@ -34,7 +35,7 @@ end
     the free-slot budget.
 ]]
 local function IsItemLootSlot(slot)
-	return GetLootSlotType(slot) == LOOT_SLOT_ITEM
+	return GetLootSlotType(slot) == ns.LOOT_SLOT_TYPE_ITEM
 end
 
 --------------------------------------------------------------------------------
@@ -42,8 +43,9 @@ end
 --------------------------------------------------------------------------------
 
 --[[
-    True only when the most recent Speedy Loot pass took everything, so nothing
-    was left in the loot window. The LootFrame OnShow hook at the bottom of this
+    True only when the most recent Speedy Loot pass took everything with bag space
+    to spare, so nothing was left in the loot window and nothing it asked for can
+    still bounce off full bags. The LootFrame OnShow hook at the bottom of this
     file re-hides the window the instant the default UI re-shows it on
     LOOT_OPENED. That re-show is what makes the window flash for ~0.5s: a plain
     LootFrame:Hide() on LOOT_READY is a no-op because the frame is not shown yet,
@@ -65,8 +67,8 @@ local suppressLootWindow = false
 --[[
     The LOOT_READY response, invoked from Core's central dispatcher
     (EventHandlers:LOOT_READY) so a single registration owns the event. Core
-    stamps world-loot state first and then calls this, preserving the order the
-    two separate event frames previously ran in.
+    stamps world-loot state and plays the Pick Pocket sound first, because this
+    empties the slots both of them read.
 ]]
 function ns.HandleSpeedyLoot()
 	if not ns.isSpeedyLoot then
@@ -123,10 +125,6 @@ function ns.HandleSpeedyLoot()
 		end
 	end
 
-	if LootFrame then
-		LootFrame:Hide()
-	end
-
 	--[[
         Set whenever a slot is left in the loot window — either an ignored item
         we open manually (e.g. a lockbox) or an item skipped because bags filled
@@ -135,6 +133,7 @@ function ns.HandleSpeedyLoot()
         pass took everything, so anything left behind stays reachable.
     ]]
 	local leftBehind = false
+	local tookItem = false
 
 	for slot = numItems, 1, -1 do
 		if not IsItemLootSlot(slot) then
@@ -166,6 +165,7 @@ function ns.HandleSpeedyLoot()
 			if shouldLoot then
 				LootSlot(slot)
 				freeSlots = freeSlots - 1
+				tookItem = true
 			end
 		else
 			--[[
@@ -177,12 +177,24 @@ function ns.HandleSpeedyLoot()
 	end
 
 	--[[
-        Suppress the window only when this pass took everything. When something
-        was left behind, keep it visible: the OnShow hook stays a no-op and the
-        explicit Show below (belt-and-suspenders with the natural LOOT_OPENED
-        show) reveals the stranded loot.
+        Hiding the loot window closes the loot (the default UI calls CloseLoot
+        from its OnHide), and the hide lands before the server has answered a
+        single LootSlot. The free-slot count is only a guess until then: items
+        from the previous corpse can still be arriving. So once this pass leaves
+        fewer than MIN_FREE_SLOTS free, the line Auto-Opening pauses at, the window
+        stays up. It closes itself when the last item is taken, and a pickup that
+        bounces off full bags stays in it instead of on a corpse the player can no
+        longer see.
     ]]
-	suppressLootWindow = not leftBehind
+	local bagsTight = tookItem and freeSlots < ns.MIN_FREE_SLOTS
+
+	--[[
+        Suppress the window only when this pass took everything with room to
+        spare. Otherwise the OnShow hook stays a no-op and the natural LOOT_OPENED
+        show goes through; when something was left behind, the explicit Show
+        below (belt-and-suspenders with that show) reveals the stranded loot.
+    ]]
+	suppressLootWindow = not leftBehind and not bagsTight
 
 	if leftBehind and LootFrame then
 		LootFrame:Show()
@@ -204,7 +216,7 @@ end
     Re-hide the loot window the instant the default UI shows it, but only when the
     last pass took everything. This is what actually kills the flash — see the
     suppressLootWindow comment above. Hooked once at load; LootFrame exists by
-    then (FrameXML loads before addons).
+    then (FrameXML loads before add-ons).
 ]]
 if LootFrame then
 	LootFrame:HookScript("OnShow", function(self)

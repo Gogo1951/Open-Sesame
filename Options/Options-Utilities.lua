@@ -170,7 +170,7 @@ local function CreateItemLinkWidget()
 				return
 			end
 			local itemId = tonumber(text:match("item:(%d+)"))
-			self.icon:SetTexture(itemId and GetItemIcon(itemId) or nil)
+			self.icon:SetTexture(ns.GetItemIconByID(itemId))
 			self.label:SetText(text)
 		end,
 		-- Read-only display: AceConfigDialog drives an input control through these.
@@ -192,11 +192,12 @@ AceGUI:RegisterWidgetType(ns.ITEM_LINK_WIDGET_TYPE, CreateItemLinkWidget, ITEM_L
 --------------------------------------------------------------------------------
 
 --[[
-    GetItemInfo returns nil until the client has the item, so a freshly-logged-in
-    player would see bare ids where item links belong. Rows report outstanding ids
-    here; Core's GET_ITEM_INFO_RECEIVED handler calls back through
-    ns.OnItemInfoReceived, the list redraws as answers arrive, and the callback is
-    cleared once nothing is outstanding so the dispatcher stops doing work.
+    C_Item.GetItemInfo returns nil until the client has the item, so a
+    freshly-logged-in player would see bare ids where item links belong. Rows
+    report outstanding ids here; Core's GET_ITEM_INFO_RECEIVED handler calls back
+    through ns.OnItemInfoReceived, the list redraws as answers arrive, and the
+    callback is cleared once nothing is outstanding so the dispatcher stops doing
+    work.
 ]]
 local outstandingItems = {}
 local outstandingRegistry
@@ -244,9 +245,10 @@ end
 
     Ids this client cannot resolve are dropped before a row is ever built. A saved
     list can hold ids from a later expansion (the list is account-wide and the
-    defaults have since been expansion-filtered); GetItemInfoInstant answers
-    synchronously from the client's own database, so it separates "not cached yet"
-    from "does not exist here" without waiting on an event that will never fire.
+    defaults have since been expansion-filtered); C_Item.GetItemInfoInstant
+    answers synchronously from the client's own database, so it separates "not
+    cached yet" from "does not exist here" without waiting on an event that will
+    never fire.
 ]]
 local REMOVE_ICON = "Interface/Buttons/UI-GroupLoot-Pass-Up"
 local REMOVE_ICON_SIZE = 16
@@ -276,7 +278,7 @@ function ns:BuildItemListOptions(config)
 		args.restore = {
 			type = "execute",
 			name = config.restoreLabel,
-			desc = config.restoreLabel,
+			desc = config.restoreDesc,
 			order = nextOrder(),
 			width = "double",
 			confirm = true,
@@ -307,8 +309,8 @@ function ns:BuildItemListOptions(config)
 
 	local rows = {}
 	for itemId in pairs(config.source) do
-		if GetItemInfoInstant(itemId) then
-			local name, link = GetItemInfo(itemId)
+		if C_Item.GetItemInfoInstant(itemId) then
+			local name, link = C_Item.GetItemInfo(itemId)
 			if not name then
 				ns.WatchUncachedItem(itemId, config.registryName)
 			end

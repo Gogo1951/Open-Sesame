@@ -441,9 +441,7 @@ function ns.SetLootToastsUnlocked(unlocked)
 		end
 		frame.label:SetText(
 			ns.GetColor("TITLE")
-				.. ns.L["ADDON_TITLE"]
-				.. " "
-				.. ns.L["LOOT_TOASTS"]
+				.. ns.L["OPTIONS_TOASTS_HANDLE_TITLE"]
 				.. "|r"
 				.. BodyLine("OPTIONS_TOASTS_CLICK_DRAG")
 				.. BodyLine("OPTIONS_TOASTS_RIGHT_CLICK_LOCK")
@@ -589,10 +587,12 @@ end
     survivor's index by one together, which cancels: nothing near the anchor
     twitches to fill the gap the departing row left at the far end.
 
-    Rows hang off the anchor's LEFT edge, not its centre. Centred, a row's width
-    would decide where its icon landed, so widening a row to fit longer names
-    would drag the text sideways and a font change would walk the stack across
-    the screen. Anchored left, width only sets where the text runs out.
+    Rows pin to a corner of the anchor, never its centre: growth picks the top
+    or bottom edge and alignment picks the left or right end. Centred, a row's
+    width would decide where its icon landed, so widening a row to fit longer
+    names would drag the text sideways and a font change would walk the stack
+    across the screen. Pinned at a corner, width only sets where the text runs
+    out.
 ]]
 local function Restack()
 	local count = #active
@@ -678,12 +678,12 @@ end
     box counts as much as an openable one.
 
     ORDER HERE IS BY COST, and deliberately not the order the options panel lists
-    them in. The table lookup is free, the GetItemInfoInstant reads answer from the
-    client's own database, and Bind on Pickup goes last because it is the only one
-    needing the full GetItemInfo. That call can answer nil on a cold cache, which
-    reads here as "not Bind on Pickup" and leaves the threshold to decide -
-    acceptable, because the item was just looted, which is the one moment the
-    client is certain to have it cached.
+    them in. The table lookup is free, the C_Item.GetItemInfoInstant reads answer
+    from the client's own database, and Bind on Pickup goes last because it is the
+    only one needing the full C_Item.GetItemInfo. That call can answer nil on a
+    cold cache, which reads here as "not Bind on Pickup" and leaves the threshold
+    to decide - acceptable, because the item was just looted, which is the one
+    moment the client is certain to have it cached.
 ]]
 local function AlwaysShown(itemId)
 	if not itemId then
@@ -694,7 +694,7 @@ local function AlwaysShown(itemId)
 		return true
 	end
 
-	local _, _, _, _, _, classId, subclassId = GetItemInfoInstant(itemId)
+	local _, _, _, _, _, classId, subclassId = C_Item.GetItemInfoInstant(itemId)
 	if profile.lootToastQuestItems and classId == ns.ITEM_CLASS_QUEST then
 		return true
 	end
@@ -716,7 +716,7 @@ local function AlwaysShown(itemId)
 		end
 	end
 
-	if profile.lootToastBindOnPickup and select(14, GetItemInfo(itemId)) == ns.ITEM_BIND_ON_PICKUP then
+	if profile.lootToastBindOnPickup and select(14, C_Item.GetItemInfo(itemId)) == ns.ITEM_BIND_ON_PICKUP then
 		return true
 	end
 
@@ -779,7 +779,7 @@ function ns.ShowLootToast(link, message)
     ]]
 	local quantity = ParseQuantity(message)
 	local name = (link:gsub("|h%[(.-)%]|h", "|h%1|h"))
-	PushToast(itemId and GetItemIcon(itemId) or nil, quantity > 1 and (name .. " x" .. quantity) or name)
+	PushToast(ns.GetItemIconByID(itemId), quantity > 1 and (name .. " x" .. quantity) or name)
 end
 
 --[[

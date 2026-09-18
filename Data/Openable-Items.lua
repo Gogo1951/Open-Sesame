@@ -9,8 +9,10 @@ local _, ns = ...
     a large generated table rather than the hand-set constants that file holds,
     and it is regenerated from a different source.
 
-    Keyed by item ID and sorted by item NAME within each expansion block, which
-    is the order the query below emits.
+    Keyed by item ID and sorted by item NAME, which is the order the query below
+    emits. This file holds the rows every client has; Data/TBC/Openable-Items.lua
+    and Data/Wrath/Openable-Items.lua add the rows only those clients have, and
+    each TOC lists only the files that are true on its client.
 ]]
 
 --[[
@@ -32,10 +34,11 @@ local _, ns = ...
     (Classic Era including Season of Discovery, Burning Crusade, Wrath), exported
     as id + name. These answer two things the world DB cannot:
 
-      * WHICH CLIENTS HAVE IT, which is the entire basis of the expansion blocks.
-        An id present on Era sits in block 01, one first appearing in TBC in block
-        02, one only in Wrath in block 03. Do not go back to guessing this from id
-        ranges: six-digit modern Classic re-adds break any range rule.
+      * WHICH CLIENTS HAVE IT, which is the entire basis of the file split. An
+        id present on Era stays in this file, one first appearing in TBC goes to
+        Data/TBC/, one only in Wrath to Data/Wrath/. Do not go back to guessing
+        this from id ranges: six-digit modern Classic re-adds break any range
+        rule.
       * THE ITEMS A WRATH DB HAS NEVER HEARD OF - modern Classic re-adds and every
         Season of Discovery container. Roughly 128 rows here came from Wowhead
         alone and would vanish if this table were rebuilt from SQL only.
@@ -62,11 +65,6 @@ local _, ns = ...
 -- { [itemId] = canOpenImmediately (true) or requiresUnlock (false) }
 
 ns.AllowedItems = {
-
-	--------------------------------------------------------------------------------
-	-- 01. World of Warcraft
-	--------------------------------------------------------------------------------
-
 	[10456] = true, -- A Bulging Coin Purse
 	[15902] = true, -- A Crazy Grab Bag
 	[11883] = true, -- A Dingy Fanny Pack
@@ -400,162 +398,4 @@ ns.AllowedItems = {
 	[22137] = true, -- Ysida's Satchel
 	[22233] = true, -- Zigris' Footlocker
 	[216646] = true, -- Ziri's Mystery Crate
-
-	--------------------------------------------------------------------------------
-	-- 02. World of Warcraft : The Burning Crusade
-	--------------------------------------------------------------------------------
-
-	[34583] = true, -- Aldor Supplies Package
-	[34587] = true, -- Aldor Supplies Package
-	[34592] = true, -- Aldor Supplies Package
-	[34595] = true, -- Aldor Supplies Package
-	[28499] = true, -- Arakkoa Hunter's Supplies
-	[31955] = true, -- Arelion's Knapsack
-	[35348] = true, -- Bag of Fishing Treasures
-	[34863] = true, -- Bag of Fishing Treasures
-	[25423] = true, -- Bag of Premium Gems
-	[33844] = true, -- Barrel of Fish
-	[34846] = true, -- Black Sack of Gems
-	[191060] = true, -- Black Sack of Gems
-	[35313] = true, -- Bloated Barbed Gill Trout
-	[35286] = true, -- Bloated Giant Sunfish
-	[28135] = true, -- Bomb Crate
-	[34503] = true, -- Box of Adamantite Shells
-	[191061] = true, -- Brilliant Glass
-	[35945] = true, -- Brilliant Glass
-	[25422] = true, -- Bulging Sack of Gems
-	[23921] = true, -- Bulging Sack of Silver
-	[30320] = true, -- Bundle of Nether Spikes
-	[34548] = true, -- Cache of the Shattered Sun
-	[33857] = true, -- Crate of Meat
-	[34077] = true, -- Crudely Wrapped Gift
-	[27513] = true, -- Curious Crate
-	[30650] = true, -- Dertrok's Wand Case
-	[187714] = true, -- Enlistment Bonus
-	[187799] = true, -- Enlistment Bonus
-	[24336] = true, -- Fireproof Satchel
-	[25424] = true, -- Gem-Stuffed Envelope
-	[37586] = true, -- Handful of Candy
-	[27481] = true, -- Heavy Supply Crate
-	[33928] = true, -- Hollowed Bone Decanter
-	[27511] = true, -- Inscribed Scrollcase
-	[24476] = true, -- Jaggal Clam
-	[31952] = false, -- Khorium Lockbox
-	[32777] = true, -- Kronk's Grab Bag
-	[32626] = true, -- Large Copper Metamorphosis Geode
-	[32629] = true, -- Large Gold Metamorphosis Geode
-	[32624] = true, -- Large Iron Metamorphosis Geode
-	[32628] = true, -- Large Silver Metamorphosis Geode
-	[32462] = true, -- Morthis' Materials
-	[27446] = true, -- Mr. Pinchy's Gift
-	[23895] = true, -- Netted Goods
-	[23846] = true, -- Nolkai's Box
-	[31408] = true, -- Offering of the Sha'tar
-	[32835] = true, -- Ogri'la Care Package
-	[31800] = true, -- Outcast's Cache
-	[24402] = true, -- Package of Identified Plants
-	[35512] = true, -- Pocket Full of Snow
-	[37605] = true, -- Pouch of Pennies
-	[31522] = true, -- Primal Mooncloth Supplies
-	[32064] = true, -- Protectorate Treasure Cache
-	[33045] = true, -- Renn's Supplies
-	[34584] = true, -- Scryer Supplies Package
-	[34585] = true, -- Scryer Supplies Package
-	[34593] = true, -- Scryer Supplies Package
-	[34594] = true, -- Scryer Supplies Package
-	[33926] = true, -- Sealed Scroll Case
-	[35232] = true, -- Shattered Sun Supplies
-	[32724] = true, -- Sludge-covered Object
-	[32627] = true, -- Small Copper Metamorphosis Geode
-	[32630] = true, -- Small Gold Metamorphosis Geode
-	[32625] = true, -- Small Iron Metamorphosis Geode
-	[32631] = true, -- Small Silver Metamorphosis Geode
-	[29569] = false, -- Strong Junkbox
-	[32561] = true, -- Tier 5 Arrow Box
-	[273162] = true, -- Unexpected Gift
-	[25419] = true, -- Unmarked Bag of Gems
-	[30260] = true, -- Voren'thal's Package
-	[34426] = true, -- Winter Veil Gift
-
-	--------------------------------------------------------------------------------
-	-- 03. World of Warcraft : Wrath of the Lich King
-	--------------------------------------------------------------------------------
-
-	[44663] = true, -- Abandoned Adventurer's Satchel
-	[46110] = true, -- Alchemist's Cache
-	[44161] = true, -- Arcane Tarot
-	[39903] = true, -- Argent Crusade Gratuity
-	[39904] = true, -- Argent Crusade Gratuity
-	[49294] = true, -- Ashen Sack of Gems
-	[46007] = true, -- Bag of Fishing Treasures
-	[52274] = true, -- Bag of Shaman Stuff
-	[52344] = true, -- Bag of Shaman Stuff
-	[34119] = true, -- Black Conrad's Treasure
-	[45328] = true, -- Bloated Slippery Eel
-	[40308] = true, -- Bonework Soul Jar
-	[46809] = true, -- Bountiful Cookbook
-	[46810] = true, -- Bountiful Cookbook
-	[208157] = true, -- Bounty Satchel
-	[202269] = true, -- Bounty Satchel
-	[44951] = true, -- Box of Bombs
-	[49909] = true, -- Box of Chocolates
-	[35745] = true, -- Box of Treasure
-	[49926] = true, -- Brazie's Black Book of Secrets
-	[45072] = true, -- Brightly Colored Egg
-	[44700] = true, -- Brooding Darkwater Clam
-	[52676] = true, -- Cache of the Ley-Guardian
-	[45724] = true, -- Champion's Purse
-	[39883] = true, -- Cracked Egg
-	[34871] = true, -- Crafty's Sack
-	[50161] = true, -- Dinner Suit Box
-	[39014] = false, -- Floral Foundations
-	[43622] = false, -- Froststeel Lockbox
-	[262788] = true, -- Grand Gift
-	[54537] = true, -- Heart-Shaped Box
-	[44751] = true, -- Hyldnir Spoils
-	[44943] = true, -- Icy Prism
-	[54535] = true, -- Keg-Shaped Treasure Chest
-	[54218] = true, -- Landro's Gift Box
-	[50301] = true, -- Landro's Pet Box
-	[45878] = true, -- Large Sack of Ulduar Spoils
-	[43346] = true, -- Large Satchel of Spoils
-	[54516] = true, -- Loot-Filled Pumpkin
-	[50160] = true, -- Lovely Dress Box
-	[35792] = true, -- Mage Hunter Personal Effects
-	[41426] = true, -- Magically Wrapped Gift
-	[37168] = true, -- Mysterious Tarot
-	[199210] = true, -- Northrend Adventuring Supplies
-	[200238] = true, -- Northrend Adventuring Supplies
-	[200239] = true, -- Northrend Adventuring Supplies
-	[200240] = true, -- Northrend Adventuring Supplies
-	[46812] = true, -- Northrend Mystery Gem Pouch
-	[39418] = true, -- Ornately Jeweled Box
-	[43556] = true, -- Patroller's Pack
-	[44475] = true, -- Reinforced Crate
-	[43575] = false, -- Reinforced Junkbox
-	[44718] = true, -- Ripe Disgusting Jar
-	[52006] = true, -- Sack of Frosty Treasures
-	[38539] = true, -- Sack of Gold
-	[45875] = true, -- Sack of Ulduar Spoils
-	[54536] = true, -- Satchel of Chilled Goods
-	[51999] = true, -- Satchel of Helpful Goods
-	[52000] = true, -- Satchel of Helpful Goods
-	[52001] = true, -- Satchel of Helpful Goods
-	[52003] = true, -- Satchel of Helpful Goods
-	[52002] = true, -- Satchel of Helpful Goods
-	[52005] = true, -- Satchel of Helpful Goods
-	[52004] = true, -- Satchel of Helpful Goods
-	[43347] = true, -- Satchel of Spoils
-	[44163] = true, -- Shadowy Tarot
-	[44113] = true, -- Small Spice Bag
-	[41888] = true, -- Small Velvet Bag
-	[49631] = true, -- Standard Apothecary Serving Kit
-	[42953] = false, -- Strange Envelope
-	[44142] = true, -- Strange Tarot
-	[54467] = true, -- Tabard Lost & Found
-	[45986] = false, -- Tiny Titanium Lockbox
-	[43624] = false, -- Titanium Lockbox
-	[51316] = true, -- Unsealed Chest
-	[43504] = true, -- Winter Veil Gift
-	[46740] = true, -- Winter Veil Gift
 }

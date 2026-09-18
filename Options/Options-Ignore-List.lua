@@ -26,6 +26,7 @@ function ns.BuildIgnoreListOptions()
 		addHint = L["OPTIONS_IGNORE_LIST_ADD_HINT"],
 		removeLabel = L["OPTIONS_IGNORE_LIST_REMOVE"],
 		restoreLabel = L["OPTIONS_IGNORE_LIST_RESTORE"],
+		restoreDesc = L["OPTIONS_IGNORE_LIST_RESTORE_DESCRIPTION"],
 		restoreConfirm = L["OPTIONS_IGNORE_LIST_RESTORE_CONFIRM"],
 		onAdd = function(itemId)
 			ns:AddIgnoredItem(itemId)
@@ -44,6 +45,7 @@ function ns.BuildIgnoreListOptions()
 	args.toggleIgnoreListNotifications = {
 		type = "toggle",
 		name = L["OPTIONS_ENABLE_IGNORE_LIST_NOTIFICATIONS"],
+		desc = L["OPTIONS_ENABLE_IGNORE_LIST_NOTIFICATIONS_DESCRIPTION"],
 		order = 3,
 		width = "full",
 		get = function()

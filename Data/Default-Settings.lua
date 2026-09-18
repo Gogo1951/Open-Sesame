@@ -6,9 +6,11 @@ local _, ns = ...
 
 --[[
     AceDB-3.0 defaults. Open Sesame uses the Simple saved-variables model — one
-    shared profile for every character — so everything lives under `profile`,
-    the mini-map subtable included, and `global` is unused. Core.lua hands this
-    table to AceDB:New, which applies defaults via metatables — no hand-merge.
+    shared profile for every character — so every setting lives under `profile`,
+    the mini-map subtable included. `global` holds the two things that must not
+    move with a profile: `ignoreList` and `lootToastPosition` (see below).
+    Core.lua hands this table to AceDB:New, which applies the defaults itself —
+    no hand-merge.
 ]]
 ns.DATABASE_DEFAULTS = {
 	profile = {
@@ -99,6 +101,10 @@ ns.DATABASE_DEFAULTS = {
     from by Restore Defaults. The live list is ns.db.global.ignoreList; nothing
     reads this table directly. Shipping new entries here does not change an
     existing player's saved list, so note additions in the release notes.
+
+    This file holds the rows every client has; Data/TBC/Default-Settings.lua and
+    Data/Wrath/Default-Settings.lua add the rows only those clients have, and
+    each TOC lists only the files that are true on its client.
 ]]
 
 --[[
@@ -133,8 +139,8 @@ ns.DATABASE_DEFAULTS = {
     144 rows instead of 35, because nearly every quest item and one-off trinket
     is Unique. Do not add it back.
 
-    Source 2, WOWHEAD's per-client openable listings, decides the EXPANSION TAG
-    and supplies ids the world DB has never heard of. See Data/Openable-Items.lua
+    Source 2, WOWHEAD's per-client openable listings, decides WHICH FILE a row
+    lands in and supplies ids the world DB has never heard of. See Data/Openable-Items.lua
     for the fuller account; the same three listings feed both tables.
 
     SQL comments here are /* block */ form on purpose: a -- comment runs to end of
@@ -193,8 +199,10 @@ ns.DATABASE_DEFAULTS = {
 
     THREE THINGS THE QUERY DOES NOT PRODUCE, all of which ship here:
 
-      1. The EXPANSION tag. It emits the literal EXPANSION as a placeholder; the
-         real value comes from Wowhead availability (see Openable-Items.lua).
+      1. The file a row lands in. The query emits a literal EXPANSION
+         placeholder, which is dropped: each row ships as just its reason, in
+         this file or a flavor file as Wowhead availability decides (see
+         Openable-Items.lua).
       2. Re-added ids under a name the query already returns - 191060 Black Sack
          of Gems is the current example. Wowhead carries them, the Wrath DB does
          not. They inherit the reason of the row sharing their name.
@@ -204,57 +212,34 @@ ns.DATABASE_DEFAULTS = {
          decision and carry the QUEST reason.
 ]]
 
--- { [itemId] = { expansionThatAddedIt, reasonKey } } -- Container (the BoP loot)
+-- { [itemId] = reasonKey } -- Container (the BoP loot)
 
 ns.DEFAULT_IGNORE_ITEMS = {
-
-	--------------------------------------------------------------------------------
-	-- 01. World of Warcraft
-	--------------------------------------------------------------------------------
-
-	[17962] = { ns.VANILLA, "RAID" }, -- Blue Sack of Gems (Azuregos, Kazzak, the dragons, Nefarian)
-	[11937] = { ns.VANILLA, "GEAR" }, -- Fat Sack of Coins (Fire Opal Necklace)
-	[21979] = { ns.VANILLA, "HOLIDAY" }, -- Gift of Adoration: Darnassus (Love is in the Air gifts)
-	[21980] = { ns.VANILLA, "HOLIDAY" }, -- Gift of Adoration: Ironforge (Love is in the Air gifts)
-	[22164] = { ns.VANILLA, "HOLIDAY" }, -- Gift of Adoration: Orgrimmar (Love is in the Air gifts)
-	[21981] = { ns.VANILLA, "HOLIDAY" }, -- Gift of Adoration: Stormwind (Love is in the Air gifts)
-	[22165] = { ns.VANILLA, "HOLIDAY" }, -- Gift of Adoration: Thunder Bluff (Love is in the Air gifts)
-	[22166] = { ns.VANILLA, "HOLIDAY" }, -- Gift of Adoration: Undercity (Love is in the Air gifts)
-	[8049] = { ns.VANILLA, "QUEST" }, -- Gnarlpine Necklace (hand-added: Tallonkai's Jewel)
-	[17964] = { ns.VANILLA, "RAID" }, -- Gray Sack of Gems (Azuregos, Kazzak, the dragons, Nefarian)
-	[17963] = { ns.VANILLA, "RAID" }, -- Green Sack of Gems (Azuregos, Kazzak, the dragons, Nefarian)
-	[13874] = { ns.VANILLA, "RAID" }, -- Heavy Crate (Gahz'ranka)
-	[21150] = { ns.VANILLA, "RECIPE" }, -- Iron Bound Trunk (Weather-Beaten Journal)
-	[21228] = { ns.VANILLA, "RECIPE" }, -- Mithril Bound Trunk (Weather-Beaten Journal)
-	[9276] = { ns.VANILLA, "QUEST" }, -- Pirate's Footlocker (hand-added: Ship Schedule, map fragments)
-	[22155] = { ns.VANILLA, "HOLIDAY" }, -- Pledge of Adoration: Darnassus (Love is in the Air gifts)
-	[22154] = { ns.VANILLA, "HOLIDAY" }, -- Pledge of Adoration: Ironforge (Love is in the Air gifts)
-	[22156] = { ns.VANILLA, "HOLIDAY" }, -- Pledge of Adoration: Orgrimmar (Love is in the Air gifts)
-	[21975] = { ns.VANILLA, "HOLIDAY" }, -- Pledge of Adoration: Stormwind (Love is in the Air gifts)
-	[22158] = { ns.VANILLA, "HOLIDAY" }, -- Pledge of Adoration: Thunder Bluff (Love is in the Air gifts)
-	[22157] = { ns.VANILLA, "HOLIDAY" }, -- Pledge of Adoration: Undercity (Love is in the Air gifts)
-	[17969] = { ns.VANILLA, "RAID" }, -- Red Sack of Gems (Azuregos, Kazzak, the dragons, Nefarian)
-	[20767] = { ns.VANILLA, "RECIPE" }, -- Scum Covered Bag (Plans: Wicked Mithril Blade)
-	[20708] = { ns.VANILLA, "RECIPE" }, -- Tightly Sealed Trunk (Weather-Beaten Journal)
-	[6352] = { ns.VANILLA, "GEAR" }, -- Waterlogged Crate (Hammer of the Vesper)
-	[21113] = { ns.VANILLA, "RECIPE" }, -- Watertight Trunk (Weather-Beaten Journal)
-	[17965] = { ns.VANILLA, "RAID" }, -- Yellow Sack of Gems (Azuregos, Kazzak, the dragons, Nefarian)
-
-	--------------------------------------------------------------------------------
-	-- 02. World of Warcraft : The Burning Crusade
-	--------------------------------------------------------------------------------
-
-	[34846] = { ns.TBC, "RAID" }, -- Black Sack of Gems (Magtheridon)
-	[191060] = { ns.TBC, "RAID" }, -- Black Sack of Gems (Magtheridon, same name)
-	[34548] = { ns.TBC, "RECIPE" }, -- Cache of the Shattered Sun (11 Designs, Patterns and Plans)
-	[27513] = { ns.TBC, "RECIPE" }, -- Curious Crate (Weather-Beaten Journal)
-	[27481] = { ns.TBC, "RECIPE" }, -- Heavy Supply Crate (Weather-Beaten Journal)
-
-	--------------------------------------------------------------------------------
-	-- 03. World of Warcraft : Wrath of the Lich King
-	--------------------------------------------------------------------------------
-
-	[49294] = { ns.WRATH, "RAID" }, -- Ashen Sack of Gems (Onyxia)
-	[43346] = { ns.WRATH, "RAID" }, -- Large Satchel of Spoils (Sartharion)
-	[43347] = { ns.WRATH, "RAID" }, -- Satchel of Spoils (Sartharion)
+	[17962] = "RAID", -- Blue Sack of Gems (Azuregos, Kazzak, the dragons, Nefarian)
+	[11937] = "GEAR", -- Fat Sack of Coins (Fire Opal Necklace)
+	[21979] = "HOLIDAY", -- Gift of Adoration: Darnassus (Love is in the Air gifts)
+	[21980] = "HOLIDAY", -- Gift of Adoration: Ironforge (Love is in the Air gifts)
+	[22164] = "HOLIDAY", -- Gift of Adoration: Orgrimmar (Love is in the Air gifts)
+	[21981] = "HOLIDAY", -- Gift of Adoration: Stormwind (Love is in the Air gifts)
+	[22165] = "HOLIDAY", -- Gift of Adoration: Thunder Bluff (Love is in the Air gifts)
+	[22166] = "HOLIDAY", -- Gift of Adoration: Undercity (Love is in the Air gifts)
+	[8049] = "QUEST", -- Gnarlpine Necklace (hand-added: Tallonkai's Jewel)
+	[17964] = "RAID", -- Gray Sack of Gems (Azuregos, Kazzak, the dragons, Nefarian)
+	[17963] = "RAID", -- Green Sack of Gems (Azuregos, Kazzak, the dragons, Nefarian)
+	[13874] = "RAID", -- Heavy Crate (Gahz'ranka)
+	[21150] = "RECIPE", -- Iron Bound Trunk (Weather-Beaten Journal)
+	[21228] = "RECIPE", -- Mithril Bound Trunk (Weather-Beaten Journal)
+	[9276] = "QUEST", -- Pirate's Footlocker (hand-added: Ship Schedule, map fragments)
+	[22155] = "HOLIDAY", -- Pledge of Adoration: Darnassus (Love is in the Air gifts)
+	[22154] = "HOLIDAY", -- Pledge of Adoration: Ironforge (Love is in the Air gifts)
+	[22156] = "HOLIDAY", -- Pledge of Adoration: Orgrimmar (Love is in the Air gifts)
+	[21975] = "HOLIDAY", -- Pledge of Adoration: Stormwind (Love is in the Air gifts)
+	[22158] = "HOLIDAY", -- Pledge of Adoration: Thunder Bluff (Love is in the Air gifts)
+	[22157] = "HOLIDAY", -- Pledge of Adoration: Undercity (Love is in the Air gifts)
+	[17969] = "RAID", -- Red Sack of Gems (Azuregos, Kazzak, the dragons, Nefarian)
+	[20767] = "RECIPE", -- Scum Covered Bag (Plans: Wicked Mithril Blade)
+	[20708] = "RECIPE", -- Tightly Sealed Trunk (Weather-Beaten Journal)
+	[6352] = "GEAR", -- Waterlogged Crate (Hammer of the Vesper)
+	[21113] = "RECIPE", -- Watertight Trunk (Weather-Beaten Journal)
+	[17965] = "RAID", -- Yellow Sack of Gems (Azuregos, Kazzak, the dragons, Nefarian)
 }
