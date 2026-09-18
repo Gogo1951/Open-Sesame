@@ -1,20 +1,20 @@
 # Open Sesame
 
-Automatically open clams and unlocked containers in your bags, no clicking required. Built-in Speedy Loot hides the loot window for near-instant auto looting, and Loot Toasts show every pickup so your eyes stay on the fight. Fast, efficient looting.
+Automatically open clams, containers, and unlocked lockboxes in your bags, no clicking required. Speedy Loot hides the loot window for faster auto loot, and Loot Toasts show every pickup so your eyes stay on the fight. Fast, efficient looting.
 
-TL;DR: Kill stuff. Loot stuff. Skip the clicking. Keep killing. Loot more, faster.
+**TL;DR:** Clams and containers open themselves, corpses empty without the loot window, and toasts show what you got. Less clicking, more killing.
 
 ## Features
 
 📦 **Auto-Opening** // Opens clams, sacks, crates, and unlocked containers in the background, no clicks required, and always respects your Ignore List.
 
-🔐 **Locked Items** // Hover a lockbox to see the Lockpicking skill it needs and whether yours clears it. Once unlocked, it pops open automatically.
+🔐 **Locked Items** // Hover a lockbox to see the Lockpicking skill it needs and whether yours clears it, and once it's unlocked it pops open on its own.
 
 ⚡ **Speedy Loot** // Hides the loot window so you can pick up loot near-instantly.
 
-🔊 **Loot Notifications** // On-screen toasts log every pickup, and a distinct sound plays for the good stuff. Both are yours to tune, or turn off.
+🔊 **Loot Notifications** // On-screen toasts log every pickup and a distinct chime plays for the good stuff, both yours to tune or turn off.
 
-🦺 **Safety First** // Combat, casting, low bag space, Bind on Pickup, and raid-boss containers are all skipped automatically. Your bags stay protected.
+🦺 **Safety First** // Combat, casting, low bag space, Bind on Pickup, and raid-boss containers are all skipped automatically, so your bags stay protected.
 
 ## Setup
 
@@ -29,7 +29,7 @@ TL;DR: Kill stuff. Loot stuff. Skip the clicking. Keep killing. Loot more, faste
 
 ### What Gets Opened, and What Does Not
 
-- **Opens on sight** // Clams, coin purses, sacks, crates, and anything else that needs no key. Nearly 500 containers, matched by item ID.
+- **Opens on sight** // Clams, coin purses, sacks, crates, and anything else that needs no key. Over 330 containers and lockboxes are known by item ID, 400 on Burning Crusade Anniversary.
 - **Waits on locked boxes** // Open Sesame can't pick a lock, so a lockbox still needs a rogue or a key. Once it's unlocked, it opens on its own.
 - **Pauses when bags get tight** // Auto-Opening stops below four free slots and resumes once you make room.
 - **Skips your Ignore List** // Seeded with the containers usually worth more sealed, like raid gem sacks and crates holding Bind on Pickup gear.
@@ -37,7 +37,9 @@ TL;DR: Kill stuff. Loot stuff. Skip the clicking. Keep killing. Loot more, faste
 
 ### Loot Toasts
 
-Loot Toasts replace the need to keep the loot window open. They briefly show everything you pick up and can be positioned and customized with settings for font, size, outline, duration, row count, and stacking direction.
+- **Every pickup, at a glance** // Each item and coin pickup gets a brief on-screen toast, so hiding the loot window never costs you a thing.
+- **Put it where you want it** // Drag the stack anywhere, then set the font, size, outline, duration, row count, and which way it grows.
+- **The good stuff always shows** // Raise the minimum quality, and quest items, recipes, mounts, pets, keys, bags, Bind on Pickup items, and containers still get a toast.
 
 <img width="400" src="https://github.com/user-attachments/assets/7e3dc009-ba1e-42bd-98e4-9fe3f65a57c3" />
 
@@ -53,16 +55,10 @@ Loot Toasts replace the need to keep the loot window open. They briefly show eve
 
 <img width="260" src="https://github.com/user-attachments/assets/d5a4ac09-c5e8-425f-8215-49550c7308b9" />
 
-### Slash Commands
-
-| Command | Effect |
-| --- | --- |
-| `/os` | Opens the Options Interface for this add-on |
-
 ### Options
 
 - **Open Sesame** // Welcome message, mini-map button, and the master switches for Auto-Opening and Speedy Loot. Auto-Opening can be limited to outside instances, or to solo play.
-- **Notifications** // The loot chime and its minimum quality, a separate Pick Pocket chime, and every Loot Toast setting: position, font, size, duration, and which pickups always show.
+- **Notifications** // The loot chime and its minimum quality, a separate Pick Pocket sound, and every Loot Toast setting: position, font, size, duration, and which pickups always show.
 - **Lockboxes** // Tooltip skill lines and chat notices, shown to rogues only or to every character.
 - **Ignore List** // Drag in an item, or paste a link or item ID, to leave it alone for good. Shared across your characters, with one-click restore of the defaults.
 - **Profiles** // The standard profile controls.
@@ -73,6 +69,8 @@ Loot Toasts replace the need to keep the loot window open. They briefly show eve
 ## Testing & Localization Status
 
 🟢 World of Warcraft Classic (🟡 Season of Discovery) // WoW 1.15.9
+
+🟢 World of Warcraft Forever // WoW 1.60.1
 
 🟢 Burning Crusade Anniversary // WoW 2.5.6
 
@@ -89,7 +87,7 @@ Please reach out if you would like to be involved!
 - [GitHub](https://github.com/Gogo1951/Open-Sesame)
 - [Discord](https://discord.gg/eh8hKq992Q)
 
-## History
+## Appreciation & History
 
 👾 **I didn't create this add-on, I just updated it.**
 
@@ -97,32 +95,32 @@ Please reach out if you would like to be involved!
 - pipsqueakcurse's [AutoClam](https://www.curseforge.com/wow/addons/autoclam)
 - fr0z3nights' [kAutoOpen Dragonflight](https://www.curseforge.com/wow/addons/kautoopen-dragonflight)
 - _ForgeUser1016257's [kAutoOpen](https://www.curseforge.com/wow/addons/kautoopen)
-- [Openables (Weak Aura)](https://wago.io/gtRVJZetK)
+- jejanim's [Openables (Weak Aura)](https://wago.io/gtRVJZetK)
 
 ## Related Add-ons
 
-🟢 Pairs With // gogo1951's [GogoLoot](https://www.curseforge.com/wow/addons/gogoloot)
+🟢 Pairs With // Kelayz's [Junkbox Breaker BCC](https://www.curseforge.com/wow/addons/junkbox-breaker)
 
-🟡 Some Overlap // Michigras's [Lockbox Cracker](https://www.curseforge.com/wow/addons/lockbox-cracker)
+🟢 Pairs With // Lotimar's [Locksmith](https://www.curseforge.com/wow/addons/locksmith)
 
-🟡 Some Overlap // Hyphie24's [LockboxHelper](https://www.curseforge.com/wow/addons/unlockhelper)
+🟢 Pairs With // gogo1951's [Magic Eraser](https://www.curseforge.com/wow/addons/magic-eraser)
 
-🟡 Some Overlap // Lotimar's [Locksmith](https://www.curseforge.com/wow/addons/locksmith)
+🟡 Some Overlap // DarkAtair's [Auto Loot Assist](https://www.curseforge.com/wow/addons/auto-loot-assist)
 
-🔴 Direct Alternative // mrmaffen's [Auto Open Anything](https://www.curseforge.com/wow/addons/auto-open-anything)
+🟡 Some Overlap // Eliote's [AutoLooter](https://www.curseforge.com/wow/addons/autolooter)
 
-🔴 Direct Alternative // mjbmitch's [AutoLootPlus](https://www.curseforge.com/wow/addons/auto-loot-plus)
+🟡 Some Overlap // gogo1951's [GogoLoot](https://www.curseforge.com/wow/addons/gogoloot)
+
+🟡 Some Overlap // Leatrix's [Leatrix Plus](https://www.curseforge.com/wow/addons/leatrix-plus)
+
+🟡 Some Overlap // Xuerian's [XLoot](https://www.curseforge.com/wow/addons/xloot)
 
 🔴 Direct Alternative // dtabacaru's [Clam Pulp](https://www.curseforge.com/wow/addons/clam-pulp)
 
 🔴 Direct Alternative // Xarano's [Faster Loot](https://www.curseforge.com/wow/addons/faster-loot)
 
-🔴 Direct Alternative // FoobarZA's [FasterLoot](https://www.curseforge.com/wow/addons/fasterloot)
-
-🔴 Direct Alternative // cannonpalms's [FasterLooting](https://www.curseforge.com/wow/addons/fasterlooting)
-
 🔴 Direct Alternative // LazyLoafs_Addons's [Lazy LockBoxes](https://www.curseforge.com/wow/addons/lazy-lockboxes)
 
-🔴 Direct Alternative // Dapal003's [Openable be gone](https://www.curseforge.com/wow/addons/auto-open-anything-updated)
+🔴 Direct Alternative // clearcmos's [ScrollingLoot](https://www.curseforge.com/wow/addons/scrolling-loot)
 
 🔴 Direct Alternative // Yuyuli's [Speedy AutoLoot](https://www.curseforge.com/wow/addons/speedyautoloot)
