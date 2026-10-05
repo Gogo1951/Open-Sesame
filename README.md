@@ -1,4 +1,4 @@
-# Open Sesame Is Now Part of GogoLoot
+# 😎 Open Sesame Is Now Part of GogoLoot
 
 This is the final release of Open Sesame. All of its features have been merged into GogoLoot.
 
