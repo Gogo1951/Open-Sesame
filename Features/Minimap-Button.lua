@@ -212,4 +212,13 @@ function ns:InitMinimap()
 	})
 
 	LDBIcon:Register(ADDON_NAME, brokerObj, ns.db.profile.minimap)
+
+	if ns.FLAVOR == "Camelot" or ns.FLAVOR == "Mainline" then
+		LDBIcon:SetButtonIcon(ADDON_NAME, nil, 20, "CENTER", 1, -0.35)
+		local button = LDBIcon:GetMinimapButton(ADDON_NAME)
+		local mask = button:CreateMaskTexture()
+		mask:SetTexture(130924, "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE") -- Interface\CharacterFrame\TempPortraitAlphaMask
+		mask:SetAllPoints(button.icon)
+		button.icon:AddMaskTexture(mask)
+	end
 end

@@ -1,5 +1,5 @@
 ## Title: Open Sesame
-## Notes: Automatically open clams, containers, and unlocked lockboxes in your bags, no clicking required. Speedy Loot hides the loot window for faster auto loot, and Loot Toasts show every pickup so your eyes stay on the fight. Fast, efficient looting.
+## Notes: Automatically open clams, containers, and unlocked lockboxes in your bags, no clicking required. Speedy Loot hides the loot window for faster auto loot. Fast, efficient looting.
 ## Author: Gogo1951
 
 ## IconTexture: Interface/AddOns/Open-Sesame/Includes/Images/Open-Sesame.tga
@@ -38,7 +38,6 @@ Includes/Libraries/AceConfig-3.0/AceConfig-3.0.lua
 Includes/Libraries/AceDBOptions-3.0/AceDBOptions-3.0.lua
 Includes/Libraries/LibDataBroker-1.1/LibDataBroker-1.1.lua
 Includes/Libraries/LibDBIcon-1.0/LibDBIcon-1.0.lua
-Includes/Libraries/LibSharedMedia-3.0/LibSharedMedia-3.0.lua
 
 # Localization
 Locales/enUS.lua
@@ -56,12 +55,12 @@ Locales/zhTW.lua
 # Data
 Data/Flavor.lua
 Data/Data.lua
+Data/TBC/Openable-Items-TBC.lua
+Data/TBC/Lockbox-Skill-Levels-TBC.lua
+Data/TBC/Default-Ignore-Items-TBC.lua
+Data/TBC/Spells-TBC.lua
+Data/TBC/Game-IDs-TBC.lua
 Data/Default-Settings.lua
-Data/Openable-Items.lua
-Data/Lockbox-Skill-Levels.lua
-Data/TBC/Default-Settings.lua
-Data/TBC/Openable-Items.lua
-Data/TBC/Lockbox-Skill-Levels.lua
 
 # Open Sesame
 Features/Core.lua
@@ -72,9 +71,16 @@ Features/Auto-Opening.lua
 Features/Speedy-Loot.lua
 Features/Loot-Sounds.lua
 Features/Lockbox-Tooltips.lua
-Features/Loot-Toasts.lua
-Features/Diagnostics.lua
 Features/Minimap-Button.lua
+
+# Diagnostics
+Diagnostics/Diagnostics-Core.lua
+Diagnostics/Manifests.lua
+Diagnostics/Event-Log.lua
+Diagnostics/Code-Reports.lua
+Diagnostics/Settings-Reports.lua
+Diagnostics/Validate-Data.lua
+Diagnostics/Report-Runner.lua
 
 # Options
 Options/Options-Utilities.lua
@@ -83,7 +89,7 @@ Options/Options-Notifications.lua
 Options/Options-Lockboxes.lua
 Options/Options-Ignore-List.lua
 Options/Options-Profiles.lua
-Options/Options-Diagnostics.lua
+Diagnostics/Options-Diagnostics.lua
 Options/Options.lua
 
 # Feedback Welcome! (=

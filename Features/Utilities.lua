@@ -59,8 +59,8 @@ local scanTooltip = CreateFrame("GameTooltip", "OpenSesameScanTooltip", nil, "Ga
 scanTooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
 
 --[[
-    Does a tooltip carry this exact line? Split out from the two scanners below so
-    the reading and the scanning are separable.
+    Does a tooltip carry this exact line? Split out from the scanner below so the
+    reading and the scanning are separable.
 
     Matched against the WHOLE line, never as a substring: LOCKED is a short word,
     and other add-ons write lines that contain it without meaning it.
@@ -110,28 +110,66 @@ function ns.IsItemLocked(bag, slot)
 end
 
 --[[
-    "Does this item begin a quest", which the client will say in a tooltip and
-    nowhere else: no API on any target client flags it, and the item's CLASS
-    does not give it away either, since quest starters are ordinary weapons,
-    armour and trinkets as often as they are class 12. Read by hyperlink because
-    the caller has an item, not a bag slot -- this is asked of loot, which may
-    never reach the bags at all.
-
-    The scan is the most expensive question Loot Toasts asks, so it is also the
-    last one asked: everything cheaper has already failed by the time it runs, and
-    it only runs for loot the quality threshold would otherwise have hidden.
+    An item's or spell's tooltip as plain lines, for Validate Data, a right-hand
+    column kept after " >> ". kind is "item" or "spell". C_TooltipInfo hands the
+    lines over as data where the client ships both its GetItemByID and
+    GetSpellByID getters (WoW Forever); elsewhere they are read off the scan
+    tooltip. Color escapes are stripped so each line reads as its words. A read
+    can throw on an odd id, so callers protect it.
 ]]
-function ns.ItemStartsQuest(itemId)
-	if not itemId then
-		return false
+local TOOLTIP_DATA_GETTERS = C_TooltipInfo
+	and C_TooltipInfo.GetItemByID
+	and C_TooltipInfo.GetSpellByID
+	and { item = C_TooltipInfo.GetItemByID, spell = C_TooltipInfo.GetSpellByID }
+
+local function PlainText(text)
+	if type(text) ~= "string" then
+		return nil
 	end
+	return (text:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|cn[^:]*:", ""):gsub("|r", ""))
+end
+
+local function JoinTooltipLine(left, right)
+	left = PlainText(left) or ""
+	right = PlainText(right)
+	if right and right ~= "" then
+		return left .. " >> " .. right
+	end
+	return left
+end
+
+local function ReadTooltipData(kind, identifier)
+	local lines = {}
+	local data = TOOLTIP_DATA_GETTERS[kind](identifier)
+	for _, line in ipairs(data and data.lines or {}) do
+		lines[#lines + 1] = JoinTooltipLine(line.leftText, line.rightText)
+	end
+	return lines
+end
+
+local function ReadScanTooltip(kind, identifier)
 	scanTooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
 	scanTooltip:ClearLines()
-	scanTooltip:SetHyperlink("item:" .. itemId)
-	local startsQuest = TooltipHasLine(scanTooltip, ITEM_STARTS_QUEST)
+	scanTooltip:SetHyperlink(kind .. ":" .. identifier)
+	local tooltipName = scanTooltip:GetName()
+	local lines = {}
+	for lineIndex = 1, scanTooltip:NumLines() do
+		local left = _G[tooltipName .. "TextLeft" .. lineIndex]
+		local right = _G[tooltipName .. "TextRight" .. lineIndex]
+		lines[#lines + 1] = JoinTooltipLine(left and left:GetText(), right and right:IsShown() and right:GetText())
+	end
 	scanTooltip:Hide()
-	return startsQuest
+	return lines
 end
+
+ns.GetTooltipLines = TOOLTIP_DATA_GETTERS and ReadTooltipData or ReadScanTooltip
+
+--[[
+    An item's stat table, for Validate Data. WoW Forever ships C_Item.GetItemStats;
+    Classic Era and TBC Anniversary have only the legacy global GetItemStats,
+    which returns the same table.
+]]
+ns.GetItemStats = C_Item.GetItemStats or GetItemStats
 
 --------------------------------------------------------------------------------
 -- Loot Slot Type
@@ -164,18 +202,8 @@ for key, hex in pairs(ns.PALETTE) do
 	COLORS[key] = COLOR_PREFIX .. hex
 end
 
---[[
-    The coin colours get the same treatment from their own table. They are kept
-    apart from the palette above because they are not the add-on's to choose: gold,
-    silver and copper look the way the client makes them look everywhere else.
-]]
-local MONEY_COLORS = {}
-for key, hex in pairs(ns.MONEY_PALETTE) do
-	MONEY_COLORS[key] = COLOR_PREFIX .. hex
-end
-
 --------------------------------------------------------------------------------
--- Utility Functions
+-- Color and Icon Accessors
 --------------------------------------------------------------------------------
 
 function ns.GetColor(key)
@@ -249,8 +277,7 @@ end
     Turns one of the client's own format strings into a Lua pattern that captures
     what the client would have filled in. This is how the add-on reads the game's
     words in any locale without shipping a translation of them: ITEM_MIN_SKILL
-    becomes the requirement line's skill and number, GOLD_AMOUNT becomes the coin
-    count in a loot message.
+    becomes the requirement line's skill and number.
 
     Escape the magic characters first, deliberately leaving % alone so the format's
     own %s and %d survive to become captures on the next two lines. Matching a
@@ -267,101 +294,35 @@ function ns.BuildFormatPattern(format)
 end
 
 --------------------------------------------------------------------------------
--- Money
---------------------------------------------------------------------------------
-
-local goldPattern = ns.BuildFormatPattern(GOLD_AMOUNT)
-local silverPattern = ns.BuildFormatPattern(SILVER_AMOUNT)
-local copperPattern = ns.BuildFormatPattern(COPPER_AMOUNT)
-
---[[
-    Reads a coin total out of a loot message ("You loot 1 Gold 24 Silver 7
-    Copper"). The client hands over the sentence, not the number, so the number
-    has to come back out of it -- and matching against the client's OWN
-    GOLD_AMOUNT / SILVER_AMOUNT / COPPER_AMOUNT formats is what makes that work in
-    every locale rather than only in English. A unit the message does not mention
-    simply does not match, which is the same as none of it.
-]]
-function ns.ParseMoney(message)
-	if not message then
-		return 0
-	end
-	local gold = goldPattern and tonumber(message:match(goldPattern)) or 0
-	local silver = silverPattern and tonumber(message:match(silverPattern)) or 0
-	local copper = copperPattern and tonumber(message:match(copperPattern)) or 0
-	return (gold * ns.COPPER_PER_GOLD) + (silver * ns.COPPER_PER_SILVER) + copper
-end
-
---[[
-    One coin: the amount in body white, then its unit in that coin's own colour.
-    Splitting the colour at the letter is what makes a stack of these readable --
-    the numbers line up as one column of white, and the eye picks the unit off the
-    colour without reading the letter at all.
-
-    The symbol is the client's own, so this reads right in a locale that does not
-    call them gold, silver and copper.
-]]
-local function Coin(amount, digits, symbol, colorKey)
-	return COLORS.BODY .. string.format(digits, amount) .. "|r" .. MONEY_COLORS[colorKey] .. symbol .. "|r"
-end
-
---[[
-    "123g 02s 27c" - the largest unit the amount reaches, then every unit below it
-    padded to two digits, and nothing above it. Padding only the lower units is
-    what lines the numbers up when several toasts stack, while a leading "0g" on
-    small change would be noise.
-]]
-function ns.FormatMoney(copper)
-	copper = copper or 0
-	local gold = math.floor(copper / ns.COPPER_PER_GOLD)
-	local silver = math.floor((copper % ns.COPPER_PER_GOLD) / ns.COPPER_PER_SILVER)
-	local remainder = copper % ns.COPPER_PER_SILVER
-	if gold > 0 then
-		return Coin(gold, "%d", GOLD_AMOUNT_SYMBOL, "GOLD")
-			.. " "
-			.. Coin(silver, "%02d", SILVER_AMOUNT_SYMBOL, "SILVER")
-			.. " "
-			.. Coin(remainder, "%02d", COPPER_AMOUNT_SYMBOL, "COPPER")
-	end
-	if silver > 0 then
-		return Coin(silver, "%d", SILVER_AMOUNT_SYMBOL, "SILVER")
-			.. " "
-			.. Coin(remainder, "%02d", COPPER_AMOUNT_SYMBOL, "COPPER")
-	end
-	return Coin(remainder, "%d", COPPER_AMOUNT_SYMBOL, "COPPER")
-end
-
---[[
-    The coin pile matches what the amount actually is, so the icon carries the
-    magnitude before the digits are read: a gold pile for anything reaching gold,
-    silver for anything reaching silver, coppers for the rest.
-]]
-function ns.MoneyIcon(copper)
-	if (copper or 0) >= ns.COPPER_PER_GOLD then
-		return ns.MONEY_ICON_GOLD
-	end
-	if (copper or 0) >= ns.COPPER_PER_SILVER then
-		return ns.MONEY_ICON_SILVER
-	end
-	return ns.MONEY_ICON_COPPER
-end
-
---------------------------------------------------------------------------------
--- Utility Functions
+-- Item Quality and Bag Space
 --------------------------------------------------------------------------------
 
 --[[
     An item link's colour is the only quality signal available without a
-    C_Item.GetItemInfo round trip, and ns.QUALITY_COLORS maps it. Returns nil for a
-    colour the table does not carry (quest yellow, say) - callers decide whether
-    unknown means show or stay quiet.
+    C_Item.GetItemInfo round trip. The Retail engine (WoW Forever) writes it as a
+    |cnIQn: escape whose n is the quality itself; Classic clients write a hex
+    colour, which ns.QUALITY_COLORS maps. Returns nil for a colour the table does
+    not carry (quest yellow, say) - callers decide whether unknown means show or
+    stay quiet.
 ]]
 function ns.GetLinkQuality(link)
-	local colorSequence = link and link:match("|c(%x+)|H")
+	if not link then
+		return nil
+	end
+	local qualityEscape = link:match("|cnIQ(%d+):")
+	if qualityEscape then
+		return tonumber(qualityEscape)
+	end
+	local colorSequence = link:match("|c(%x+)|H")
 	if not colorSequence or #colorSequence ~= 8 then
 		return nil
 	end
 	return ns.QUALITY_COLORS[string.lower(string.sub(colorSequence, 3, 8))]
+end
+
+-- 1240 as "1,240", for Diagnostic Tools' progress and tallies.
+function ns:FormatCommaNumber(number)
+	return (tostring(number):reverse():gsub("(%d%d%d)", "%1,"):reverse():gsub("^,", ""))
 end
 
 function ns.GetFreeSlots()

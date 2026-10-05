@@ -31,6 +31,8 @@ L["CHAT_OPTIONS_IN_COMBAT"] =
 	"В целях безопасности интерфейс настроек нельзя открыть в бою."
 L["CHAT_LOADED"] =
 	"Версия %s. Настройки (включая отключение этого сообщения) находятся в разделе Настройки > Дополнения > Open Sesame. Нравится дополнение? Расскажите о нем другу! (="
+L["CHAT_END_OF_SUPPORT"] =
+	"Поддержка прекращена: этот аддон теперь входит в состав GogoLoot, и это его последняя версия. Установите GogoLoot, чтобы и дальше получать обновления, после чего Open Sesame можно удалить."
 
 -- Auto-Opening
 L["PAUSED_BAG_SLOTS"] =
@@ -42,7 +44,7 @@ L["ITEM_WILL_AUTO_OPEN"] =
 L["ITEM_IGNORED"] =
 	"%s находится в списке исключений, поэтому автооткрытие его не тронет."
 L["ITEM_OPEN_MANUALLY"] =
-	"%s оставлен в окне добычи, чтобы вы забрали его сами."
+	"%s находится в списке исключений, поэтому быстрый сбор оставил его в окне добычи."
 
 --------------------------------------------------------------------------------
 -- Features
@@ -55,15 +57,12 @@ L["SPEEDY_LOOT"] = "Быстрый сбор"
 L["SPEEDY_LOOT_DESCRIPTION"] =
 	"Скрывает окно добычи, чтобы собирать почти мгновенно."
 L["NOTIFICATIONS_DESCRIPTION"] =
-	"Быстрый сбор скрывает окно добычи, поэтому эти звуки и уведомления сообщают, что вы только что подобрали."
+	"Быстрый сбор скрывает окно добычи, поэтому эти звуки сообщают, что вы только что подобрали."
 L["LOCKBOXES_DESCRIPTION"] =
 	"Запертые контейнеры требуют навыка взлома замков разбойника, прежде чем откроются. Эти настройки показывают, что нужно каждому ящику, и сообщают, когда один из них ждет."
 L["LOOT_SOUNDS"] = "Звук добычи"
 L["LOOT_SOUNDS_DESCRIPTION"] =
 	"Воспроизводит звук, когда вы забираете предмет выбранного вами качества или выше."
-L["LOOT_TOASTS"] = "Уведомления о добыче"
-L["LOOT_TOASTS_DESCRIPTION"] =
-	"Показывает короткое уведомление на экране для подобранных предметов, ведь быстрый сбор скрывает окно добычи. Когда уведомления включены, можно отключить сообщения о добыче в настройках чата и оставить чат для разговоров и важных сообщений."
 
 --------------------------------------------------------------------------------
 -- Tooltip
@@ -85,7 +84,7 @@ L["TOOLTIP_LOCKED_ITEMS"] = "Запертые предметы"
 
 -- General Panel
 L["OPTIONS_DESCRIPTION"] =
-	"Автоматически открывает моллюсков, контейнеры и взломанные запертые ящики в ваших сумках, без единого клика. Быстрый сбор скрывает окно добычи, ускоряя автоматический сбор, а уведомления о добыче показывают каждую находку, чтобы вы не отрывали глаз от боя. Быстрый и эффективный сбор добычи."
+	"Автоматически открывает моллюсков, контейнеры и взломанные запертые ящики в ваших сумках, без единого клика. Быстрый сбор скрывает окно добычи, ускоряя автоматический сбор. Быстрый и эффективный сбор добычи."
 L["OPTIONS_ENABLE_WELCOME"] = "Показывать приветственное сообщение"
 L["OPTIONS_ENABLE_WELCOME_DESCRIPTION"] =
 	"Выводит в чат версию и короткое приветствие при каждом входе в игру."
@@ -93,7 +92,7 @@ L["OPTIONS_ENABLE_MINIMAP"] = "Показывать кнопку на мини-�
 L["OPTIONS_ENABLE_MINIMAP_DESCRIPTION"] = "Показывает кнопку Open Sesame на мини-карте."
 
 -- Commands
-L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
+L["OPTIONS_COMMANDS_HEADER"] = "/Команды"
 L["OPTIONS_COMMAND"] = "/os"
 L["OPTIONS_COMMAND_DESCRIPTION"] =
 	"Открывает интерфейс настроек этого дополнения."
@@ -104,7 +103,7 @@ L["OPTIONS_ENABLE_AUTO_OPENING_DESCRIPTION"] =
 	"Включает или отключает автоматическое открытие моллюсков и незапертых контейнеров."
 L["OPTIONS_AUTO_OPENING_WHERE"] = "Где"
 L["OPTIONS_AUTO_OPENING_WHERE_DESCRIPTION"] =
-	"Выберите, открываются ли контейнеры везде или ждут, пока вы не покинете подземелья и рейды."
+	"Выберите, открываются ли контейнеры везде или только вне подземелий."
 L["OPTIONS_ANYWHERE"] = "Везде"
 L["OPTIONS_OUTSIDE_INSTANCES"] = "Вне подземелий"
 L["OPTIONS_AUTO_OPENING_GROUP"] = "Группа"
@@ -139,89 +138,11 @@ L["OPTIONS_ENABLE_LOOT_SOUNDS_DESCRIPTION"] =
 	"Проигрывает сигнал, когда вы забираете с трупа или из сундука предмет с минимальным качеством или выше."
 L["OPTIONS_LOOT_SOUND_QUALITY_DESCRIPTION"] =
 	"Самое низкое качество предмета, для которого проигрывается звук добычи."
-L["OPTIONS_TEST_LOOT_SOUND"] = "Воспроизвести звук добычи."
+L["OPTIONS_TEST_LOOT_SOUND"] = "Воспроизводит звук добычи."
 L["OPTIONS_ENABLE_PICK_POCKET_SOUND"] = "Включить звук Обшаривания карманов"
 L["OPTIONS_ENABLE_PICK_POCKET_SOUND_DESCRIPTION"] =
 	"Проигрывает звук сумки, когда Обшаривание карманов действительно что-то приносит."
 L["OPTIONS_MINIMUM_QUALITY"] = "Минимальное качество"
-
--- Loot Toasts
-L["OPTIONS_ENABLE_LOOT_TOASTS"] = "Включить уведомления о добыче"
-L["OPTIONS_ENABLE_LOOT_TOASTS_DESCRIPTION"] =
-	"Показывает короткое уведомление на экране о подобранных предметах и монетах."
-L["OPTIONS_LOOT_TOAST_QUALITY_DESCRIPTION"] =
-	"Самое низкое качество предмета, для которого показывается уведомление, если только его не охватывает одна из опций Всегда показывать ниже."
--- The threshold bypasses, then the money row, in the order the panel lists them.
-L["OPTIONS_ALWAYS_SHOW_BIND_ON_PICKUP"] = "Всегда показывать персональные предметы"
-L["OPTIONS_ALWAYS_SHOW_QUEST_ITEMS"] = "Всегда показывать предметы заданий"
-L["OPTIONS_ALWAYS_SHOW_RECIPES"] = "Всегда показывать рецепты"
-L["OPTIONS_ALWAYS_SHOW_MOUNTS"] = "Всегда показывать средства передвижения"
-L["OPTIONS_ALWAYS_SHOW_PETS"] = "Всегда показывать питомцев"
-L["OPTIONS_ALWAYS_SHOW_KEYS"] = "Всегда показывать ключи"
-L["OPTIONS_ALWAYS_SHOW_BAGS"] = "Всегда показывать сумки"
-L["OPTIONS_ALWAYS_SHOW_CONTAINERS"] = "Всегда показывать контейнеры"
-L["OPTIONS_ALWAYS_SHOW_MONEY"] = "Всегда показывать деньги"
-L["OPTIONS_ALWAYS_SHOW_BIND_ON_PICKUP_DESCRIPTION"] =
-	"Показывает каждый персональный предмет, независимо от качества."
-L["OPTIONS_ALWAYS_SHOW_QUEST_ITEMS_DESCRIPTION"] =
-	"Показывает предметы для заданий и предметы, начинающие задание, независимо от качества."
-L["OPTIONS_ALWAYS_SHOW_RECIPES_DESCRIPTION"] =
-	"Показывает рецепты, выкройки, чертежи и формулы, независимо от качества."
-L["OPTIONS_ALWAYS_SHOW_MOUNTS_DESCRIPTION"] =
-	"Показывает средства передвижения, независимо от качества."
-L["OPTIONS_ALWAYS_SHOW_PETS_DESCRIPTION"] =
-	"Показывает питомцев, независимо от качества."
-L["OPTIONS_ALWAYS_SHOW_KEYS_DESCRIPTION"] =
-	"Показывает ключи, независимо от качества."
-L["OPTIONS_ALWAYS_SHOW_BAGS_DESCRIPTION"] =
-	"Показывает сумки, колчаны и подсумки, независимо от качества."
-L["OPTIONS_ALWAYS_SHOW_CONTAINERS_DESCRIPTION"] =
-	"Показывает контейнеры, которые может открыть Open Sesame, включая запертые ящики, независимо от качества."
-L["OPTIONS_ALWAYS_SHOW_MONEY_DESCRIPTION"] =
-	"Показывает уведомление о подобранных монетах."
-L["OPTIONS_LOOT_TOAST_MAX_ITEMS"] = "Максимум строк на экране"
-L["OPTIONS_LOOT_TOAST_MAX_ITEMS_DESCRIPTION"] =
-	"Сколько уведомлений может быть на экране одновременно; самое старое исчезает, освобождая место."
-L["OPTIONS_UNLIMITED"] = "Без ограничений"
-L["OPTIONS_LOOT_TOAST_DURATION"] = "Секунд на экране"
-L["OPTIONS_LOOT_TOAST_DURATION_DESCRIPTION"] =
-	"Сколько секунд каждое уведомление остается на экране, прежде чем исчезнуть."
-L["OPTIONS_LOOT_TOAST_GROWTH"] = "Направление роста"
-L["OPTIONS_LOOT_TOAST_GROWTH_DESCRIPTION"] =
-	"Сдвигаются ли старые уведомления вверх или вниз, прочь от самого нового."
-L["OPTIONS_GROW_UP"] = "Вверх"
-L["OPTIONS_GROW_DOWN"] = "Вниз"
-L["OPTIONS_LOOT_TOAST_ALIGN"] = "Выравнивание строк"
-L["OPTIONS_LOOT_TOAST_ALIGN_DESCRIPTION"] =
-	"По какой стороне рамки перемещения выравниваются уведомления."
-L["OPTIONS_ALIGN_LEFT"] = "Слева"
-L["OPTIONS_ALIGN_RIGHT"] = "Справа"
-L["OPTIONS_LOOT_TOAST_FONT"] = "Шрифт"
-L["OPTIONS_LOOT_TOAST_FONT_DESCRIPTION"] = "Шрифт, которым написаны уведомления."
-L["OPTIONS_FONT_DEFAULT"] = "По умолчанию"
-L["OPTIONS_LOOT_TOAST_FONT_SIZE"] = "Размер шрифта"
-L["OPTIONS_LOOT_TOAST_FONT_SIZE_DESCRIPTION"] =
-	"Размер текста уведомлений; значки увеличиваются и уменьшаются вместе с ним."
-L["OPTIONS_LOOT_TOAST_OUTLINE"] = "Контур шрифта"
-L["OPTIONS_LOOT_TOAST_OUTLINE_DESCRIPTION"] =
-	"Контур вокруг текста уведомлений, благодаря которому он читается на ярком фоне."
-L["OPTIONS_FONT_OUTLINE_NONE"] = "Нет"
-L["OPTIONS_FONT_OUTLINE_OUTLINE"] = "Контур"
-L["OPTIONS_FONT_OUTLINE_THICK_OUTLINE"] = "Толстый контур"
-L["OPTIONS_FONT_OUTLINE_MONOCHROME"] = "Монохромный"
-L["OPTIONS_FONT_OUTLINE_MONOCHROME_OUTLINE"] = "Монохромный контур"
-L["OPTIONS_TOASTS_UNLOCK"] = "Разблокировать позицию"
-L["OPTIONS_TOASTS_LOCK"] = "Заблокировать позицию"
-L["OPTIONS_TOASTS_RESET"] = "Сбросить позицию"
-L["OPTIONS_TOASTS_LOCK_DESCRIPTION"] =
-	"Показывает или скрывает рамку, за которую уведомления перетаскиваются на новое место."
-L["OPTIONS_TOASTS_RESET_DESCRIPTION"] =
-	"Возвращает уведомления на исходное место над центром экрана."
-L["OPTIONS_TOASTS_HANDLE_TITLE"] = "Уведомления о добыче Open Sesame"
-L["OPTIONS_TOASTS_CLICK_DRAG"] = "Нажмите и перетащите, чтобы разместить"
-L["OPTIONS_TOASTS_RIGHT_CLICK_LOCK"] = "Правый клик, чтобы заблокировать"
-L["OPTIONS_TOASTS_DISABLE_BUTTON"] = "Отключить уведомления о добыче"
-L["OPTIONS_TOASTS_EXAMPLE_ITEM"] = "Пример предмета"
 
 -- Ignore List
 L["OPTIONS_IGNORE_LIST_DESCRIPTION"] =
@@ -233,7 +154,8 @@ L["OPTIONS_ENABLE_IGNORE_LIST_NOTIFICATIONS_DESCRIPTION"] =
 L["OPTIONS_IGNORE_LIST_ADD"] = "Добавить предмет"
 L["OPTIONS_IGNORE_LIST_ADD_HINT"] =
 	"Перетащите предмет сюда или вставьте ссылку на предмет либо его ID."
-L["OPTIONS_IGNORE_LIST_REMOVE"] = "Убрать этот предмет из списка исключений."
+L["OPTIONS_IGNORE_LIST_REMOVE"] = "Убирает этот предмет из списка исключений."
+L["OPTIONS_ITEM_LOADING"] = "Загрузка предмета %d..."
 L["OPTIONS_IGNORE_LIST_RESTORE"] = "Восстановить по умолчанию"
 L["OPTIONS_IGNORE_LIST_RESTORE_DESCRIPTION"] =
 	"Заменяет ваш список исключений списком по умолчанию и удаляет добавленные вами предметы."
@@ -258,3 +180,4 @@ L["OPTIONS_CURSEFORGE"] = "CurseForge"
 L["OPTIONS_GITHUB"] = "GitHub"
 L["OPTIONS_DISCORD"] = "Discord"
 L["OPTIONS_WAGO"] = "Wago"
+L["OPTIONS_VERSION"] = "Версия %s"

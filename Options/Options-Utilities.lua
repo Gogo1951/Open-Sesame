@@ -1,5 +1,6 @@
 local ADDON_NAME, ns = ...
 
+local L = ns.L
 local GetColor = ns.GetColor
 local AceGUI = LibStub("AceGUI-3.0")
 
@@ -15,8 +16,8 @@ function ns.OptionsDesc(text, order)
 	return { type = "description", name = text, fontSize = "medium", order = order }
 end
 
-function ns.OptionsSpacer(order)
-	return { type = "description", name = " ", order = order }
+function ns.OptionsSpacer(order, hidden)
+	return { type = "description", name = " ", order = order, hidden = hidden }
 end
 
 function ns.OptionsRowLabel(text, order, width)
@@ -69,8 +70,8 @@ function ns.OptionsSubRow(order, hidden, controls)
 end
 
 --[[
-    A caption beside a control, as one sub-row. The shape both quality dropdowns,
-    both lockbox scopes and the auto-open rules all use.
+    A caption beside a control, as one sub-row. The shape both lockbox scopes and
+    both auto-open rules use.
 ]]
 --[[
     labelWidth is for a panel whose captions are longer than the shared default
@@ -111,7 +112,7 @@ local ITEM_LINK_ICON_SIZE = 16
 ]]
 local function ItemLinkOnEnter(frame)
 	local widget = frame.obj
-	if not widget.itemLink then
+	if not widget.itemLink or not widget.itemLink:find("|Hitem:", 1, true) then
 		return
 	end
 	GameTooltip:SetOwner(frame, "ANCHOR_RIGHT")
@@ -144,6 +145,8 @@ local function CreateItemLinkWidget()
 	label:SetPoint("LEFT", icon, "RIGHT", 4, 0)
 	label:SetPoint("RIGHT", frame, "RIGHT", 0, 0)
 	label:SetJustifyH("LEFT")
+	-- A long name would wrap out of the 20px row and into the next one.
+	label:SetWordWrap(false)
 
 	local widget = {
 		type = ns.ITEM_LINK_WIDGET_TYPE,
@@ -198,26 +201,43 @@ AceGUI:RegisterWidgetType(ns.ITEM_LINK_WIDGET_TYPE, CreateItemLinkWidget, ITEM_L
     through ns.OnItemInfoReceived, the list redraws as answers arrive, and the
     callback is cleared once nothing is outstanding so the dispatcher stops doing
     work.
+
+    Answers arrive in bursts on a cold cache, so the redraw waits
+    ITEM_INFO_REDRAW_DELAY and covers the whole burst rather than rebuilding the
+    list once per item. An id the server refuses (success false: WoW Forever
+    knows later expansions' ids but never serves them) is remembered and gets no
+    row, or it would sit as a bare number and hold the watcher open forever.
 ]]
+local ITEM_INFO_REDRAW_DELAY = 0.3
+
 local outstandingItems = {}
+local refusedItems = {}
 local outstandingRegistry
+local redrawPending = false
 
 local function ClearItemInfoWatcher()
 	ns.OnItemInfoReceived = nil
 	outstandingRegistry = nil
 end
 
-local function OnItemInfoReceived(itemId)
+local function OnItemInfoReceived(itemId, success)
 	if not outstandingItems[itemId] then
 		return
 	end
 	outstandingItems[itemId] = nil
+	if success == false then
+		refusedItems[itemId] = true
+	end
 	local registryName = outstandingRegistry
 	if not next(outstandingItems) then
 		ClearItemInfoWatcher()
 	end
-	if registryName then
-		LibStub("AceConfigRegistry-3.0"):NotifyChange(registryName)
+	if registryName and not redrawPending then
+		redrawPending = true
+		C_Timer.After(ITEM_INFO_REDRAW_DELAY, function()
+			redrawPending = false
+			LibStub("AceConfigRegistry-3.0"):NotifyChange(registryName)
+		end)
 	end
 end
 
@@ -237,15 +257,15 @@ end
     list is owned here so every add-on's lists look and behave the same.
 
     Rows are sorted by item NAME, not id — an id-ordered list reads as random.
-    Uncached rows sort under their raw id until the client answers, then the
-    refresh watcher above redraws them in place.
+    Uncached rows sort under their raw id and show a "Loading ID" placeholder
+    until the client answers, then the refresh watcher above redraws them in
+    place. Restore Defaults comes last, below the rows.
 
     An optional config.noteFor(itemId) supplies a per-row explanation, carried as
     the option's `desc` and drawn into the row's tooltip by the item-link widget.
 
-    Ids this client cannot resolve are dropped before a row is ever built. A saved
-    list can hold ids from a later expansion (the list is account-wide and the
-    defaults have since been expansion-filtered); C_Item.GetItemInfoInstant
+    Ids this client cannot resolve are dropped before a row is ever built. An
+    account-wide list can hold ids saved on another client; C_Item.GetItemInfoInstant
     answers synchronously from the client's own database, so it separates "not
     cached yet" from "does not exist here" without waiting on an event that will
     never fire.
@@ -266,26 +286,14 @@ end
 
 function ns:BuildItemListOptions(config)
 	local args = {}
-	-- The panel owns everything below config.startOrder, so it can put its own
-	-- copy and controls above the list without renumbering the shared shape.
+	--[[
+        The panel owns everything below config.startOrder, so it can put its own
+        copy and controls above the list without renumbering the shared shape.
+    ]]
 	local order = (config.startOrder or 1) - 1
 	local function nextOrder()
 		order = order + 1
 		return order
-	end
-
-	if config.onRestore then
-		args.restore = {
-			type = "execute",
-			name = config.restoreLabel,
-			desc = config.restoreDesc,
-			order = nextOrder(),
-			width = "double",
-			confirm = true,
-			confirmText = config.restoreConfirm,
-			func = config.onRestore,
-		}
-		args.restoreSpacer = ns.OptionsSpacer(nextOrder())
 	end
 
 	args.addLabel = ns.OptionsRowLabel(config.addLabel, nextOrder())
@@ -309,7 +317,7 @@ function ns:BuildItemListOptions(config)
 
 	local rows = {}
 	for itemId in pairs(config.source) do
-		if C_Item.GetItemInfoInstant(itemId) then
+		if C_Item.GetItemInfoInstant(itemId) and not refusedItems[itemId] then
 			local name, link = C_Item.GetItemInfo(itemId)
 			if not name then
 				ns.WatchUncachedItem(itemId, config.registryName)
@@ -343,7 +351,7 @@ function ns:BuildItemListOptions(config)
 					order = 1,
 					width = ns.OPTIONS_ROW_WIDTH - ns.OPTIONS_REMOVE_ICON_WIDTH,
 					get = function()
-						return row.link or tostring(itemId)
+						return row.link or L["OPTIONS_ITEM_LOADING"]:format(itemId)
 					end,
 					set = function() end,
 				},
@@ -367,6 +375,20 @@ function ns:BuildItemListOptions(config)
 					end,
 				},
 			},
+		}
+	end
+
+	if config.onRestore then
+		args.restoreSpacer = ns.OptionsSpacer(nextOrder())
+		args.restore = {
+			type = "execute",
+			name = config.restoreLabel,
+			desc = config.restoreDesc,
+			order = nextOrder(),
+			width = "double",
+			confirm = true,
+			confirmText = config.restoreConfirm,
+			func = config.onRestore,
 		}
 	end
 

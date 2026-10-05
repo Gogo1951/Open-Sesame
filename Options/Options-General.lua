@@ -55,15 +55,6 @@ function ns.BuildGeneralOptions()
 					ns:SetMinimapShown(value)
 				end,
 			},
-			-- /Commands
-
-			spaceCommands0 = ns.OptionsSpacer(10),
-			headerCommands = ns.OptionsHeader(L["OPTIONS_COMMANDS_HEADER"], 11),
-			spaceCommands1 = ns.OptionsSpacer(12),
-			descCommands = ns.OptionsDesc(
-				GetColor("INFO") .. L["OPTIONS_COMMAND"] .. "|r" .. "  " .. L["OPTIONS_COMMAND_DESCRIPTION"],
-				13
-			),
 			-- Auto-Opening
 
 			spaceAutoOpen0 = ns.OptionsSpacer(20),
@@ -147,6 +138,15 @@ function ns.BuildGeneralOptions()
 					ns:UpdateMinimapIcon()
 				end,
 			},
+			-- /Commands
+
+			spaceCommands0 = ns.OptionsSpacer(80),
+			headerCommands = ns.OptionsHeader(L["OPTIONS_COMMANDS_HEADER"], 81),
+			spaceCommands1 = ns.OptionsSpacer(82),
+			descCommands = ns.OptionsDesc(
+				GetColor("INFO") .. L["OPTIONS_COMMAND"] .. "|r" .. "  " .. L["OPTIONS_COMMAND_DESCRIPTION"],
+				83
+			),
 			-- Feedback & Support
 
 			spaceCommunity0 = ns.OptionsSpacer(90),
@@ -212,7 +212,7 @@ function ns.BuildGeneralOptions()
 			},
 			versionLine = {
 				type = "description",
-				name = GetColor("MUTED") .. "Version " .. ns.Version .. "|r",
+				name = GetColor("MUTED") .. L["OPTIONS_VERSION"]:format(ns.Version) .. "|r",
 				fontSize = "medium",
 				order = 999,
 			},

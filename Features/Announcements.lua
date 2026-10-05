@@ -21,11 +21,20 @@ ns.BRAND_PREFIX = string.format("%s%s|r %s//|r ", GetColor("INFO"), L["ADDON_TIT
 function ns:PrintMessage(msg, ...)
 	local text = select("#", ...) > 0 and string.format(msg, ...) or msg
 	local output = ns.BRAND_PREFIX .. GetColor("TEXT") .. text .. "|r"
-	if DEFAULT_CHAT_FRAME then
-		DEFAULT_CHAT_FRAME:AddMessage(output)
-	else
-		print(output)
-	end
+	print(output)
+end
+
+--------------------------------------------------------------------------------
+-- End of Support
+--------------------------------------------------------------------------------
+
+--[[
+    Printed at every login, straight after the welcome, with no setting of its
+    own: it never reads showWelcome, so a player who turned the welcome off
+    still learns that Open Sesame now lives on inside GogoLoot.
+]]
+function ns:PrintEndOfSupport()
+	ns:PrintMessage(L["CHAT_END_OF_SUPPORT"])
 end
 
 --------------------------------------------------------------------------------

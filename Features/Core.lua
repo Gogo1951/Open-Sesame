@@ -13,12 +13,22 @@ local L = ns.L
 local CreateFrame, C_Timer, tonumber = CreateFrame, C_Timer, tonumber
 
 --[[
-    Loot-message prefixes, derived once from the global loot format strings
-    (e.g. "You receive loot: %s."). Guarded in case the globals are absent at
-    load; CHAT_MSG_LOOT references these cached upvalues.
+    Loot-message prefixes: the text before %s in the client's own loot format
+    strings ("You receive loot: %s."). Only the prefix is matched, because what
+    follows the link differs by locale (zhCN ends in "。"). Guarded in case the
+    globals are absent at load; CHAT_MSG_LOOT references these cached upvalues.
 ]]
-local lootSelfPrefix = LOOT_ITEM_SELF and LOOT_ITEM_SELF:gsub("%%s", ""):gsub("%.$", "")
-local lootPushedPrefix = LOOT_ITEM_PUSHED_SELF and LOOT_ITEM_PUSHED_SELF:gsub("%%s", ""):gsub("%.$", "")
+local lootSelfPrefix = LOOT_ITEM_SELF and LOOT_ITEM_SELF:match("^(.-)%%s")
+local lootPushedPrefix = LOOT_ITEM_PUSHED_SELF and LOOT_ITEM_PUSHED_SELF:match("^(.-)%%s")
+
+--[[
+    The prefix must open the line, not merely appear in it: in koKR another
+    player's line ("%s님이 아이템을 획득했습니다: %s") contains the player's own
+    prefix whole. An empty prefix would match every line, so it never counts.
+]]
+local function StartsWithPrefix(msg, prefix)
+	return prefix ~= nil and prefix ~= "" and msg:sub(1, #prefix) == prefix
+end
 
 --------------------------------------------------------------------------------
 -- Version
@@ -52,7 +62,9 @@ ns.state = {
 	lastBagFullAt = 0,
 	lastFreeSlots = 0,
 	lastLootAt = 0,
-	lastWorldLootAt = 0,
+	-- Whether a corpse or chest's loot window is open, and when the last one closed.
+	worldLootOpen = false,
+	worldLootClosedAt = 0,
 	-- When Pick Pocket last landed; 0 once its sound has played or nothing came.
 	pickPocketAt = 0,
 	lastStatusAt = 0,
@@ -95,12 +107,6 @@ local function ApplyProfile()
 	end
 	ns.ScheduleScan(true)
 	ns:UpdateMinimapIcon()
-	if ns.ApplyLootToastPosition then
-		ns.ApplyLootToastPosition()
-	end
-	if ns.ApplyLootToastSettings then
-		ns.ApplyLootToastSettings()
-	end
 	local AceConfigRegistry = LibStub("AceConfigRegistry-3.0")
 	for _, registryName in pairs(ns.OPTIONS_REGISTRY) do
 		AceConfigRegistry:NotifyChange(registryName)
@@ -116,14 +122,20 @@ local EventHandlers = {}
 function EventHandlers:PLAYER_LOGIN()
 	ns.db = LibStub("AceDB-3.0"):New("OpenSesameDB", ns.DATABASE_DEFAULTS, true)
 
-	-- Deprecated key: the mini-map subtable moved to the profile under the Simple model.
+	-- MIGRATION (remove after 2026-11-04): the mini-map subtable moved to the profile under the Simple model.
 	if type(ns.db.global.minimap) == "table" then
 		ns.db.global.minimap = nil
 	end
 
-	-- Deprecated keys: the outline and bold toggles became lootToastFontFlags.
-	ns.db.profile.lootToastFontOutline = nil
-	ns.db.profile.lootToastFontBold = nil
+	-- MIGRATION (remove after 2026-11-04): Loot Toasts was removed; clear its keys from every profile and its global anchor.
+	for _, profile in pairs(ns.db.profiles) do
+		for key in pairs(profile) do
+			if key:find("^lootToast") then
+				profile[key] = nil
+			end
+		end
+	end
+	ns.db.global.lootToastPosition = nil
 
 	ns:SeedIgnoreList()
 
@@ -136,18 +148,6 @@ function EventHandlers:PLAYER_LOGIN()
 	ns.db.RegisterCallback(ns, "OnProfileReset", ApplyProfile)
 	ns.db.RegisterCallback(ns, "OnProfileCopied", ApplyProfile)
 
-	if ns.ApplyLootToastPosition then
-		ns.ApplyLootToastPosition()
-	end
-	--[[
-        Toasts ship on, so a profile that has never dismissed the drag handle is
-        shown it here: the feature introducing itself, once, rather than a player
-        meeting it as loot drawn somewhere they did not choose. It stays up until
-        they put it away.
-    ]]
-	if ns.ShowLootToastIntro then
-		ns.ShowLootToastIntro()
-	end
 	if ns.InitMinimap then
 		ns:InitMinimap()
 	end
@@ -162,6 +162,7 @@ function EventHandlers:PLAYER_LOGIN()
 	end
 	ns:UpdateMinimapIcon()
 	PrintWelcome()
+	ns:PrintEndOfSupport()
 end
 
 function EventHandlers:PLAYER_ENTERING_WORLD(isInitialLogin, isReloadingUi)
@@ -187,6 +188,10 @@ function EventHandlers:UPDATE_STEALTH()
 end
 
 function EventHandlers:UNIT_SPELLCAST_SUCCEEDED(unit, _, spellID)
+	-- On WoW Forever this payload is secret while the player's casts are restricted.
+	if C_Secrets.ShouldUnitSpellCastingBeSecret("player") then
+		return
+	end
 	if unit ~= "player" then
 		return
 	end
@@ -230,14 +235,16 @@ end
     them via LootSlot. The first two live in Features/Loot-Sounds.lua.
 ]]
 function EventHandlers:LOOT_READY()
-	ns.StampWorldLoot()
-	ns.PlayPickPocketSound()
+	-- Each step runs on its own, so an error in a sound can't stop Speedy Loot.
+	securecallfunction(ns.StampWorldLoot)
+	securecallfunction(ns.PlayPickPocketSound)
 	ns.HandleSpeedyLoot()
 end
 
 function EventHandlers:LOOT_OPENED()
 	ns.StampWorldLoot()
 	ns.PlayPickPocketSound()
+	ns.OnOpenAnswered()
 end
 
 --[[
@@ -245,17 +252,36 @@ end
     a throttled LOOT_READY on the next corpse can't reuse this corpse's "fully
     looted" state to hide a window that still has items in it. Registered
     automatically like every handler here (see the EventHandlers loop below).
+    An open loot window also holds Auto-Opening (opening a container would
+    replace a corpse's window and strand what Speedy Loot left in it), so its
+    close rescans like any other interaction window's.
 ]]
 function EventHandlers:LOOT_CLOSED()
 	if ns.ResetSpeedyLootWindow then
 		ns.ResetSpeedyLootWindow()
 	end
+	ns.CloseWorldLoot()
+	OnInteractionClosed()
 end
 
 EventHandlers.BAG_UPDATE_DELAYED = OnScanRequest
 EventHandlers.BAG_NEW_ITEMS_UPDATED = OnScanRequest
--- Joining or leaving a group can flip the Group hold-off either way.
-EventHandlers.GROUP_ROSTER_UPDATE = OnScanRequest
+
+-- Whether the player was in a group at the last roster update; nil before the first.
+local wasGrouped = nil
+
+-- The Group hold-off reads only whether the player is grouped, so a roster update rescans only when that changes.
+function EventHandlers:GROUP_ROSTER_UPDATE()
+	local isGrouped = IsInGroup()
+	if isGrouped ~= wasGrouped then
+		wasGrouped = isGrouped
+		OnScanRequest()
+	end
+end
+
+function EventHandlers:PLAYER_LEVEL_UP()
+	ns.OnLevelUp()
+end
 
 --[[
     The Ignore List panel draws item links, and C_Item.GetItemInfo returns nil
@@ -265,52 +291,32 @@ EventHandlers.GROUP_ROSTER_UPDATE = OnScanRequest
     private frame keeps the single registration rule and puts the event in
     ns.EVENT_NAMES for the diagnostics probe.
 ]]
-function EventHandlers:GET_ITEM_INFO_RECEIVED(itemId)
+function EventHandlers:GET_ITEM_INFO_RECEIVED(itemId, success)
 	if ns.OnItemInfoReceived then
-		ns.OnItemInfoReceived(itemId)
+		ns.OnItemInfoReceived(itemId, success)
 	end
 end
 
 --[[
-    Coin is the loot Speedy Loot hides most completely: it has no item, no quality
-    and no link, so nothing else in this file has anything to say about it, and
-    with the loot window gone the only record is the chat line this event carries.
-    The amount comes back out of that sentence -- see ns.ParseMoney.
+    Only the player's own loot reaches their bags, so only it rescans; a raid's
+    loot lines would otherwise walk the bags on every member's pickup.
+    BAG_UPDATE_DELAYED covers anything this misses.
 ]]
-function EventHandlers:CHAT_MSG_MONEY(msg)
-	if ns.ShowMoneyToast then
-		ns.ShowMoneyToast(ns.ParseMoney(msg))
-	end
-end
-
 function EventHandlers:CHAT_MSG_LOOT(msg)
-	if not msg then
-		OnScanRequest()
+	if not msg or not (StartsWithPrefix(msg, lootSelfPrefix) or StartsWithPrefix(msg, lootPushedPrefix)) then
 		return
 	end
 
-	if
-		not (
-			(lootSelfPrefix and msg:find(lootSelfPrefix, 1, true))
-			or (lootPushedPrefix and msg:find(lootPushedPrefix, 1, true))
-		)
-	then
-		OnScanRequest()
-		return
-	end
-
-	local link = msg:match("(|c%x+|Hitem:.-|h%[.-%]|h|r)")
+	-- Either colour form: |cffRRGGBB, or the Retail engine's |cnIQn: quality escape.
+	local link = msg:match("(|c[^|]+|Hitem:.-|h%[.-%]|h|r)")
 	if not link then
 		OnScanRequest()
 		return
 	end
 
-	ns.AnnounceLootedContainer(tonumber(link:match("item:(%d+)")), link)
-	ns.PlayLootSound(link)
-
-	if ns.ShowLootToast then
-		ns.ShowLootToast(link, msg)
-	end
+	-- Each step runs on its own, so an error in the notice can't silence the sound or skip the rescan.
+	securecallfunction(ns.AnnounceLootedContainer, tonumber(link:match("item:(%d+)")), link)
+	securecallfunction(ns.PlayLootSound, link)
 
 	OnScanRequest()
 end
@@ -355,7 +361,7 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
 end)
 
 --[[
-    Exported for Features/Diagnostics.lua so the event probe can never drift
+    Exported for Diagnostics/Code-Reports.lua so the event probe can never drift
     from the events the add-on actually registers.
 ]]
 ns.EVENT_NAMES = {}

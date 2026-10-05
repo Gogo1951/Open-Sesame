@@ -12,6 +12,12 @@ ns.DISCORD_URL = "https://discord.gg/eh8hKq992Q"
 ns.WAGO_URL = "https://addons.wago.io/addons/open-sesame"
 
 --------------------------------------------------------------------------------
+-- Saved Variables
+--------------------------------------------------------------------------------
+
+ns.SAVED_VARIABLES_NAME = "OpenSesameDB"
+
+--------------------------------------------------------------------------------
 -- Options Registry
 --------------------------------------------------------------------------------
 
@@ -37,6 +43,8 @@ ns.WORLD_LOAD_DELAY = 8
 ns.SCAN_DEBOUNCE = 0.5
 ns.OPEN_TICK_INTERVAL = 0.25
 ns.OPEN_RECHECK_DELAY = 0.25 -- Delay before re-checking a slot after opening
+ns.OPEN_ANSWER_TIMEOUT = 1 -- Seconds an open waits for its loot window before it counts as refused
+ns.OPEN_REFUSAL_LIMIT = 3 -- Unanswered opens in a row before an item is left alone until the next level-up or login
 ns.PICK_LOCK_RESCAN_DELAY = 0.5 -- Delay after Pick Lock before rescanning bags
 ns.STATUS_FLUSH_DELAY = 0.25 -- Delay after closing an interaction window before flushing a held status message
 ns.BAG_FULL_COOLDOWN = 10
@@ -49,51 +57,12 @@ ns.STATUS_REPEAT_COOLDOWN = 5 -- Seconds before an identical status message may 
     are the one kind of picture sanctioned in game text.
 ]]
 ns.ICON_IGNORED = "|TInterface\\Buttons\\UI-GroupLoot-Pass-Up:14|t"
-ns.LOOT_SOUND_FILE = "Interface\\AddOns\\Open-Sesame\\Includes\\Sounds\\item-pick-up.ogg" -- Rare-loot chime; play with PlaySoundFile
-ns.BAG_FULL_SOUND_FALLBACK = 846 -- SoundKitID; play with PlaySound
+ns.LOOT_SOUND_FILE = "Interface\\AddOns\\" .. ADDON_NAME .. "\\Includes\\Sounds\\item-pick-up.ogg" -- Rare-loot chime; play with PlaySoundFile
 ns.LOOT_DELAY = 0.25
 ns.LOOT_SOUND_WINDOW = 1 -- Seconds after a corpse/chest loot during which CHAT_MSG_LOOT may play the rare-loot sound
-ns.LOOT_TOAST_FADE_DURATION = 0.5 -- Seconds the fade itself takes, once ns.LOOT_TOAST_DURATIONS' dwell has elapsed
 
--- Seconds a toast stays up. Offered as a dropdown, so the steps widen as they grow.
-ns.LOOT_TOAST_DURATIONS = { 1, 2, 3, 5, 8, 13, 21 }
-
---[[
-    Most rows on screen at once. Same widening steps as the durations above, so
-    the two dropdowns read as a pair. The list is joined by an Unlimited choice
-    stored as 0 - a sentinel, not a count, and the one value the cap code has to
-    special-case, since a literal cap of zero would retire every row on sight.
-]]
-ns.LOOT_TOAST_COUNTS = { 1, 2, 3, 5, 8, 13, 21 }
-ns.LOOT_TOAST_UNLIMITED = 0
-
--- The face list itself comes from LibSharedMedia; only the bounds are ours.
-ns.LOOT_TOAST_FONT_SIZE_MIN = 8
-ns.LOOT_TOAST_FONT_SIZE_MAX = 24
-
---[[
-    The client's own SetFont flag strings, in the order the dropdown offers them:
-    the weight ladder first, then the two monochrome variants. "NONE" is our
-    sentinel for the empty flag string, which SetFont wants instead of a name.
-]]
-ns.LOOT_TOAST_FONT_FLAGS = { "NONE", "OUTLINE", "THICKOUTLINE", "MONOCHROME", "MONOCHROMEOUTLINE" }
-
---[[
-    One potion icon per item quality, colour-matched to the quality it stands
-    for, so a sample toast reads as that quality at a glance. Used only by the
-    unlock preview in Features/Loot-Toasts.lua; real toasts always draw the
-    looted item's own icon.
-]]
-
--- { [quality] = iconPath }
-ns.LOOT_TOAST_SAMPLE_ICONS = {
-	[0] = "Interface\\Icons\\inv_potion_132", -- Poor (gray)
-	[1] = "Interface\\Icons\\inv_potion_133", -- Common (white)
-	[2] = "Interface\\Icons\\inv_potion_138", -- Uncommon (green)
-	[3] = "Interface\\Icons\\inv_potion_137", -- Rare (blue)
-	[4] = "Interface\\Icons\\inv_potion_134", -- Epic (purple)
-	[5] = "Interface\\Icons\\inv_potion_135", -- Legendary (orange)
-}
+-- The client's own symbol first, so a renumbering can't silently reclassify items; 1 on every flavor we target.
+ns.BIND_ON_PICKUP = (Enum and Enum.ItemBind and Enum.ItemBind.OnAcquire) or 1
 
 --------------------------------------------------------------------------------
 -- Options Layout
@@ -128,104 +97,12 @@ ns.QUALITY_COLORS = {
 }
 
 --[[
-    LOCKPICKING is the skill spell behind skill line 633, not something a player
-    casts. It is here because its NAME is the localized name of the Lockpicking
-    skill line, which is the only handle Features/Lockbox-Tooltips.lua has for
-    finding the player's rank in GetSkillLineInfo -- see the note there.
+    Seconds a loot window may follow a Pick Pocket cast and still be counted as
+    its haul. Pick Pocket's window opens immediately, so this only has to be long
+    enough to span the cast-to-loot gap, not to bridge anything the player did
+    next.
 ]]
-ns.SPELLS = {
-	PICK_LOCK = 1804,
-	LOCKPICKING = 1809,
-	PICK_POCKET = 921,
-	SHADOWMELD = 20580,
-}
-
---[[
-    PickupBag, the client's own bag-grab sound, for a Pick Pocket that actually
-    took something: https://www.wowhead.com/classic/sound=1183/pickupbag
-
-    Seconds a loot window may follow that cast and still be counted as its haul.
-    Pick Pocket's window opens immediately, so this only has to be long enough to
-    span the cast-to-loot gap, not to bridge anything the player did next.
-]]
-ns.PICK_POCKET_SOUND = 1183 -- SoundKitID; play with PlaySound
 ns.PICK_POCKET_LOOT_WINDOW = 1
-
---[[
-    The item kinds Loot Toasts can show regardless of the quality threshold. All
-    but the last are read from C_Item.GetItemInfoInstant, which answers from the
-    client's own database with no cold-cache nil, so the kind is recognised the
-    first time the item is looted. Class and subclass numbers are stable across
-    every client we target.
-
-    ITEM_BIND_ON_PICKUP is the odd one out: bindType comes from the full
-    C_Item.GetItemInfo, which CAN answer nil on a cold cache. See the note in
-    Features/Loot-Toasts.lua for why that is acceptable there, and the
-    "C_Item.GetItemInfo bindType" row in the Diagnostics API report, which proves
-    the return position on each client rather than trusting it.
-]]
---[[
-    Class 1 is the client's "Container", which is a BAG - the thing loot goes in,
-    not the lockbox Open Sesame opens. The add-on's own openable containers are
-    ns.AllowedItems and are matched by id, never by class.
-
-    Quivers and ammo pouches are their OWN class rather than bags, which is a
-    distinction the client's item database makes and a hunter does not: both are
-    the bag you were hoping would drop. The Bags toggle covers the pair.
-]]
-ns.ITEM_CLASS_BAG = 1
-ns.ITEM_CLASS_QUIVER = 11
-ns.ITEM_CLASS_RECIPE = 9
-ns.ITEM_CLASS_QUEST = 12
-ns.ITEM_CLASS_KEY = 13
-ns.ITEM_CLASS_MISCELLANEOUS = 15
-ns.ITEM_SUBCLASS_COMPANION_PET = 2 -- of Miscellaneous
-ns.ITEM_SUBCLASS_MOUNT = 5 -- of Miscellaneous
-ns.ITEM_BIND_ON_PICKUP = 1 -- C_Item.GetItemInfo's bindType, 14th return
-ns.ITEM_BIND_PROBE_ID = 6948 -- Hearthstone: Bind on Pickup, and in every bag
-
---------------------------------------------------------------------------------
--- Money
---------------------------------------------------------------------------------
-
---[[
-    Coin piles for the money toast, one per magnitude, so the icon says roughly how
-    much before the digits are read. Written as texture paths rather than the file
-    ids the same art is also known by, matching every other icon in the add-on.
-]]
-ns.MONEY_ICON_GOLD = "Interface\\Icons\\INV_Misc_Coin_02" -- 133785
-ns.MONEY_ICON_SILVER = "Interface\\Icons\\INV_Misc_Coin_04" -- 133787
-ns.MONEY_ICON_COPPER = "Interface\\Icons\\INV_Misc_Coin_06" -- 133789
-
-ns.COPPER_PER_SILVER = 100
-ns.COPPER_PER_GOLD = 10000
-
---[[
-    One colour per coin, for the g/s/c suffixes while the numbers stay body white.
-    These are the CLIENT'S conventions rather than the add-on's, which is why they
-    sit apart from ns.PALETTE: gold, silver and copper look the way they look in
-    every money display in the game, and a player reads the unit off the colour
-    before they read the letter.
-]]
-ns.MONEY_PALETTE = {
-	GOLD = "FFD700",
-	SILVER = "C7C7CF",
-	COPPER = "EDA55F",
-}
-
--- { [raceKey] = { [genderId] = soundId } }
-ns.RACE_SOUNDS = {
-	["Human"] = { [2] = 1897, [3] = 2021 },
-	["Orc"] = { [2] = 2308, [3] = 2363 },
-	["Dwarf"] = { [2] = 1609, [3] = 1673 },
-	["NightElf"] = { [2] = 2140, [3] = 2251 },
-	["Scourge"] = { [2] = 2076, [3] = 2196 },
-	["Tauren"] = { [2] = 2440, [3] = 2441 },
-	["Gnome"] = { [2] = 1730, [3] = 1787 },
-	["Troll"] = { [2] = 1842, [3] = 1952 },
-	["BloodElf"] = { [2] = 9589, [3] = 9590 },
-	["Draenei"] = { [2] = 9504, [3] = 9505 },
-}
 
 --------------------------------------------------------------------------------
 -- Colors

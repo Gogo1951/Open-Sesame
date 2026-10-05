@@ -22,11 +22,9 @@ local GetColor = ns.GetColor
 
 --[[
     Finding the player's lockpicking rank needs the skill line's LOCALIZED name,
-    and the client publishes no LOCKPICKING global to supply it.
-
-    The name comes from the client's own spell database instead. Spell 1809 is the
-    skill spell behind skill line 633, and its name IS the skill line's name in
-    whatever language the client is running, so one lookup answers in every locale.
+    because GetSkillLineInfo returns names, not ids. The name comes from the skill
+    line record itself (C_TradeSkillUI.GetTradeSkillDisplayName), the same kind of
+    record the skill list shows, never from a spell that merely shares the name.
     Nothing about the player is involved, so it answers for an untrained rogue and
     on the first hover of the session. The name only finds a rank on a client with
     a skill-line API; WoW Forever has none, so there the rank is always unknown.
@@ -34,15 +32,13 @@ local GetColor = ns.GetColor
     THE TRAP: the tooltip is not a source for this name. Reading it off the
     tooltip's own "Requires Lockpicking (225)" line is circular: on a client that
     does not print that line, the name is never learned, the rank is always nil,
-    and the requirement line stays neutral white instead of green or red. The
-    name has to come from somewhere the client has already spoken, which is the
-    spell database above.
+    and the requirement line stays neutral white instead of green or red.
 ]]
 local lockpickingSkillName
 
 local function GetLockpickingSkillName()
 	if not lockpickingSkillName then
-		lockpickingSkillName = C_Spell.GetSpellName(ns.SPELLS.LOCKPICKING)
+		lockpickingSkillName = C_TradeSkillUI.GetTradeSkillDisplayName(ns.SKILL_LINE_IDS.LOCKPICKING)
 	end
 	return lockpickingSkillName
 end
@@ -75,8 +71,8 @@ end
 --[[
     The skill lines are the only place the player's CURRENT rank lives; the spell
     says nothing about rank. Returns nil when the rank cannot be read -- a
-    non-rogue, an untrained rogue, a client whose spell database did not answer
-    for the skill spell, or a client with no skill-line API at all (WoW Forever)
+    non-rogue, an untrained rogue, a client that did not answer for the skill
+    line's name, or a client with no skill-line API at all (WoW Forever)
     -- and every caller treats nil as "unknown" and falls back to neutral
     colouring rather than erroring.
 ]]
