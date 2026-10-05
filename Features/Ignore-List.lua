@@ -7,7 +7,7 @@ local _, ns = ...
 --[[
     The player's list of containers Open Sesame leaves alone entirely: Speedy
     Loot leaves them in the loot window with a notice, and Auto-Opening never
-    queues them even when ns.AllowedItems allows the item.
+    queues them even when ns.ALLOWED_ITEMS allows the item.
 
     The list is account-wide (ns.db.global.ignoreList) because which containers a
     player hoards is a decision about the items, not about the character. It is
@@ -89,10 +89,10 @@ function ns:RemoveIgnoredItem(itemId)
 end
 
 --[[
-    Seeding and Restore Defaults write every row this client loaded. The TOC only
-    loads the flavor files whose rows exist here, so an id from a later
-    expansion, which would never answer C_Item.GetItemInfo and sit in the panel
-    as a bare number forever, is never in the table to begin with.
+    Seeding and Restore Defaults write every row this client loaded. Each TOC
+    loads only its own flavor folder, so an id from a later expansion, which
+    would never answer C_Item.GetItemInfo and sit in the panel as a bare number
+    forever, is never in the table to begin with.
 ]]
 local function SeedFrom(list)
 	for itemId in pairs(ns.DEFAULT_IGNORE_ITEMS) do

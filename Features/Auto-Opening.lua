@@ -10,7 +10,7 @@ local L = ns.L
 -- API References
 --------------------------------------------------------------------------------
 
-local C_Timer, UnitAffectingCombat, GetTime = C_Timer, UnitAffectingCombat, GetTime
+local C_Timer, UnitAffectingCombat, GetTime, UnitLevel = C_Timer, UnitAffectingCombat, GetTime, UnitLevel
 local tonumber, wipe, UnitRace, UnitSex = tonumber, wipe, UnitRace, UnitSex
 local UnitCastingInfo, UnitChannelInfo = UnitCastingInfo, UnitChannelInfo
 
@@ -34,15 +34,27 @@ end
 local function PlayBagFullSound()
 	local _, raceEnglish = UnitRace("player")
 	local gender = UnitSex("player")
-	if raceEnglish and ns.RACE_SOUNDS[raceEnglish] and ns.RACE_SOUNDS[raceEnglish][gender] then
-		PlaySound(ns.RACE_SOUNDS[raceEnglish][gender], "Master")
+	if
+		raceEnglish
+		and ns.SOUND_KIT_IDS.BAG_FULL_BY_RACE[raceEnglish]
+		and ns.SOUND_KIT_IDS.BAG_FULL_BY_RACE[raceEnglish][gender]
+	then
+		PlaySound(ns.SOUND_KIT_IDS.BAG_FULL_BY_RACE[raceEnglish][gender], "Master")
 	else
-		PlaySound(ns.BAG_FULL_SOUND_FALLBACK, "Master")
+		PlaySound(ns.SOUND_KIT_IDS.BAG_FULL_FALLBACK, "Master")
 	end
 end
 
+--[[
+    On WoW Forever, aura and cast reads can come back secret, and a secret value
+    errors when compared. C_Secrets is asked first, and an answer that would be
+    secret reads as "not safe to open".
+]]
 local function IsPlayerStealthed()
 	if IsStealthed() then
+		return true
+	end
+	if C_Secrets.ShouldAurasBeSecret() then
 		return true
 	end
 	for buffIndex = 1, 40 do
@@ -57,6 +69,13 @@ local function IsPlayerStealthed()
 	return false
 end
 
+local function IsPlayerCasting()
+	if C_Secrets.ShouldUnitSpellCastingBeSecret("player") then
+		return true
+	end
+	return UnitCastingInfo("player") or UnitChannelInfo("player")
+end
+
 local function IsInteractionActive()
 	return (MerchantFrame and MerchantFrame:IsShown())
 		or (MailFrame and MailFrame:IsShown())
@@ -64,9 +83,29 @@ local function IsInteractionActive()
 		or (BankFrame and BankFrame:IsShown())
 		or (GuildBankFrame and GuildBankFrame:IsShown())
 		or (AuctionFrame and AuctionFrame:IsShown())
+		or (AuctionHouseFrame and AuctionHouseFrame:IsShown())
 		or (GossipFrame and GossipFrame:IsShown())
 		or (QuestFrame and QuestFrame:IsShown())
-		or (StaticPopup1 and StaticPopup1:IsShown())
+		or (LootFrame and LootFrame:IsShown())
+end
+
+--[[
+    The player is busy with something no event reports the end of: an item
+    under the cursor, or an open confirmation pop-up. The tick waits these out
+    itself rather than stopping, since nothing would start it again.
+]]
+local function IsWaitingOnPlayer()
+	if StaticPopup1 and StaticPopup1:IsShown() then
+		return true
+	end
+	-- The player is looking at an item; opening under the cursor would move it.
+	if GameTooltip:IsShown() then
+		local hasItem, itemLink = GameTooltip:GetItem()
+		if hasItem or itemLink then
+			return true
+		end
+	end
+	return false
 end
 
 local function IsSafeToOpen()
@@ -91,15 +130,8 @@ local function IsSafeToOpen()
 	if UnitAffectingCombat("player") or IsInteractionActive() or IsPlayerStealthed() then
 		return false
 	end
-	if UnitCastingInfo("player") or UnitChannelInfo("player") then
+	if IsPlayerCasting() then
 		return false
-	end
-
-	if GameTooltip:IsShown() then
-		local hasItem, itemLink = GameTooltip:GetItem()
-		if hasItem or itemLink then
-			return false
-		end
 	end
 
 	ns.state.lastFreeSlots = ns.GetFreeSlots()
@@ -142,6 +174,18 @@ ns.AnnounceStatus = AnnounceStatus
 
 local queue, queueHead, queueTail = {}, 1, 0
 
+--[[
+    The open still waiting on its answer. A container the game opens answers
+    with a loot window, so one still unanswered ns.OPEN_ANSWER_TIMEOUT later was
+    refused: a holiday, or another rule no API reports, rules it out for this
+    character. After ns.OPEN_REFUSAL_LIMIT refusals in a row the item is left
+    alone until the next level-up or login, rather than tried every tick into
+    the same red error.
+]]
+local pendingOpenItem, pendingOpenAt = nil, 0
+local refusedOpenCounts = {}
+local refusedItems = {}
+
 local function QueuePush(bag, slot, itemId)
 	queueTail = queueTail + 3
 	queue[queueTail - 2], queue[queueTail - 1], queue[queueTail] = bag, slot, itemId
@@ -169,6 +213,35 @@ local function SafeFastItemID(bag, slot)
 	return link and tonumber(link:match("item:(%d+)"))
 end
 
+local function ShouldOpen(bag, slot, itemId)
+	if ns:IsIgnored(itemId) or refusedItems[itemId] then
+		return false
+	end
+	local allowed = ns.ALLOWED_ITEMS[itemId]
+	if allowed == nil then
+		return false
+	end
+	-- Uncached reads nil and is tried; the refusal count catches it if the game says no.
+	local requiredLevel = select(5, C_Item.GetItemInfo(itemId))
+	if requiredLevel and requiredLevel > UnitLevel("player") then
+		return false
+	end
+	return allowed == true or not ns.IsItemLocked(bag, slot)
+end
+
+-- The last open went unanswered past its timeout, so it counts toward setting its item aside.
+local function CountRefusedOpen()
+	if not pendingOpenItem then
+		return
+	end
+	local count = (refusedOpenCounts[pendingOpenItem] or 0) + 1
+	refusedOpenCounts[pendingOpenItem] = count
+	if count >= ns.OPEN_REFUSAL_LIMIT then
+		refusedItems[pendingOpenItem] = true
+	end
+	pendingOpenItem = nil
+end
+
 local function BuildQueue()
 	wipe(queue)
 	queueHead, queueTail = 1, 0
@@ -176,11 +249,8 @@ local function BuildQueue()
 		local slots = ns.GetContainerNumSlots(bag)
 		for slot = 1, slots or 0 do
 			local itemId = SafeFastItemID(bag, slot)
-			if itemId and not ns:IsIgnored(itemId) then
-				local allowed = ns.AllowedItems[itemId]
-				if allowed == true or (allowed == false and not ns.IsItemLocked(bag, slot)) then
-					QueuePush(bag, slot, itemId)
-				end
+			if itemId and ShouldOpen(bag, slot, itemId) then
+				QueuePush(bag, slot, itemId)
 			end
 		end
 	end
@@ -194,7 +264,7 @@ end
 
     Computed on demand and deliberately not cached — it runs once per tooltip
     render, not per frame, and a cache would need invalidating on every bag,
-    trade, and pick-lock event. IsItemLocked is reached only for ids AllowedItems
+    trade, and pick-lock event. IsItemLocked is reached only for ids ALLOWED_ITEMS
     already marks as needing an unlock, so the tooltip scan costs a handful of
     reads rather than one per bag slot.
 
@@ -209,7 +279,7 @@ function ns.GetLockedBoxes()
 			local itemId = SafeFastItemID(bag, slot)
 			if
 				itemId
-				and ns.AllowedItems[itemId] == false
+				and ns.ALLOWED_ITEMS[itemId] == false
 				and not ns:IsIgnored(itemId)
 				and ns.IsItemLocked(bag, slot)
 			then
@@ -252,29 +322,36 @@ local function OpenTick()
 	if UnitAffectingCombat("player") then
 		return
 	end
-	if UnitCastingInfo("player") or UnitChannelInfo("player") then
+	if IsPlayerCasting() then
 		ns.state.openTimerLive = true
 		C_Timer.After(ns.OPEN_TICK_INTERVAL, OpenTick)
 		return
 	end
-	if not IsSafeToOpen() then
+	if not IsSafeToOpen() or queueHead > queueTail then
 		return
 	end
+	if IsWaitingOnPlayer() then
+		ns.state.openTimerLive = true
+		C_Timer.After(ns.OPEN_TICK_INTERVAL, OpenTick)
+		return
+	end
+	-- The last open's loot may still be on its way; the next one waits for it or for its timeout.
+	if pendingOpenItem and GetTime() - pendingOpenAt < ns.OPEN_ANSWER_TIMEOUT then
+		ns.state.openTimerLive = true
+		C_Timer.After(ns.OPEN_TICK_INTERVAL, OpenTick)
+		return
+	end
+	CountRefusedOpen()
 
 	local bag, slot, cachedId = QueuePop()
-	if not bag then
-		return
-	end
 
-	if SafeFastItemID(bag, slot) == cachedId then
+	if SafeFastItemID(bag, slot) == cachedId and not refusedItems[cachedId] then
+		pendingOpenItem, pendingOpenAt = cachedId, GetTime()
 		ns.UseContainerItem(bag, slot)
 		C_Timer.After(ns.OPEN_RECHECK_DELAY, function()
 			local still = SafeFastItemID(bag, slot)
-			if still == cachedId and not ns:IsIgnored(still) then
-				local allowed = ns.AllowedItems[still]
-				if allowed == true or (allowed == false and not ns.IsItemLocked(bag, slot)) then
-					QueuePush(bag, slot, still)
-				end
+			if still == cachedId and ShouldOpen(bag, slot, still) then
+				QueuePush(bag, slot, still)
 			end
 			if IsSafeToOpen() and not ns.state.openTimerLive and queueHead <= queueTail then
 				ns.state.openTimerLive = true
@@ -300,6 +377,10 @@ end
 ]]
 local function RunScan()
 	ns.state.scanPending = false
+	-- An event can reach here before PLAYER_LOGIN has built the database.
+	if not ns.db then
+		return
+	end
 	ns.state.lastFreeSlots = ns.GetFreeSlots()
 	if ns.isEnabled then
 		local shouldPause = ShouldPause(ns.state.lastFreeSlots)
@@ -362,6 +443,23 @@ function ns.OnWorldLoaded()
 	ns:UpdateMinimapIcon()
 end
 
+-- A loot window answers the last open, so the game took it.
+function ns.OnOpenAnswered()
+	if pendingOpenItem then
+		refusedOpenCounts[pendingOpenItem] = nil
+		pendingOpenItem = nil
+	end
+end
+
+-- A level-up can lift a level requirement, so every item set aside gets another try.
+function ns.OnLevelUp()
+	wipe(refusedItems)
+	wipe(refusedOpenCounts)
+	if ns.isEnabled then
+		ns.ScheduleScan()
+	end
+end
+
 function ns.OnCombatEnded()
 	if ns.isEnabled then
 		ns.ScheduleScan(true)
@@ -400,7 +498,7 @@ function ns.OnBagFullError(errTypeOrID)
 			ns.state.announcedPaused = true
 			ns.state.openTimerLive = false
 			ns:UpdateMinimapIcon()
-			ns:StatusPrint(L["INVENTORY_FULL"])
+			ns:StatusPrint(ERR_INV_FULL)
 			PlayBagFullSound()
 		end
 	end
@@ -420,8 +518,8 @@ end
 function ns.AnnounceLootedContainer(itemId, link)
 	if
 		itemId
-		and ns.AllowedItems
-		and ns.AllowedItems[itemId] == false
+		and ns.ALLOWED_ITEMS
+		and ns.ALLOWED_ITEMS[itemId] == false
 		and not ns:IsIgnored(itemId)
 		and ns.db.profile.autoOpen
 		and LockboxNotificationsEnabled()

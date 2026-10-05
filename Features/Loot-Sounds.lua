@@ -47,24 +47,34 @@ local function CurrentLootFromWorldSource()
 end
 
 --[[
-    Drive lastWorldLootAt, the timestamp that gates the loot sound in
-    ns.PlayLootSound, from the classified source:
+    Open the window the loot sound may play in, which stays open as long as the
+    corpse or chest's loot window does, so a Bind on Pickup item confirmed or an
+    item looted by hand seconds later still sounds:
 
-      world   - stamp now. Run on both LOOT_READY and LOOT_OPENED because the
+      world   - open it. Run on both LOOT_READY and LOOT_OPENED because the
                 source GUID can populate on either and Speedy Loot may empty the
-                slots between them; whichever event sees the world GUID records it.
-      item    - clear the stamp so a disenchant or merge within LOOT_SOUND_WINDOW
-                of a real corpse loot can't reuse that window and play the sound.
+                slots between them; whichever event sees the world GUID opens it.
+      item    - close it outright so a disenchant or merge just after a real
+                corpse loot can't reuse that window and play the sound.
       unknown - leave it alone: a late-arriving world GUID on a later event must
-                still be able to stamp, and a stamp just set for this same corpse
-                must survive an empty or not-yet-populated re-read.
+                still be able to open it, and one just opened for this same
+                corpse must survive an empty or not-yet-populated re-read.
 ]]
 function ns.StampWorldLoot()
 	local source = CurrentLootFromWorldSource()
 	if source == "world" then
-		ns.state.lastWorldLootAt = GetTime()
+		ns.state.worldLootOpen = true
 	elseif source == "item" then
-		ns.state.lastWorldLootAt = 0
+		ns.state.worldLootOpen = false
+		ns.state.worldLootClosedAt = 0
+	end
+end
+
+-- Called from Core's LOOT_CLOSED: loot lines can land just after the window shuts.
+function ns.CloseWorldLoot()
+	if ns.state.worldLootOpen then
+		ns.state.worldLootOpen = false
+		ns.state.worldLootClosedAt = GetTime()
 	end
 end
 
@@ -73,13 +83,18 @@ end
 --------------------------------------------------------------------------------
 
 --[[
-    Only sound off for loot that came from a corpse or chest within the last
-    ns.LOOT_SOUND_WINDOW seconds. Item-produced loot (disenchant, prospect,
-    merge, container opens) never stamps lastWorldLootAt, so it stays silent
-    even though it travels the same loot + CHAT_MSG_LOOT path.
+    Only sound off for loot that came from a corpse or chest: while its loot
+    window is open, or within ns.LOOT_SOUND_WINDOW seconds of its closing.
+    Item-produced loot (disenchant, prospect, merge, container opens) never opens
+    the window, so it stays silent even though it travels the same loot +
+    CHAT_MSG_LOOT path.
 ]]
+local function IsWorldLootWindow()
+	return ns.state.worldLootOpen or (GetTime() - ns.state.worldLootClosedAt) < ns.LOOT_SOUND_WINDOW
+end
+
 function ns.PlayLootSound(link)
-	if ns.db.profile.lootSounds and (GetTime() - ns.state.lastWorldLootAt) < ns.LOOT_SOUND_WINDOW then
+	if ns.db.profile.lootSounds and IsWorldLootWindow() then
 		local quality = ns.GetLinkQuality(link)
 		if quality and quality >= ns.db.profile.lootSoundThreshold then
 			PlaySoundFile(ns.LOOT_SOUND_FILE, "Master")
@@ -123,5 +138,5 @@ function ns.PlayPickPocketSound()
 		return
 	end
 	ns.state.pickPocketAt = 0
-	PlaySound(ns.PICK_POCKET_SOUND, "Master")
+	PlaySound(ns.SOUND_KIT_IDS.PICK_POCKET, "Master")
 end

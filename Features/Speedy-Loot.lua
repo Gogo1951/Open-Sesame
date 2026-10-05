@@ -126,53 +126,63 @@ function ns.HandleSpeedyLoot()
 	end
 
 	--[[
-        Set whenever a slot is left in the loot window — either an ignored item
-        we open manually (e.g. a lockbox) or an item skipped because bags filled
-        up partway through this loop. Drives both re-showing the window and the
-        suppressLootWindow flag below: the window is only suppressed when this
-        pass took everything, so anything left behind stays reachable.
+        Set whenever the window has to stay up: an ignored item we open
+        manually (e.g. a lockbox), an item skipped because bags filled up
+        partway through this loop, or a Bind on Pickup item, whose bind question
+        the client only asks while the loot session is open, so hiding the
+        window would cancel it and leave the item behind. Drives both re-showing
+        the window and the suppressLootWindow flag below: the window is only
+        suppressed when this pass took everything, so anything left behind stays
+        reachable.
     ]]
 	local leftBehind = false
 	local tookItem = false
 
 	for slot = numItems, 1, -1 do
-		if not IsItemLootSlot(slot) then
-			-- Money/currency: no bag cost, always loot.
-			LootSlot(slot)
-		elseif freeSlots > 0 then
-			local link = GetLootSlotLink(slot)
-			local shouldLoot = true
+		-- A locked slot is still being rolled for, or isn't the player's to take yet; its roll window handles it.
+		local locked = select(6, GetLootSlotInfo(slot))
+		if not locked then
+			if not IsItemLootSlot(slot) then
+				-- Money/currency: no bag cost, always loot.
+				LootSlot(slot)
+			elseif freeSlots > 0 then
+				local link = GetLootSlotLink(slot)
+				local shouldLoot = true
 
-			if link then
-				local itemId = tonumber(link:match("item:(%d+)"))
-				if ns:IsIgnored(itemId) then
-					shouldLoot = false
+				if link then
+					local itemId = tonumber(link:match("item:(%d+)"))
+					if ns:IsIgnored(itemId) then
+						shouldLoot = false
 
-					if ns.db.profile.ignoreListNotifications then
-						ns:AnnounceItemOnce("ITEM_OPEN_MANUALLY", itemId, link)
-					end
+						if ns.db.profile.ignoreListNotifications then
+							ns:AnnounceItemOnce("ITEM_OPEN_MANUALLY", itemId, link)
+						end
 
-					--[[
+						--[[
                         We deliberately leave this item in the window for the
                         player to open by hand. Flag it so the window is re-shown
                         below and stays unsuppressed; the single post-loop
                         LootFrame:Show() covers it.
                     ]]
-					leftBehind = true
+						leftBehind = true
+					end
 				end
-			end
 
-			if shouldLoot then
-				LootSlot(slot)
-				freeSlots = freeSlots - 1
-				tookItem = true
-			end
-		else
-			--[[
+				if shouldLoot then
+					LootSlot(slot)
+					freeSlots = freeSlots - 1
+					tookItem = true
+					if link and select(14, C_Item.GetItemInfo(link)) == ns.BIND_ON_PICKUP then
+						leftBehind = true
+					end
+				end
+			else
+				--[[
                 Item slot we can't take: bags filled up earlier in this
                 loop. Flag it so the loot window is re-shown below.
             ]]
-			leftBehind = true
+				leftBehind = true
+			end
 		end
 	end
 

@@ -53,8 +53,12 @@ function ns:RegisterOptionsPanels()
 	AceConfigRegistry:RegisterOptionsTable(ns.OPTIONS_REGISTRY.Profiles, profilesOptions)
 	AceConfigDialog:AddToBlizOptions(ns.OPTIONS_REGISTRY.Profiles, profilesOptions.name, L["ADDON_TITLE"])
 
-	-- Diagnostic Tools registered last so it sits at the bottom of the settings tree.
-	AceConfigRegistry:RegisterOptionsTable(ns.OPTIONS_REGISTRY.Diagnostics, ns.BuildDiagnosticsOptions())
+	--[[
+        Diagnostic Tools registered last so it sits at the bottom of the settings
+        tree, as its builder so every repaint rebuilds it and its tabs come and go
+        with the enable toggle.
+    ]]
+	AceConfigRegistry:RegisterOptionsTable(ns.OPTIONS_REGISTRY.Diagnostics, ns.BuildDiagnosticsOptions)
 	AceConfigDialog:AddToBlizOptions(ns.OPTIONS_REGISTRY.Diagnostics, ns.DiagnosticsStrings.TAB, L["ADDON_TITLE"])
 end
 
@@ -67,8 +71,9 @@ end
     Middle-Click both open here. The combat gate lives only here — Blizzard's
     Settings panel is protected in combat, and without it the player gets an
     ADDON_ACTION_BLOCKED error naming the add-on. Routing uses the category ID
-    captured at registration; passing the title instead returns nil on any client
-    with the Settings API and drops the panel into a floating window.
+    captured at registration. A title lookup fails wherever the category ID is a
+    number assigned at registration (TBC Anniversary today) and falls through to
+    a floating window.
 ]]
 function ns:OpenOptionsPanel()
 	if InCombatLockdown() then

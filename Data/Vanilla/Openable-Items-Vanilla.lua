@@ -1,0 +1,246 @@
+local _, ns = ...
+
+if ns.IS_DISCOVERY then
+	return
+end
+
+-- { [itemId] = opensWithoutUnlock }
+ns.ALLOWED_ITEMS = {
+	[10456] = true, -- A Bulging Coin Purse
+	[15902] = true, -- A Crazy Grab Bag
+	[11883] = true, -- A Dingy Fanny Pack
+	[5335] = true, -- A Sack of Coins (unique: Old Moneybag)
+	[6755] = true, -- A Small Container of Gems (unique: Jewelry Box)
+	[11107] = true, -- A Small Pack (unique: Large Compass, Curled Map Parchment, Lion-headed Key, ...)
+	[21509] = true, -- Ahn'Qiraj War Effort Supplies
+	[21510] = true, -- Ahn'Qiraj War Effort Supplies
+	[21511] = true, -- Ahn'Qiraj War Effort Supplies
+	[21512] = true, -- Ahn'Qiraj War Effort Supplies
+	[21513] = true, -- Ahn'Qiraj War Effort Supplies
+	[22152] = true, -- Anthion's Pouch
+	[20231] = true, -- Arathor Advanced Care Package
+	[20233] = true, -- Arathor Basic Care Package
+	[20236] = true, -- Arathor Standard Care Package
+	[11955] = true, -- Bag of Empty Ooze Containers
+	[20603] = true, -- Bag of Spoils
+	[6356] = true, -- Battered Chest
+	[16882] = false, -- Battered Junkbox
+	[7973] = true, -- Big-mouth Clam
+	[6646] = true, -- Bloated Albacore
+	[6647] = true, -- Bloated Catfish
+	[21163] = true, -- Bloated Firefin
+	[6644] = true, -- Bloated Mackerel
+	[21243] = true, -- Bloated Mightfish
+	[6645] = true, -- Bloated Mud Snapper
+	[21162] = true, -- Bloated Oily Blackmouth
+	[13881] = true, -- Bloated Redgill
+	[21164] = true, -- Bloated Rockscale Cod
+	[13891] = true, -- Bloated Salmon
+	[6643] = true, -- Bloated Smallfish
+	[8366] = true, -- Bloated Trout (Bind on Pickup: Pendant of Myzrael)
+	[17962] = true, -- Blue Sack of Gems (raid bosses: Azuregos, Onyxia, Nefarian, Lord Kazzak, ...)
+	[21812] = true, -- Box of Chocolates
+	[10695] = true, -- Box of Empty Vials (unique: Empty Vial Labeled #1, Empty Vial Labeled #2, Empty Vial Labeled #3, ...)
+	[9541] = true, -- Box of Goodies
+	[9539] = true, -- Box of Rations
+	[9540] = true, -- Box of Spells
+	[6827] = true, -- Box of Supplies
+	[8502] = true, -- Bronze Lotterybox
+	[22746] = true, -- Buccaneer's Uniform
+	[16783] = true, -- Bundle of Reports
+	[21191] = true, -- Carefully Wrapped Present
+	[11887] = true, -- Cenarion Circle Cache
+	[20602] = true, -- Chest of Spoils
+	[21741] = true, -- Cluster Rocket Recipes
+	[21528] = true, -- Colossal Bag of Loot
+	[20808] = true, -- Combat Assignment
+	[15103] = true, -- Corrupt Tested Sample
+	[5738] = true, -- Covert Ops Pack (unique: Remote Detonator (Red), Remote Detonator (Blue), NG-5 Explosives (Red), ...)
+	[9265] = true, -- Cuergo's Hidden Treasure (unique: Cuergo's Gold)
+	[23022] = true, -- Curmudgeon's Payoff
+	[19422] = true, -- Darkmoon Faire Fortune (unique: Sayge's Fortune #23, Sayge's Fortune #24, Sayge's Fortune #25, ...)
+	[191656] = true, -- Death's Essence
+	[20469] = true, -- Decoded True Believer Clippings
+	[20228] = true, -- Defiler's Advanced Care Package
+	[20229] = true, -- Defiler's Basic Care Package
+	[20230] = true, -- Defiler's Standard Care Package
+	[12849] = true, -- Demon Kissed Sack
+	[6351] = true, -- Dented Crate
+	[8647] = true, -- Egg Crate (unique: Extraordinary Egg, Fine Egg, Ordinary Egg, ...)
+	[10752] = true, -- Emerald Encrusted Chest
+	[11617] = true, -- Eridan's Supplies (unique: Book of Aquor, Irontree Heart)
+	[5760] = false, -- Eternium Lockbox
+	[11024] = true, -- Evergreen Herb Casing
+	[11937] = true, -- Fat Sack of Coins (Bind on Pickup: Fire Opal Necklace)
+	[10834] = true, -- Felhound Tracker Kit (unique: Fel Orb)
+	[21363] = true, -- Festive Gift
+	[189421] = true, -- Fire Resist Leather Gear
+	[189419] = true, -- Fire Resist Plate Gear
+	[189420] = true, -- Fire Resist Plate Gear
+	[21131] = true, -- Followup Combat Assignment
+	[20805] = true, -- Followup Logistics Assignment (unique: Logistics Task Briefing I, Logistics Task Briefing II, Logistics Task Briefing III, ...)
+	[21386] = true, -- Followup Logistics Assignment (unique: Logistics Task Briefing I, Logistics Task Briefing II, Logistics Task Briefing III, ...)
+	[21133] = true, -- Followup Tactical Assignment (unique: Tactical Task Briefing X, Tactical Task Briefing II, Tactical Task Briefing IV, ...)
+	[8484] = true, -- Gadgetzan Water Co. Care Package
+	[21310] = true, -- Gaily Wrapped Present
+	[21270] = true, -- Gently Shaken Gift
+	[21271] = true, -- Gently Shaken Gift
+	[21979] = true, -- Gift of Adoration: Darnassus (Bind on Pickup: Box of Chocolates, Bag of Candies, Silver Shafted Arrow, ...)
+	[21980] = true, -- Gift of Adoration: Ironforge (Bind on Pickup: Box of Chocolates, Bag of Candies, Silver Shafted Arrow, ...)
+	[22164] = true, -- Gift of Adoration: Orgrimmar (Bind on Pickup: Box of Chocolates, Bag of Candies, Silver Shafted Arrow, ...)
+	[21981] = true, -- Gift of Adoration: Stormwind (Bind on Pickup: Box of Chocolates, Bag of Candies, Silver Shafted Arrow, ...)
+	[22165] = true, -- Gift of Adoration: Thunder Bluff (Bind on Pickup: Box of Chocolates, Bag of Candies, Silver Shafted Arrow, ...)
+	[22166] = true, -- Gift of Adoration: Undercity (Bind on Pickup: Box of Chocolates, Bag of Candies, Silver Shafted Arrow, ...)
+	[22167] = true, -- Gift of Friendship: Darnassus
+	[22168] = true, -- Gift of Friendship: Ironforge
+	[22169] = true, -- Gift of Friendship: Orgrimmar
+	[22170] = true, -- Gift of Friendship: Stormwind
+	[22171] = true, -- Gift of Friendship: Thunder Bluff
+	[22172] = true, -- Gift of Friendship: Undercity
+	[8049] = true, -- Gnarlpine Necklace (unique: Tallonkai's Jewel)
+	[11423] = true, -- Gnome Engineer's Renewal Gift
+	[5857] = true, -- Gnome Prize Box
+	[11422] = true, -- Goblin Engineer's Renewal Gift
+	[5858] = true, -- Goblin Prize Box
+	[17964] = true, -- Gray Sack of Gems (raid bosses: Azuregos, Onyxia, Nefarian, Lord Kazzak, ...)
+	[19296] = true, -- Greater Darkmoon Prize
+	[17963] = true, -- Green Sack of Gems (raid bosses: Azuregos, Onyxia, Nefarian, Lord Kazzak, ...)
+	[10773] = true, -- Hakkari Urn
+	[4633] = false, -- Heavy Bronze Lockbox
+	[8503] = true, -- Heavy Bronze Lotterybox
+	[13874] = true, -- Heavy Crate
+	[8505] = true, -- Heavy Iron Lotterybox
+	[16885] = false, -- Heavy Junkbox
+	[8507] = true, -- Heavy Mithril Lotterybox
+	[22648] = true, -- Hive'Ashi Dossier (unique: Combat Task Briefing XII, Combat Task Briefing III, Combat Task Briefing I, ...)
+	[22649] = true, -- Hive'Regal Dossier (unique: Combat Task Briefing VIII, Combat Task Briefing IX, Combat Task Briefing X, ...)
+	[22650] = true, -- Hive'Zora Dossier (unique: Combat Task Briefing IV, Combat Task Briefing V, Combat Task Briefing VI, ...)
+	[10569] = true, -- Hoard of the Black Dragonflight (unique: Preserved Threshadon Meat, Preserved Pheromone Mixture)
+	[20367] = true, -- Hunting Gear
+	[9529] = true, -- Internal Warrior Equipment Kit L25
+	[9532] = true, -- Internal Warrior Equipment Kit L30
+	[21150] = true, -- Iron Bound Trunk
+	[4634] = false, -- Iron Lockbox
+	[8504] = true, -- Iron Lotterybox
+	[13875] = false, -- Ironbound Locked Chest
+	[10479] = true, -- Kovic's Trading Satchel
+	[10595] = true, -- Kum'isha's Junk
+	[12122] = true, -- Kum'isha's Junk
+	[19035] = true, -- Lard's Special Picnic Basket
+	[21743] = true, -- Large Cluster Rocket Recipes
+	[21742] = true, -- Large Rocket Recipes
+	[19297] = true, -- Lesser Darkmoon Prize
+	[21132] = true, -- Logistics Assignment (unique: Logistics Task Briefing X, Logistics Task Briefing IV, Logistics Task Briefing V, ...)
+	[21266] = true, -- Logistics Assignment (unique: Logistics Task Briefing IV, Logistics Task Briefing VI, Logistics Task Briefing VII, ...)
+	[18804] = true, -- Lord Grayson's Satchel (unique: Divination Scryer, Blessed Arcanite Barding)
+	[21746] = true, -- Lucky Red Envelope
+	[21640] = true, -- Lunar Festival Fireworks Pack
+	[6307] = true, -- Message in a Bottle
+	[19298] = true, -- Minor Darkmoon Prize
+	[21228] = true, -- Mithril Bound Trunk
+	[5758] = false, -- Mithril Lockbox
+	[8506] = true, -- Mithril Lotterybox
+	[189427] = true, -- More Raid Consumables
+	[22320] = true, -- Mux's Quality Goods
+	[19425] = true, -- Mysterious Lockbox
+	[21042] = true, -- Narain's Special Kit
+	[15876] = true, -- Nathanos' Chest (unique: Rotten Apple)
+	[9537] = true, -- Neatly Wrapped Box
+	[20768] = true, -- Oozing Bag (unique: Disgusting Oozeling)
+	[4632] = false, -- Ornate Bronze Lockbox
+	[19153] = true, -- Outrider Advanced Care Package
+	[19154] = true, -- Outrider Basic Care Package
+	[19155] = true, -- Outrider Standard Care Package
+	[11912] = true, -- Package of Empty Ooze Containers
+	[9276] = true, -- Pirate's Footlocker (unique: Captain's Key, Ship Schedule)
+	[22155] = true, -- Pledge of Adoration: Darnassus (Bind on Pickup: Box of Chocolates, Bag of Candies, Silver Shafted Arrow, ...)
+	[22154] = true, -- Pledge of Adoration: Ironforge (Bind on Pickup: Box of Chocolates, Bag of Candies, Silver Shafted Arrow, ...)
+	[22156] = true, -- Pledge of Adoration: Orgrimmar (Bind on Pickup: Box of Chocolates, Bag of Candies, Silver Shafted Arrow, ...)
+	[21975] = true, -- Pledge of Adoration: Stormwind (Bind on Pickup: Box of Chocolates, Bag of Candies, Silver Shafted Arrow, ...)
+	[22158] = true, -- Pledge of Adoration: Thunder Bluff (Bind on Pickup: Box of Chocolates, Bag of Candies, Silver Shafted Arrow, ...)
+	[22157] = true, -- Pledge of Adoration: Undercity (Bind on Pickup: Box of Chocolates, Bag of Candies, Silver Shafted Arrow, ...)
+	[22159] = true, -- Pledge of Friendship: Darnassus
+	[22160] = true, -- Pledge of Friendship: Ironforge
+	[22161] = true, -- Pledge of Friendship: Orgrimmar
+	[22178] = true, -- Pledge of Friendship: Stormwind
+	[22162] = true, -- Pledge of Friendship: Thunder Bluff
+	[22163] = true, -- Pledge of Friendship: Undercity
+	[13247] = true, -- Quartermaster Zigris' Footlocker
+	[189426] = true, -- Raid Consumables
+	[17969] = true, -- Red Sack of Gems (raid bosses: Azuregos, Onyxia, Nefarian, Lord Kazzak, ...)
+	[13918] = false, -- Reinforced Locked Chest
+	[4638] = false, -- Reinforced Steel Lockbox
+	[6715] = true, -- Ruined Jumper Cables
+	[18636] = true, -- Ruined Jumper Cables XL
+	[11938] = true, -- Sack of Gems
+	[20601] = true, -- Sack of Spoils
+	[21156] = true, -- Scarab Bag
+	[7190] = true, -- Scorched Rocket Boots
+	[20767] = true, -- Scum Covered Bag (Bind on Pickup: Plans: Wicked Mithril Blade)
+	[22568] = true, -- Sealed Craftsman's Writ
+	[6357] = true, -- Sealed Crate
+	[19152] = true, -- Sentinel Advanced Care Package
+	[19150] = true, -- Sentinel Basic Care Package
+	[19151] = true, -- Sentinel Standard Care Package
+	[20766] = true, -- Slimy Bag
+	[5523] = true, -- Small Barnacled Clam
+	[15699] = true, -- Small Brown-wrapped Package
+	[6353] = true, -- Small Chest
+	[6354] = false, -- Small Locked Chest
+	[21740] = true, -- Small Rocket Recipes
+	[11966] = true, -- Small Sack of Coins
+	[21216] = true, -- Smokywood Pastures Extra-Special Gift
+	[17727] = true, -- Smokywood Pastures Gift Pack
+	[17685] = true, -- Smokywood Pastures Sampler
+	[17726] = true, -- Smokywood Pastures Special Gift
+	[21315] = true, -- Smokywood Satchel (unique: Pouch of Reindeer Dust, Metzen's Letters and Notes)
+	[15874] = true, -- Soft-shelled Clam
+	[9363] = true, -- Sparklematic-Wrapped Box
+	[4637] = false, -- Steel Lockbox
+	[11442] = true, -- Stormwind Deputy Kit
+	[4636] = false, -- Strong Iron Lockbox
+	[16884] = false, -- Sturdy Junkbox
+	[6355] = false, -- Sturdy Locked Chest
+	[23224] = true, -- Summer Gift Package
+	[20809] = true, -- Tactical Assignment (unique: Tactical Task Briefing IX, Tactical Task Briefing VI, Tactical Task Briefing VII, ...)
+	[7209] = false, -- Tazan's Satchel
+	[7870] = true, -- Thaumaturgy Vessel Lockbox
+	[12033] = false, -- Thaurissan Family Jewels
+	[5524] = true, -- Thick-shelled Clam
+	[7868] = false, -- Thieven' Kit
+	[5759] = false, -- Thorium Lockbox
+	[21327] = true, -- Ticking Present
+	[20708] = true, -- Tightly Sealed Trunk
+	[11568] = true, -- Torwa's Pouch (unique: Preserved Threshadon Meat, Preserved Pheromone Mixture)
+	[20393] = true, -- Treat Bag
+	[15102] = true, -- Un'Goro Tested Sample
+	[12339] = true, -- Vaelan's Gift (unique: Orb of Draconic Energy, Unforged Seal of Ascension)
+	[6352] = true, -- Waterlogged Crate (Bind on Pickup: Hammer of the Vesper)
+	[21113] = true, -- Watertight Trunk
+	[16883] = false, -- Worn Junkbox
+	[17965] = true, -- Yellow Sack of Gems (raid bosses: Azuregos, Onyxia, Nefarian, Lord Kazzak, ...)
+	[22137] = true, -- Ysida's Satchel
+}
+
+--[[
+How We Got the Data
+
+Last Validated
+	Never. Copied from GogoLoot's Data/Vanilla/, last validated there 2026-10-04, Classic Era 1.15.9.70003.
+
+Notes
+	- Every item this client can open, keyed by item ID. true opens on sight; false is a locked container, which Auto-Opening opens once a Rogue has picked it and ns.IsItemLocked stops reading it as locked (Features/Auto-Opening.lua).
+	- Which containers Open Sesame leaves alone is the Ignore List's business (ns.DEFAULT_IGNORE_ITEMS seeds it), not this table's: an ignored row is still true here.
+	- Copied by script from GogoLoot's Data/Vanilla/Openable-Items-Vanilla.lua, whose rows GogoLoot pulled from this client's own tables: every item flagged Openable (the flag behind "<Right Click to Open>"), less bags, equippable items, and test and placeholder items. GogoLoot's ns.OPENING_UNLOCKED rows are false here; every other default is true.
+	- Season of Discovery's items, the Classic Era IDs first seen after build 1.14.4.51829, are Data/Discovery's alone.
+	- Every ns.LOCKBOX_SKILL_LEVELS row is a false row here, and every ns.DEFAULT_IGNORE_ITEMS row a true one.
+
+SQL (CMaNGOS)
+	TODO: Add SQL Query
+
+Wowhead
+	None.
+
+wago.tools
+	https://wago.tools/db2/ItemSparse?build=1.15.9.69722
+]]

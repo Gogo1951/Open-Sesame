@@ -1,70 +1,78 @@
--- .luacheckrc
 std = "lua51"
 max_line_length = false -- StyLua owns formatting
 ignore = { "212/self", "611", "612", "613", "614", "621" } -- implicit self (house ns: methods) + whitespace — StyLua owns the latter
-exclude_files = { "Includes/" } -- vendored, never linted
+exclude_files = { "Includes/", ".claude/" } -- vendored or session-local, never linted
 read_globals = {
-	-- Libraries
-	"LibStub",
-
-	-- Namespaces
+	"AuctionFrame",
+	"AuctionHouseFrame",
+	"BankFrame",
 	"C_AddOns",
-	"C_CVar",
 	"C_Container",
+	"C_CVar",
 	"C_EventUtils",
 	"C_Item",
 	"C_PartyInfo",
+	"C_QuestLog",
 	"C_Seasons",
+	"C_Secrets",
 	"C_Spell",
 	"C_Timer",
+	"C_TooltipInfo",
+	"C_TradeSkillUI",
 	"C_UnitAuras",
-	"Enum",
-	"Settings",
-
-	-- Client info, timing, and add-on metadata
-	"GetBuildInfo",
-	"GetLocale",
-	"GetTime",
-
-	-- Frames and UI
-	"AuctionFrame",
-	"BankFrame",
 	"CreateFrame",
-	"DEFAULT_CHAT_FRAME",
-	"GameFontNormal",
+	"Enum",
+	"ERR_INV_FULL",
 	"GameTooltip",
-	"GetPhysicalScreenSize",
-	"GossipFrame",
-	"GuildBankFrame",
-	"LootFrame",
-	"MailFrame",
-	"MerchantFrame",
-	"QuestFrame",
-	"StaticPopup1",
-	"TradeFrame",
-	"UIParent",
-	"WorldFrame",
-
-	-- Loot
+	"GetBuildInfo",
+	"GetItemStats",
+	"GetLocale",
+	"GetLootSlotInfo",
 	"GetLootSlotLink",
 	"GetLootSlotType",
 	"GetLootSourceInfo",
 	"GetLootThreshold",
 	"GetNumLootItems",
-	"LootSlot",
-	"LOOT_SLOT_ITEM",
-
-	-- Player state
 	"GetNumSkillLines",
+	"GetPhysicalScreenSize",
 	"GetSkillLineInfo",
+	"GetTime",
+	"GossipFrame",
+	"GuildBankFrame",
+	"hooksecurefunc",
 	"InCombatLockdown",
 	"IsInGroup",
 	"IsInInstance",
 	"IsModifiedClick",
 	"IsPlayerSpell",
 	"IsShiftKeyDown",
-	"IsStealthed",
 	"IsSpellKnown",
+	"IsStealthed",
+	"ITEM_MIN_SKILL",
+	"ITEM_QUALITY0_DESC",
+	"ITEM_QUALITY1_DESC",
+	"ITEM_QUALITY2_DESC",
+	"ITEM_QUALITY3_DESC",
+	"ITEM_QUALITY4_DESC",
+	"ITEM_QUALITY_COLORS",
+	"LE_GAME_ERR_INV_FULL",
+	"LibStub",
+	"LOCKED",
+	"LOOT_ITEM_PUSHED_SELF",
+	"LOOT_ITEM_SELF",
+	"LOOT_SLOT_ITEM",
+	"LootFrame",
+	"LootSlot",
+	"MailFrame",
+	"MerchantFrame",
+	"PlaySound",
+	"PlaySoundFile",
+	"QuestFrame",
+	"securecallfunction",
+	"Settings",
+	"StaticPopup1",
+	"TradeFrame",
+	"UIParent",
 	"UnitAffectingCombat",
 	"UnitCastingInfo",
 	"UnitChannelInfo",
@@ -72,40 +80,10 @@ read_globals = {
 	"UnitLevel",
 	"UnitRace",
 	"UnitSex",
-
-	-- Sound
-	"PlaySound",
-	"PlaySoundFile",
-
-	-- Tooltips
-	"hooksecurefunc",
-
-	-- Localized client strings and enums
-	"ITEM_QUALITY0_DESC",
-	"ITEM_QUALITY1_DESC",
-	"ITEM_QUALITY2_DESC",
-	"ITEM_QUALITY3_DESC",
-	"ITEM_QUALITY4_DESC",
-	"ITEM_MIN_SKILL",
-	"ITEM_STARTS_QUEST",
-	"GOLD_AMOUNT",
-	"SILVER_AMOUNT",
-	"COPPER_AMOUNT",
-	"GOLD_AMOUNT_SYMBOL",
-	"SILVER_AMOUNT_SYMBOL",
-	"COPPER_AMOUNT_SYMBOL",
-	"ITEM_QUALITY_COLORS",
-	"LE_GAME_ERR_INV_FULL",
-	"LOCKED",
-	"LOOT_ITEM_PUSHED_SELF",
-	"LOOT_ITEM_SELF",
-
-	-- Lua 5.1 globals the client provides
 	"wipe",
+	"WorldFrame",
 }
 globals = {
-	-- The add-on's own sanctioned globals: its SavedVariables table and its
-	-- slash registration. Nothing else.
 	"OpenSesameDB",
 	"SLASH_OPENSESAME1",
 	"SlashCmdList",
