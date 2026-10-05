@@ -1,8 +1,19 @@
+# Open Sesame Is Now Part of GogoLoot
+
+This is the final release of Open Sesame. All of its features have been merged into GogoLoot.
+
+You will need to install GogoLoot to keep receiving updates. Once it's installed, you can safely remove Open Sesame.
+
+### Download GogoLoot
+
+* [GogoLoot on CurseForge](https://www.curseforge.com/wow/addons/gogoloot)
+* [GogoLoot on Wago](https://addons.wago.io/addons/gogoloot)
+
 # Open Sesame
 
-Automatically open clams, containers, and unlocked lockboxes in your bags, no clicking required. Speedy Loot hides the loot window for faster auto loot, and Loot Toasts show every pickup so your eyes stay on the fight. Fast, efficient looting.
+Automatically open clams, containers, and unlocked lockboxes in your bags, no clicking required. Speedy Loot hides the loot window for faster auto loot. Fast, efficient looting.
 
-**TL;DR:** Clams and containers open themselves, corpses empty without the loot window, and toasts show what you got. Less clicking, more killing.
+**TL;DR:** Clams and containers open themselves, and corpses empty without the loot window. Less clicking, more killing.
 
 ## Features
 
@@ -12,7 +23,7 @@ Automatically open clams, containers, and unlocked lockboxes in your bags, no cl
 
 ⚡ **Speedy Loot** // Hides the loot window so you can pick up loot near-instantly.
 
-🔊 **Loot Notifications** // On-screen toasts log every pickup and a distinct chime plays for the good stuff, both yours to tune or turn off.
+🔊 **Loot Sounds** // A distinct chime plays for the good stuff, and a bag sound when Pick Pocket actually takes something, both yours to tune or turn off.
 
 🦺 **Safety First** // Combat, casting, low bag space, Bind on Pickup, and raid-boss containers are all skipped automatically, so your bags stay protected.
 
@@ -22,7 +33,7 @@ Automatically open clams, containers, and unlocked lockboxes in your bags, no cl
 2. Log in. Open Sesame switches Auto Loot on for you, since it can't work without it, and starts opening straight away.
 3. Go kill something. Your bags will be tidier than when you started.
 4. Left-click the mini-map button to toggle Auto-Opening, right-click for Speedy Loot, middle-click for Loot Sounds.
-5. Type `/os` to fine-tune: where Auto-Opening runs, how Loot Toasts look, and which containers to leave alone.
+5. Type `/os` to fine-tune: where Auto-Opening runs, which loot plays a sound, and which containers to leave alone.
 6. *"Frankly, my dear, I don't give a clam."*
 
 ## How It Works
@@ -34,14 +45,6 @@ Automatically open clams, containers, and unlocked lockboxes in your bags, no cl
 - **Pauses when bags get tight** // Auto-Opening stops below four free slots and resumes once you make room.
 - **Skips your Ignore List** // Seeded with the containers usually worth more sealed, like raid gem sacks and crates holding Bind on Pickup gear.
 - **Stands down** // In combat, mid-cast, stealthed, or at a vendor, mailbox, bank, auction house, or trade window. Speedy Loot also steps aside under master loot.
-
-### Loot Toasts
-
-- **Every pickup, at a glance** // Each item and coin pickup gets a brief on-screen toast, so hiding the loot window never costs you a thing.
-- **Put it where you want it** // Drag the stack anywhere, then set the font, size, outline, duration, row count, and which way it grows.
-- **The good stuff always shows** // Raise the minimum quality, and quest items, recipes, mounts, pets, keys, bags, Bind on Pickup items, and containers still get a toast.
-
-<img width="400" src="https://github.com/user-attachments/assets/7e3dc009-ba1e-42bd-98e4-9fe3f65a57c3" />
 
 ### Mini-Map Button
 
@@ -58,7 +61,7 @@ Automatically open clams, containers, and unlocked lockboxes in your bags, no cl
 ### Options
 
 - **Open Sesame** // Welcome message, mini-map button, and the master switches for Auto-Opening and Speedy Loot. Auto-Opening can be limited to outside instances, or to solo play.
-- **Notifications** // The loot chime and its minimum quality, a separate Pick Pocket sound, and every Loot Toast setting: position, font, size, duration, and which pickups always show.
+- **Notifications** // The loot chime and its minimum quality, and a separate Pick Pocket sound.
 - **Lockboxes** // Tooltip skill lines and chat notices, shown to rogues only or to every character.
 - **Ignore List** // Drag in an item, or paste a link or item ID, to leave it alone for good. Shared across your characters, with one-click restore of the defaults.
 - **Profiles** // The standard profile controls.
