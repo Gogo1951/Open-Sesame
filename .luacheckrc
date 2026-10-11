@@ -86,5 +86,5 @@ read_globals = {
 globals = {
 	"OpenSesameDB",
 	"SLASH_OPENSESAME1",
-	"SlashCmdList",
+	SlashCmdList = { fields = { "OPENSESAME" } }, -- a field, so only the add-on's own slash entry is writable
 }
