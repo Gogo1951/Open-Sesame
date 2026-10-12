@@ -32,6 +32,9 @@ ignore:
   - .pkgmeta
   - .vscode
   - LICENSE
+  - README-Notes.md
+  - README-Technical.md
+  - README-Testing.md
   - Tests
   - Data/Wrath
   - Data/Mists
